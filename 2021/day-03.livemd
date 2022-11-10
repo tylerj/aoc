@@ -55,3 +55,59 @@ To begin, [get your puzzle input](https://adventofcode.com/2021/day/3/input).
 ```elixir
 input = Kino.Input.textarea("Please paste your input file:")
 ```
+
+```elixir
+list =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n", trim: true)
+
+[sample | _] = list
+initial_counts = List.duplicate(0, String.length(sample))
+```
+
+```elixir
+counts =
+  Enum.reduce(
+    list,
+    initial_counts,
+    fn item, counts ->
+      item
+      |> String.to_charlist()
+      |> Enum.with_index()
+      |> Enum.reduce(counts, fn
+        {?0, index}, acc ->
+          List.update_at(acc, index, &(&1 - 1))
+
+        {?1, index}, acc ->
+          List.update_at(acc, index, &(&1 + 1))
+      end)
+    end
+  )
+```
+
+```elixir
+{gamma_rate, _} =
+  Enum.map(counts, fn
+    x when x > 0 -> "1"
+    x when x < 0 -> "0"
+  end)
+  |> Enum.join()
+  |> Integer.parse(2)
+```
+
+```elixir
+{epsilon_rate, _} =
+  Enum.map(counts, fn
+    x when x < 0 -> "1"
+    x when x > 0 -> "0"
+  end)
+  |> Enum.join()
+  |> Integer.parse(2)
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+gamma_rate * epsilon_rate
+```
