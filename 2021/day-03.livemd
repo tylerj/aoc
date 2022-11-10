@@ -63,34 +63,33 @@ list =
   |> String.split("\n", trim: true)
 
 [sample | _] = list
-initial_counts = List.duplicate(0, String.length(sample))
 ```
 
 ```elixir
-counts =
-  Enum.reduce(
-    list,
-    initial_counts,
-    fn item, counts ->
-      item
-      |> String.to_charlist()
-      |> Enum.with_index()
-      |> Enum.reduce(counts, fn
-        {?0, index}, acc ->
-          List.update_at(acc, index, &(&1 - 1))
+defmodule Foo do
+  def count_digits_at_index(list, index) do
+    Enum.reduce(list, {0, 0}, fn item, count ->
+      increase_count(String.at(item, index), count)
+    end)
+  end
 
-        {?1, index}, acc ->
-          List.update_at(acc, index, &(&1 + 1))
-      end)
-    end
-  )
+  def increase_count("0", {c0, c1}), do: {c0 + 1, c1}
+  def increase_count("1", {c0, c1}), do: {c0, c1 + 1}
+end
+```
+
+```elixir
+digit_counts =
+  for i <- 1..String.length(sample) do
+    Foo.count_digits_at_index(list, i - 1)
+  end
 ```
 
 ```elixir
 {gamma_rate, _} =
-  Enum.map(counts, fn
-    x when x > 0 -> "1"
-    x when x < 0 -> "0"
+  Enum.map(digit_counts, fn
+    {c0, c1} when c0 > c1 -> "0"
+    _ -> "1"
   end)
   |> Enum.join()
   |> Integer.parse(2)
@@ -98,9 +97,9 @@ counts =
 
 ```elixir
 {epsilon_rate, _} =
-  Enum.map(counts, fn
-    x when x < 0 -> "1"
-    x when x > 0 -> "0"
+  Enum.map(digit_counts, fn
+    {c0, c1} when c0 < c1 -> "0"
+    _ -> "1"
   end)
   |> Enum.join()
   |> Integer.parse(2)
@@ -162,5 +161,65 @@ Use the binary numbers in your diagnostic report to calculate the oxygen generat
 ## Part Two: Solution
 
 ```elixir
+# o2_rating
+[o2_rating] =
+  Enum.reduce_while(1..String.length(sample), list, fn
+    _idx, [_] = acc ->
+      {:halt, acc}
 
+    index, acc ->
+      # IO.inspect(acc, label: "NEW LIST IDX #{index}")
+
+      keep_digit =
+        case Foo.count_digits_at_index(acc, index - 1) do
+          {c0, c1} when c1 >= c0 -> "1"
+          _ -> "0"
+        end
+
+      # IO.inspect(keep_digit, label: "KEEPING DIGIT")
+      {
+        :cont,
+        Enum.filter(acc, &(String.at(&1, index - 1) == keep_digit))
+      }
+  end)
 ```
+
+```elixir
+# co2_rating
+[co2_rating] =
+  Enum.reduce_while(1..String.length(sample), list, fn
+    _idx, [_] = acc ->
+      {:halt, acc}
+
+    index, acc ->
+      # IO.inspect(acc, label: "NEW LIST IDX #{index}")
+
+      keep_digit =
+        case Foo.count_digits_at_index(acc, index - 1) do
+          {c0, c1} when c0 <= c1 -> "0"
+          _ -> "1"
+        end
+
+      # IO.inspect(keep_digit, label: "KEEPING DIGIT")
+      {
+        :cont,
+        Enum.filter(acc, &(String.at(&1, index - 1) == keep_digit))
+      }
+  end)
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+with {o2, _} <- Integer.parse(o2_rating, 2), {co2, _} <- Integer.parse(co2_rating, 2) do
+  o2 * co2
+end
+```
+
+#### Your puzzle answer was 1353024.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/3/input).
