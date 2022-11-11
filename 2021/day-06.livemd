@@ -1,7 +1,15 @@
+<!-- livebook:{"persist_outputs":true} -->
+
 # Advent of Code - Day 6: Lanternfish
 
 ```elixir
 Mix.install([:kino])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
 ```
 
 ## Day 6: Lanternfish
@@ -84,6 +92,13 @@ fish_list =
   |> Enum.map(&String.to_integer/1)
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+[1, 1, 3, 5, 1, 1, 1, 4, 1, 5, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 2, 5, 1, 1, 1, 1, 1, 2, 1, 4, 1,
+ 4, 1, 1, 1, 1, 1, 3, 1, 1, 5, 1, 1, 1, 4, 1, 1, 1, ...]
+```
+
 ```elixir
 defmodule LF do
   defstruct state: [], day: 0
@@ -111,12 +126,24 @@ defmodule LF do
 end
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+{:module, LF, <<70, 79, 82, 49, 0, 0, 14, ...>>, {:increment_state, 1}}
+```
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
 %LF{state: fish_list}
 |> LF.increment_days(80)
 |> then(fn x -> length(x.state) end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+396210
 ```
 
 #### Your puzzle answer was `396210`.
@@ -139,6 +166,13 @@ This will take too long / too much memory to keep track of the state of all of t
 
 ```elixir
 fish_list
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[1, 1, 3, 5, 1, 1, 1, 4, 1, 5, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 2, 5, 1, 1, 1, 1, 1, 2, 1, 4, 1,
+ 4, 1, 1, 1, 1, 1, 3, 1, 1, 5, 1, 1, 1, 4, 1, 1, 1, ...]
 ```
 
 ```elixir
@@ -191,16 +225,66 @@ defmodule LF do
 end
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+{:module, LF, <<70, 79, 82, 49, 0, 0, 18, ...>>, {:update_size, 1}}
+```
+
 ```elixir
 # Check that we still get the same answer as the implementation in Part 1:
 
 fish_list |> LF.init() |> LF.increment_days(80)
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+%LF{
+  count: %{
+    0 => 13735,
+    1 => 63203,
+    2 => 23096,
+    3 => 56872,
+    4 => 47378,
+    5 => 40300,
+    6 => 83877,
+    7 => 15723,
+    8 => 52026
+  },
+  start: [1, 1, 3, 5, 1, 1, 1, 4, 1, 5, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 2, 5, 1, 1, 1, 1, 1, 2,
+   1, 4, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 5, 1, 1, 1, 4, 1, ...],
+  day: 80,
+  size: 396210
+}
+```
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
 fish_list |> LF.init() |> LF.increment_days(256)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%LF{
+  count: %{
+    0 => 146712818362,
+    1 => 184289328857,
+    2 => 188786353928,
+    3 => 202168881355,
+    4 => 242460747479,
+    5 => 225357049672,
+    6 => 298390113008,
+    7 => 119908149078,
+    8 => 162750099757
+  },
+  start: [1, 1, 3, 5, 1, 1, 1, 4, 1, 5, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 2, 5, 1, 1, 1, 1, 1, 2,
+   1, 4, 1, 4, 1, 1, 1, 1, 1, 3, 1, 1, 5, 1, 1, 1, 4, 1, ...],
+  day: 256,
+  size: 1770823541496
+}
 ```
 
 ### How many lanternfish would there be after 256 days?
