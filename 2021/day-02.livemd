@@ -1,3 +1,5 @@
+<!-- livebook:{"persist_outputs":true} -->
+
 # Advent of Code - Day 2: Dive!
 
 ```elixir
@@ -49,6 +51,8 @@ Calculate the horizontal position and depth you would have after following the p
 
 ### What do you get if you multiply your final horizontal position by your final depth?
 
+To begin, [get your puzzle input](https://adventofcode.com/2021/day/2/input).
+
 ## Part One: Solution
 
 ```elixir
@@ -72,6 +76,12 @@ defmodule Submarine do
 end
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Submarine, <<70, 79, 82, 49, 0, 0, 9, ...>>, {:move, 2}}
+```
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
@@ -82,6 +92,15 @@ commands =
   |> Stream.map(&String.split/1)
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+#Stream<[
+  enum: #Function<63.124013645/2 in Stream.unfold/2>,
+  funs: [#Function<48.124013645/1 in Stream.map/2>]
+]>
+```
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
@@ -90,6 +109,12 @@ commands
 |> then(fn
   {horizontal, depth} -> horizontal * depth
 end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1727835
 ```
 
 #### Your puzzle answer was `1727835`.
@@ -142,12 +167,24 @@ defmodule Submarine do
 end
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Submarine, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:move, 2}}
+```
+
 ```elixir
 commands
 |> Enum.reduce({0, 0, 0}, &Submarine.move/2)
 |> then(fn
   {horizontal, depth, _aim} -> horizontal * depth
 end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1544000595
 ```
 
 #### Your puzzle answer was `1544000595`.

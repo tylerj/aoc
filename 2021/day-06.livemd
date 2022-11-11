@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Day 6: Lanternfish
 
 * [AOC Link](https://adventofcode.com/2021/day/6)

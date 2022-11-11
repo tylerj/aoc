@@ -1,3 +1,5 @@
+<!-- livebook:{"persist_outputs":true} -->
+
 # Advent of Code - Day 3: Binary Diagnostic
 
 ```elixir
@@ -46,7 +48,11 @@ So, the gamma rate is the binary number 10110, or **22** in decimal.
 
 The epsilon rate is calculated in a similar way; rather than use the most common bit, the least common bit from each position is used. So, the epsilon rate is 01001, or **9** in decimal. Multiplying the gamma rate (22) by the epsilon rate (9) produces the power consumption, **198**.
 
-Use the binary numbers in your diagnostic report to calculate the gamma rate and epsilon rate, then multiply them together. **What is the power consumption of the submarine?** (Be sure to represent your answer in decimal, not binary.)
+Use the binary numbers in your diagnostic report to calculate the gamma rate and epsilon rate, then multiply them together.
+
+### What is the power consumption of the submarine?
+
+(Be sure to represent your answer in decimal, not binary.)
 
 To begin, [get your puzzle input](https://adventofcode.com/2021/day/3/input).
 
@@ -65,6 +71,20 @@ list =
 [sample | _] = list
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+["101111101000", "110110011100", "010111111000", "010101000001", "011000000001", "100001111001",
+ "000000001010", "010110111001", "111000011000", "001101010111", "010101110100", "100100010111",
+ "001100010100", "010110010000", "011101001010", "100101111110", "110010100011", "100110000011",
+ "100100000100", "110000000011", "100101000000", "111011010001", "010000101111", "001100001100",
+ "110010101001", "001000001111", "111100001000", "100011111110", "101110011111", "100001001010",
+ "011110111100", "101010000000", "000101000110", "101000000111", "111010000001", "111111101101",
+ "011111100010", "000100111111", "001000111000", "001101100100", "101100010111", "100011101010",
+ "110100101001", "110011001010", "110100001110", "011110011011", "001111001110", "100110011011",
+ "101011011110", "110101000001", ...]
+```
+
 ```elixir
 defmodule Foo do
   def count_digits_at_index(list, index) do
@@ -78,11 +98,36 @@ defmodule Foo do
 end
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Foo, <<70, 79, 82, 49, 0, 0, 9, ...>>, {:increase_count, 2}}
+```
+
 ```elixir
 digit_counts =
   for i <- 1..String.length(sample) do
     Foo.count_digits_at_index(list, i - 1)
   end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {507, 493},
+  {501, 499},
+  {507, 493},
+  {487, 513},
+  {527, 473},
+  {517, 483},
+  {512, 488},
+  {495, 505},
+  {483, 517},
+  {495, 505},
+  {508, 492},
+  {529, 471}
+]
 ```
 
 ```elixir
@@ -95,6 +140,12 @@ digit_counts =
   |> Integer.parse(2)
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+{284, ""}
+```
+
 ```elixir
 {epsilon_rate, _} =
   Enum.map(digit_counts, fn
@@ -105,10 +156,22 @@ digit_counts =
   |> Integer.parse(2)
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+{3811, ""}
+```
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
 gamma_rate * epsilon_rate
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1082324
 ```
 
 #### Your puzzle answer was 1082324.
@@ -184,6 +247,12 @@ Use the binary numbers in your diagnostic report to calculate the oxygen generat
   end)
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+["000111100110"]
+```
+
 ```elixir
 # co2_rating
 [co2_rating] =
@@ -208,12 +277,24 @@ Use the binary numbers in your diagnostic report to calculate the oxygen generat
   end)
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+["101011100000"]
+```
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
 with {o2, _} <- Integer.parse(o2_rating, 2), {co2, _} <- Integer.parse(co2_rating, 2) do
   o2 * co2
 end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1353024
 ```
 
 #### Your puzzle answer was 1353024.
