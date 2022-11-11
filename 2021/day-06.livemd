@@ -77,8 +77,48 @@ input = Kino.Input.textarea("Please paste your input file:")
 ```
 
 ```elixir
-coord =
+fish_list =
   input
   |> Kino.Input.read()
-  |> String.split("\n", trim: true)
+  |> String.split(",", trim: true)
+  |> Enum.map(&String.to_integer/1)
 ```
+
+```elixir
+defmodule LF do
+  defstruct state: [], day: 0
+
+  def increment_days(lf, num_days) do
+    for _ <- 0..(num_days - 1), reduce: lf do
+      acc -> next_day(acc)
+    end
+  end
+
+  def next_day(lf) do
+    lf
+    |> Map.update!(:state, &increment_state/1)
+    |> Map.update!(:day, &(&1 + 1))
+  end
+
+  defp increment_state(state) do
+    state
+    |> Enum.map_reduce([], fn
+      0, acc -> {6, [8 | acc]}
+      fish, acc -> {fish - 1, acc}
+    end)
+    |> then(fn {old, new} -> old ++ new end)
+  end
+end
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+%LF{state: fish_list}
+|> LF.increment_days(80)
+|> then(fn x -> length(x.state) end)
+```
+
+#### Your puzzle answer was `396210`.
+
+The first half of this puzzle is complete! It provides one gold star: *
