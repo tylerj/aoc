@@ -101,6 +101,23 @@ To begin, [get your puzzle input](https://adventofcode.com/2021/day/8/input).
 
 ## Part One: Solution
 
+#### Sample input
+
+With each line on a single line (to make it easier to copy / paste below when testing).
+
+```
+be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
+edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
+fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
+fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb
+aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea
+fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb
+dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe
+bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef
+egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
+gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
+```
+
 ```elixir
 input = Kino.Input.textarea("Please paste your input file:")
 ```
@@ -117,6 +134,17 @@ list =
   end)
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+[
+  [
+    ["acedgfb", "cdfbe", "gcdfa", "fbcad", "dab", "cefabd", "cdfgeb", "eafb", "cagedb", "ab"],
+    ["cdfeb", "fcadb", "cdfeb", "cdbaf"]
+  ]
+]
+```
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
@@ -128,7 +156,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-452
+0
 ```
 
 ### In the output values, how many times do digits 1, 4, 7, or 8 appear?
@@ -204,3 +232,174 @@ Adding all of the output values in this larger example produces `61229`.
 For each entry, determine all of the wire/segment connections and decode the four-digit output values.
 
 ### What do you get if you add up all of the output values?
+
+## Part Two: Solution
+
+The input always includes all 10 patterns.
+
+The frequency of each segment, with their normal letters, is:
+
+```
+a => 8
+b => 6
+c => 8
+d => 7
+e => 4
+f => 9
+g => 7
+```
+
+The unique ones, which we can figure out right away, are:
+
+```
+b => 6
+e => 4
+f => 9
+```
+
+For each digits, the number of `total` segments and `bef` segments, displayed as `total / bef`, are:
+
+* `1`: 2 / 1
+* `7`: 3 / 1
+* `4`: 4 / 1
+* `2`: 5 / 1
+* `3`: 5 / 1
+* `5`: 5 / 2
+* `9`: 6 / 2
+* `0`: 6 / 3
+* `6`: 6 / 3
+* `8`: 7 / 3
+
+With this, we can deduce all except:
+
+* 2 vs 3 (both 5 / 1)
+* 0 vs 6 (both 6 / 3)
+
+The way to tell the difference is:
+
+* 2 has `e` only
+* 3 has `f` only
+* 0 has all but `d`
+* 6 has all but `c`
+
+Alternative approach:
+
+1. Start by finding the 2-segment pattern. **This is 1**.
+2. The 2 segments correspond to `c` and `f`.
+3. Then, find the 3-segment pattern. **This is 7**.
+4. The segment in `7` but not in `1` corresponds to the top segment `a`.
+5. Find the 4-segment pattern. **This is 4**.
+6. Find the 7-segment pattern. **This is 8**.
+
+```elixir
+defmodule Display do
+  @segment_size_map %{
+    2 => [1],
+    3 => [7],
+    4 => [4],
+    5 => [2, 3, 5],
+    6 => [0, 6, 9],
+    7 => [8]
+  }
+
+  @digits %{
+    "abcefg" => 0,
+    "cf" => 1,
+    "acdeg" => 2,
+    "acdfg" => 3,
+    "bcdf" => 4,
+    "abdfg" => 5,
+    "abdefg" => 6,
+    "acf" => 7,
+    "abcdefg" => 8,
+    "abcdfg" => 9
+  }
+
+  @frequencies %{
+    4 => "e",
+    6 => "b",
+    9 => "f"
+  }
+
+  defstruct [:input, :output, frequency: %{}, letter_map: %{}, map: %{}]
+
+  def init([input, output]) do
+    %__MODULE__{
+      input: Enum.map(input, &sort_string/1),
+      output: Enum.map(output, &sort_string/1),
+      frequency: frequency(input)
+    }
+    |> apply_unique_frequencies()
+  end
+
+  defp sort_string(s) do
+    s |> String.split("", trim: true) |> Enum.sort() |> Enum.join()
+  end
+
+  defp frequency(input) do
+    input
+    |> Enum.join()
+    |> String.split("", trim: true)
+    |> Enum.reduce(%{}, fn letter, map ->
+      Map.update(map, letter, 1, &(&1 + 1))
+    end)
+    |> Enum.reduce(%{}, fn
+      {k, v}, acc ->
+        {v, k}
+        Map.update(acc, v, k, &[k | List.wrap(&1)])
+    end)
+  end
+
+  defp apply_unique_frequencies(%{frequency: freq} = map) do
+    Enum.reduce(freq, map, &update_letter_map/2)
+  end
+
+  defp update_letter_map({f, l}, %{frequency: freq} = map) when is_binary(l) do
+    Map.update!(
+      map,
+      :letter_map,
+      fn letter_map -> Map.put(letter_map, l, @frequencies[f]) end
+    )
+  end
+
+  defp update_letter_map(_, map), do: map
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+warning: variable "freq" is unused (if the variable is not meant to be used, prefix it with an underscore)
+  day-08.livemd#cell:3vz3krnw763gohgworo4kyodrl4dorsi:62: Display.update_letter_map/2
+
+warning: module attribute @digits was set but never used
+  day-08.livemd#cell:3vz3krnw763gohgworo4kyodrl4dorsi:11
+
+warning: module attribute @segment_size_map was set but never used
+  day-08.livemd#cell:3vz3krnw763gohgworo4kyodrl4dorsi:2
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Display, <<70, 79, 82, 49, 0, 0, 17, ...>>, {:update_letter_map, 2}}
+```
+
+```elixir
+[sample | _] = list
+
+Display.init(sample)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%Display{
+  input: ["abcdefg", "bcdef", "acdfg", "abcdf", "abd", "abcdef", "bcdefg", "abef", "abcdeg", "ab"],
+  output: ["bcdef", "abcdf", "bcdef", "abcdf"],
+  frequency: %{4 => "g", 6 => "e", 7 => ["f", "c"], 8 => ["d", "a"], 9 => "b"},
+  letter_map: %{"b" => "f", "e" => "b", "g" => "e"},
+  map: %{}
+}
+```
