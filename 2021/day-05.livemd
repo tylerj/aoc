@@ -68,34 +68,65 @@ input = Kino.Input.textarea("Please paste your input file:")
 
 ```elixir
 defmodule Lines do
+  def traverse([x, y], map) do
+    move(
+      List.to_tuple(x),
+      List.to_tuple(y),
+      map
+    )
+  end
+
   def traverse_h_v([[x, y1], [x, y2]], map) do
-    move(x, {y1, y2}, map)
+    move({x, y1}, {x, y2}, map)
   end
 
   def traverse_h_v([[x1, y], [x2, y]], map) do
-    move({x1, x2}, y, map)
+    move({x1, y}, {x2, y}, map)
   end
 
   def traverse_h_v(_, map), do: map
 
-  defp move({x1, x2}, y, map) when x1 > x2, do: move({x2, x1}, y, map)
-
-  defp move({x1, x2}, y, map) do
-    Enum.reduce(
-      x1..x2,
-      map,
-      &increment_coord(&2, {&1, y})
-    )
+  # {8,0} -> {0,0}
+  defp move({x1, y}, {x2, y}, map) when x1 > x2 do
+    move({x2, y}, {x1, y}, map)
   end
 
-  defp move(x, {y1, y2}, map) when y1 > y2, do: move(x, {y2, y1}, map)
+  # {0,8} -> {0,0}
+  defp move({x, y1}, {x, y2}, map) when y1 > y2 do
+    move({x, y2}, {x, y1}, map)
+  end
 
-  defp move(x, {y1, y2}, map) do
-    Enum.reduce(
-      y1..y2,
-      map,
-      &increment_coord(&2, {x, &1})
-    )
+  # {0,0} -> {8,0}
+  defp move({x1, y}, {x2, y}, map) do
+    for x <- x1..x2, reduce: map do
+      acc -> increment_coord(acc, {x, y})
+    end
+  end
+
+  # {0,0} -> {0,8}
+  defp move({x, y1}, {x, y2}, map) do
+    for y <- y1..y2, reduce: map do
+      acc -> increment_coord(acc, {x, y})
+    end
+  end
+
+  # {8,8} -> {3,3}
+  defp move({x1, y1}, {x2, y2}, map) when x1 > x2 do
+    move({x2, y2}, {x1, y1}, map)
+  end
+
+  # {3,3} -> {8,8}
+  defp move({x1, y1}, {x2, y2}, map) when y1 < y2 do
+    for x <- x1..x2, reduce: map do
+      acc -> increment_coord(acc, {x, y1 + x - x1})
+    end
+  end
+
+  # {3,8} -> {8,3}
+  defp move({x1, y1}, {x2, y2}, map) when y1 > y2 do
+    for x <- x1..x2, reduce: map do
+      acc -> increment_coord(acc, {x, y1 - x + x1})
+    end
   end
 
   defp increment_coord(map, {x, y}) do
@@ -161,3 +192,27 @@ You still need to determine **the number of points where at least two lines over
 Consider all of the lines.
 
 ### At how many points do at least two lines overlap?
+
+## Part Two: Solution
+
+I modififed the `Lines` module above so that `traverse/2` will now work for diagonal lines, as well as horizontal and vertical.
+
+The `move/3` function was modified to accommodate the diagonal lines.
+
+```elixir
+final_map = Enum.reduce(coord, %{}, &Lines.traverse/2)
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+final_map |> Enum.count(fn {_k, v} -> v > 1 end)
+```
+
+#### Your puzzle answer was `17013`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/5/input).
