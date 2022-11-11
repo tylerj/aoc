@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Day 8: Seven Segment Search
 
 * [AOC Link](https://adventofcode.com/2021/day/8)

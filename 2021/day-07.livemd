@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Day 7: The Treachery of Whales
 
 * [AOC Link](https://adventofcode.com/2021/day/7)
