@@ -61,3 +61,73 @@ Consider only horizontal and vertical lines.
 ### At how many points do at least two lines overlap?
 
 ## Part One: Solution
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+```elixir
+defmodule Lines do
+  def traverse_h_v([[x, y1], [x, y2]], map) do
+    move(x, {y1, y2}, map)
+  end
+
+  def traverse_h_v([[x1, y], [x2, y]], map) do
+    move({x1, x2}, y, map)
+  end
+
+  def traverse_h_v(_, map), do: map
+
+  defp move({x1, x2}, y, map) when x1 > x2, do: move({x2, x1}, y, map)
+
+  defp move({x1, x2}, y, map) do
+    Enum.reduce(
+      x1..x2,
+      map,
+      &increment_coord(&2, {&1, y})
+    )
+  end
+
+  defp move(x, {y1, y2}, map) when y1 > y2, do: move(x, {y2, y1}, map)
+
+  defp move(x, {y1, y2}, map) do
+    Enum.reduce(
+      y1..y2,
+      map,
+      &increment_coord(&2, {x, &1})
+    )
+  end
+
+  defp increment_coord(map, {x, y}) do
+    Map.update(map, {x, y}, 1, &(&1 + 1))
+  end
+end
+```
+
+```elixir
+coord =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n", trim: true)
+  |> Enum.map(fn s ->
+    s
+    |> String.split(~r{\s*\-\>\s*})
+    |> Enum.map(fn s ->
+      s |> String.split(",") |> Enum.map(&String.to_integer/1)
+    end)
+  end)
+```
+
+```elixir
+final_map = Enum.reduce(coord, %{}, &Lines.traverse_h_v/2)
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+final_map |> Enum.count(fn {_k, v} -> v > 1 end)
+```
+
+#### Your puzzle answer was `5835`.
+
+The first half of this puzzle is complete! It provides one gold star: *
