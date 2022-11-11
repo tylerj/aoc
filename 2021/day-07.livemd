@@ -127,18 +127,49 @@ medians =
 [358, 358]
 ```
 
+```elixir
+defmodule CrabWalker do
+  def find_shortest_total_burn(positions, list, incr \\ 0) do
+    positions
+    # Only calculate once per unique position
+    |> Enum.uniq()
+    # For each position, calculate the total burn
+    |> Enum.map(&total_burn_for_pos(&1, list, incr))
+    # Take the smallest total burn as the winner
+    |> Enum.min()
+  end
+
+  # given a position, calculate and sum the burns for each item in the list
+  defp total_burn_for_pos(pos, list, incr) do
+    Enum.reduce(list, 0, fn x, total_burn ->
+      total_burn + calc_burn(pos, x, incr)
+    end)
+  end
+
+  # linear burn rate
+  defp calc_burn(x, y, 0) do
+    abs(x - y)
+  end
+
+  # incremental burn rate
+  defp calc_burn(x, y, 1) do
+    for x <- 1..abs(x - y), reduce: 0 do
+      acc -> acc + x
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, CrabWalker, <<70, 79, 82, 49, 0, 0, 11, ...>>, {:calc_burn, 3}}
+```
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-medians
-# Don't do it twice if we have 2 median values that are the same
-|> Enum.uniq()
-# For each median, calculate the total distance traveled
-|> Enum.map(fn med ->
-  Enum.reduce(list, 0, &(&2 + abs(&1 - med)))
-end)
-# Take the smallest total distance traveled as the winner
-|> Enum.min()
+CrabWalker.find_shortest_total_burn(medians, list)
 ```
 
 <!-- livebook:{"output":true} -->
@@ -179,3 +210,51 @@ This costs a total of `168` fuel. This is the new cheapest possible outcome; the
 Determine the horizontal position that the crabs can align to using the least fuel possible so they can make you an escape route!
 
 ### How much fuel must they spend to align to that position?
+
+## Part Two: Solution
+
+I modified the code from Part 1 to introduce a `CrabWalker` module to help perform these calculations.
+
+Check that code for details on the functions, with comments, that were used to solve Part Two.
+
+```elixir
+# Let's find the mean
+
+mean = Enum.sum(list) / length(list)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+482.596
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+# Check the whole integers around the mean for the shortest burn
+# Pass in incremental value of 1, to indicate that the burn is calculated
+# at an increasing rate
+
+CrabWalker.find_shortest_total_burn(
+  floor(mean)..ceil(mean),
+  list,
+  1
+)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+94862125
+```
+
+### How much fuel must they spend to align to that position?
+
+#### Your puzzle answer was `94862124`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/7/input).
