@@ -69,7 +69,7 @@ input = Kino.Input.textarea("Please paste your input file:")
 ```
 
 ```elixir
-fish_list =
+list =
   input
   |> Kino.Input.read()
   |> String.split(",", trim: true)
@@ -79,5 +79,76 @@ fish_list =
 <!-- livebook:{"output":true} -->
 
 ```
-[16, 1, 2, 0, 4, 2, 7, 1, 2, 14]
+[1101, 1, 29, 67, 1102, 0, 1, 65, 1008, 65, 35, 66, 1005, 66, 28, 1, 67, 65, 20, 4, 0, 1001, 65, 1,
+ 65, 1106, 0, 8, 99, 35, 67, 101, 99, 105, 32, 110, 39, 101, 115, 116, 32, 112, 97, 115, 32, 117,
+ 110, 101, 32, 105, ...]
 ```
+
+```elixir
+# Let's find the location of the median,
+# and determine if the list has an even or odd number of entries
+
+len = length(list)
+median_index = {div(len, 2), rem(len, 2)}
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{500, 0}
+```
+
+```elixir
+# Sort so we can find the median(s)
+
+sorted = Enum.sort(list)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 5, 5, 5, 6, 7, 7, 8, 9, 10, 10,
+ 10, 10, 11, 11, 11, 12, 12, 13, 14, 15, 15, 16, 16, 16, 16, 16, 16, 17, ...]
+```
+
+```elixir
+medians =
+  case median_index do
+    # If even number of entries, we need to try both median values
+    {x, 0} -> Enum.slice(sorted, x - 1, 2)
+    # If odd number of entries, we only have 1 median value
+    {x, 1} -> Enum.slice(sorted, x, 1)
+  end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[358, 358]
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+medians
+# Don't do it twice if we have 2 median values that are the same
+|> Enum.uniq()
+# For each median, calculate the total distance traveled
+|> Enum.map(fn med ->
+  Enum.reduce(list, 0, &(&2 + abs(&1 - med)))
+end)
+# Take the smallest total distance traveled as the winner
+|> Enum.min()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+344138
+```
+
+### How much fuel must they spend to align to that position?
+
+#### Your puzzle answer was `344138`.
+
+The first half of this puzzle is complete! It provides one gold star: *
