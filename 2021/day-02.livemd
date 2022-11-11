@@ -7,7 +7,7 @@ Mix.install([:kino])
 ## Day 2: Dive!
 
 * [AOC Link](https://adventofcode.com/2021/day/2)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2021/day-01.livemd)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2021/day-02.livemd)
 * [José Valim GitHub](https://github.com/josevalim/aoc/blob/main/2021/day-02.livemd)
 * [José Valim Twitch Stream](https://www.twitch.tv/videos/1222881012?collection=k_DLnk2tvBa-fQ)
 
@@ -92,7 +92,7 @@ commands
 end)
 ```
 
-#### Your puzzle answer was 1727835.
+#### Your puzzle answer was `1727835`.
 
 The first half of this puzzle is complete! It provides one gold star: *
 
@@ -150,7 +150,7 @@ commands
 end)
 ```
 
-#### Your puzzle answer was 1544000595.
+#### Your puzzle answer was `1544000595`.
 
 Both parts of this puzzle are complete! They provide two gold stars: **
 

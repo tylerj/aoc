@@ -82,7 +82,9 @@ values
 |> Enum.count(fn [left, right] -> right > left end)
 ```
 
-#### Your puzzle answer was 1559.
+#### Your puzzle answer was `1559`.
+
+The first half of this puzzle is complete! It provides one gold star: *
 
 ## Part Two: Prompt
 
@@ -136,6 +138,10 @@ values
 |> Enum.count(fn [left, right] -> right > left end)
 ```
 
-#### Your puzzle answer was 1600.
+#### Your puzzle answer was `1600`.
 
 Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/1/input).
