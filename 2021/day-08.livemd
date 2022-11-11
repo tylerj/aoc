@@ -101,23 +101,6 @@ To begin, [get your puzzle input](https://adventofcode.com/2021/day/8/input).
 
 ## Part One: Solution
 
-#### Sample input
-
-With each line on a single line (to make it easier to copy / paste below when testing).
-
-```
-be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
-edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
-fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
-fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb
-aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea
-fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb
-dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe
-bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef
-egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
-gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
-```
-
 ```elixir
 input = Kino.Input.textarea("Please paste your input file:")
 ```
@@ -126,11 +109,11 @@ input = Kino.Input.textarea("Please paste your input file:")
 list =
   input
   |> Kino.Input.read()
-  |> String.split("\n")
-  |> Enum.map(fn str ->
-    str
-    |> String.split(" | ")
-    |> Enum.map(&String.split(&1, " "))
+  |> String.split([" |\n", " | ", "\n"])
+  |> Enum.chunk_every(2)
+  |> Enum.map(fn [input, output] ->
+    {input |> String.split() |> Enum.group_by(&byte_size/1, &String.to_charlist/1),
+     output |> String.split() |> Enum.map(&String.to_charlist/1)}
   end)
 ```
 
@@ -235,171 +218,207 @@ For each entry, determine all of the wire/segment connections and decode the fou
 
 ## Part Two: Solution
 
-The input always includes all 10 patterns.
+My solution was getting too complicated, so I halted and looked at Jose's approach.
 
-The frequency of each segment, with their normal letters, is:
+I then tried to practice by reproducing his example, trying not to look back at it too frequently.
 
-```
-a => 8
-b => 6
-c => 8
-d => 7
-e => 4
-f => 9
-g => 7
-```
-
-The unique ones, which we can figure out right away, are:
-
-```
-b => 6
-e => 4
-f => 9
-```
-
-For each digits, the number of `total` segments and `bef` segments, displayed as `total / bef`, are:
-
-* `1`: 2 / 1
-* `7`: 3 / 1
-* `4`: 4 / 1
-* `2`: 5 / 1
-* `3`: 5 / 1
-* `5`: 5 / 2
-* `9`: 6 / 2
-* `0`: 6 / 3
-* `6`: 6 / 3
-* `8`: 7 / 3
-
-With this, we can deduce all except:
-
-* 2 vs 3 (both 5 / 1)
-* 0 vs 6 (both 6 / 3)
-
-The way to tell the difference is:
-
-* 2 has `e` only
-* 3 has `f` only
-* 0 has all but `d`
-* 6 has all but `c`
-
-Alternative approach:
-
-1. Start by finding the 2-segment pattern. **This is 1**.
-2. The 2 segments correspond to `c` and `f`.
-3. Then, find the 3-segment pattern. **This is 7**.
-4. The segment in `7` but not in `1` corresponds to the top segment `a`.
-5. Find the 4-segment pattern. **This is 4**.
-6. Find the 7-segment pattern. **This is 8**.
+<!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-defmodule Display do
-  @segment_size_map %{
-    2 => [1],
-    3 => [7],
-    4 => [4],
-    5 => [2, 3, 5],
-    6 => [0, 6, 9],
-    7 => [8]
-  }
+{input, output} = list |> List.first()
+```
 
-  @digits %{
-    "abcefg" => 0,
-    "cf" => 1,
-    "acdeg" => 2,
-    "acdfg" => 3,
-    "bcdf" => 4,
-    "abdfg" => 5,
-    "abdefg" => 6,
-    "acf" => 7,
-    "abcdefg" => 8,
-    "abcdfg" => 9
-  }
+<!-- livebook:{"output":true} -->
 
-  @frequencies %{
-    4 => "e",
-    6 => "b",
-    9 => "f"
-  }
+```
+{%{
+   2 => ['cg'],
+   3 => ['bcg'],
+   4 => ['egca'],
+   5 => ['cdbga', 'acbde', 'adbgf'],
+   6 => ['gdebcf', 'decabf', 'ebdgac'],
+   7 => ['eacdfbg']
+ }, ['geac', 'ceag', 'faedcb', 'cg']}
+```
 
-  defstruct [:input, :output, frequency: %{}, letter_map: %{}, map: %{}]
+```elixir
+%{
+  2 => [one],
+  3 => [seven],
+  4 => [four],
+  5 => two_three_five,
+  6 => zero_six_nine,
+  7 => [eight]
+} = input
+```
 
-  def init([input, output]) do
-    %__MODULE__{
-      input: Enum.map(input, &sort_string/1),
-      output: Enum.map(output, &sort_string/1),
-      frequency: frequency(input)
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  2 => ['cg'],
+  3 => ['bcg'],
+  4 => ['egca'],
+  5 => ['cdbga', 'acbde', 'adbgf'],
+  6 => ['gdebcf', 'decabf', 'ebdgac'],
+  7 => ['eacdfbg']
+}
+```
+
+```elixir
+find_superset = fn candidates, subset_number ->
+  Enum.split_with(
+    candidates,
+    &match?([], subset_number -- &1)
+  )
+end
+
+find_one_remaining = fn candidates, subset_number ->
+  Enum.split_with(
+    candidates,
+    &match?([_], subset_number -- &1)
+  )
+end
+
+{[nine], zero_six} = find_superset.(zero_six_nine, four)
+{[zero], [six]} = find_superset.(zero_six, one)
+{[three], two_five} = find_superset.(two_three_five, one)
+{[five], [two]} = find_one_remaining.(two_five, six)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{['acbde'], ['adbgf']}
+```
+
+```elixir
+lookup = %{
+  Enum.sort(zero) => 0,
+  Enum.sort(one) => 1,
+  Enum.sort(two) => 2,
+  Enum.sort(three) => 3,
+  Enum.sort(four) => 4,
+  Enum.sort(five) => 5,
+  Enum.sort(six) => 6,
+  Enum.sort(seven) => 7,
+  Enum.sort(eight) => 8,
+  Enum.sort(nine) => 9
+}
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  'abcde' => 5,
+  'abcdef' => 6,
+  'abcdefg' => 8,
+  'abcdeg' => 9,
+  'abcdg' => 3,
+  'abdfg' => 2,
+  'aceg' => 4,
+  'bcdefg' => 0,
+  'bcg' => 7,
+  'cg' => 1
+}
+```
+
+```elixir
+Integer.undigits(for op <- output, do: Map.get(lookup, Enum.sort(op)))
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+4461
+```
+
+```elixir
+defmodule Processor do
+  def process_row({input, output}) do
+    %{
+      2 => [one],
+      3 => [seven],
+      4 => [four],
+      5 => two_three_five,
+      6 => zero_six_nine,
+      7 => [eight]
+    } = input
+
+    find_superset = fn candidates, subset_number ->
+      Enum.split_with(
+        candidates,
+        &match?([], subset_number -- &1)
+      )
+    end
+
+    find_one_remaining = fn candidates, subset_number ->
+      Enum.split_with(
+        candidates,
+        &match?([_], subset_number -- &1)
+      )
+    end
+
+    {[nine], zero_six} = find_superset.(zero_six_nine, four)
+    {[zero], [six]} = find_superset.(zero_six, one)
+    {[three], two_five} = find_superset.(two_three_five, one)
+    {[five], [two]} = find_one_remaining.(two_five, six)
+
+    lookup = %{
+      Enum.sort(zero) => 0,
+      Enum.sort(one) => 1,
+      Enum.sort(two) => 2,
+      Enum.sort(three) => 3,
+      Enum.sort(four) => 4,
+      Enum.sort(five) => 5,
+      Enum.sort(six) => 6,
+      Enum.sort(seven) => 7,
+      Enum.sort(eight) => 8,
+      Enum.sort(nine) => 9
     }
-    |> apply_unique_frequencies()
-  end
 
-  defp sort_string(s) do
-    s |> String.split("", trim: true) |> Enum.sort() |> Enum.join()
+    Integer.undigits(for op <- output, do: Map.get(lookup, Enum.sort(op)))
   end
-
-  defp frequency(input) do
-    input
-    |> Enum.join()
-    |> String.split("", trim: true)
-    |> Enum.reduce(%{}, fn letter, map ->
-      Map.update(map, letter, 1, &(&1 + 1))
-    end)
-    |> Enum.reduce(%{}, fn
-      {k, v}, acc ->
-        {v, k}
-        Map.update(acc, v, k, &[k | List.wrap(&1)])
-    end)
-  end
-
-  defp apply_unique_frequencies(%{frequency: freq} = map) do
-    Enum.reduce(freq, map, &update_letter_map/2)
-  end
-
-  defp update_letter_map({f, l}, %{frequency: freq} = map) when is_binary(l) do
-    Map.update!(
-      map,
-      :letter_map,
-      fn letter_map -> Map.put(letter_map, l, @frequencies[f]) end
-    )
-  end
-
-  defp update_letter_map(_, map), do: map
 end
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-warning: variable "freq" is unused (if the variable is not meant to be used, prefix it with an underscore)
-  day-08.livemd#cell:3vz3krnw763gohgworo4kyodrl4dorsi:62: Display.update_letter_map/2
-
-warning: module attribute @digits was set but never used
-  day-08.livemd#cell:3vz3krnw763gohgworo4kyodrl4dorsi:11
-
-warning: module attribute @segment_size_map was set but never used
-  day-08.livemd#cell:3vz3krnw763gohgworo4kyodrl4dorsi:2
-
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Display, <<70, 79, 82, 49, 0, 0, 17, ...>>, {:update_letter_map, 2}}
+{:module, Processor, <<70, 79, 82, 49, 0, 0, 14, ...>>, {:process_row, 1}}
 ```
 
 ```elixir
-[sample | _] = list
-
-Display.init(sample)
+Processor.process_row(List.first(list))
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%Display{
-  input: ["abcdefg", "bcdef", "acdfg", "abcdf", "abd", "abcdef", "bcdefg", "abef", "abcdeg", "ab"],
-  output: ["bcdef", "abcdf", "bcdef", "abcdf"],
-  frequency: %{4 => "g", 6 => "e", 7 => ["f", "c"], 8 => ["d", "a"], 9 => "b"},
-  letter_map: %{"b" => "f", "e" => "b", "g" => "e"},
-  map: %{}
-}
+4461
 ```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+for row <- list, reduce: 0 do
+  sum -> sum + Processor.process_row(row)
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1096964
+```
+
+### What do you get if you add up all of the output values?
+
+#### Your puzzle answer was `1096964`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/8/input).
