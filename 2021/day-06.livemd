@@ -122,3 +122,93 @@ end
 #### Your puzzle answer was `396210`.
 
 The first half of this puzzle is complete! It provides one gold star: *
+
+## Part Two: Prompt
+
+Suppose the lanternfish live forever and have unlimited food and space. Would they take over the entire ocean?
+
+After 256 days in the example above, there would be a total of `26984457539` lanternfish!
+
+### How many lanternfish would there be after 256 days?
+
+## Part Two: Solution
+
+This will take too long / too much memory to keep track of the state of all of the fish. Instead, we should keep a count on every day of how many fish we have of each timer type.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+fish_list
+```
+
+```elixir
+defmodule LF do
+  defstruct count: %{}, start: [], day: 0, size: 0
+
+  def init(state) do
+    %__MODULE__{
+      start: state,
+      count: initial_count(state)
+    }
+  end
+
+  defp initial_count(list) do
+    for x <- list, reduce: %{} do
+      acc -> Map.update(acc, x, 1, &(&1 + 1))
+    end
+  end
+
+  def increment_days(lf, num_days) do
+    for _ <- 0..(num_days - 1), reduce: lf do
+      acc -> increment_day(acc)
+    end
+  end
+
+  def increment_day(lf) do
+    lf
+    |> Map.update!(:count, &increment_count/1)
+    |> Map.update!(:day, &(&1 + 1))
+    |> update_size()
+  end
+
+  defp increment_count(map) do
+    Enum.reduce(map, %{}, &adjust_count/2)
+  end
+
+  defp adjust_count({0, count}, map) do
+    map
+    |> Map.update(6, count, &(&1 + count))
+    |> Map.update(8, count, &(&1 + count))
+  end
+
+  defp adjust_count({k, count}, map) do
+    Map.update(map, k - 1, count, &(&1 + count))
+  end
+
+  defp update_size(%{count: count} = map) do
+    Map.put(map, :size, count |> Map.values() |> Enum.sum())
+  end
+end
+```
+
+```elixir
+# Check that we still get the same answer as the implementation in Part 1:
+
+fish_list |> LF.init() |> LF.increment_days(80)
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+fish_list |> LF.init() |> LF.increment_days(256)
+```
+
+### How many lanternfish would there be after 256 days?
+
+#### Your puzzle answer was `1770823541496`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/6/input).
