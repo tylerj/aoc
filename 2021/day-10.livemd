@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Day 10: Syntax Scoring
 
 * [AOC Link](https://adventofcode.com/2021/day/10)
@@ -214,3 +208,68 @@ Autocomplete tools are an odd bunch: the winner is found by `sorting` all of the
 Find the completion string for each incomplete line, score the completion strings, and sort the scores.
 
 ### What is the middle score?
+
+## Part Two: Solution
+
+```elixir
+defmodule Scorer do
+  @points %{
+    ")" => 1,
+    "]" => 2,
+    "}" => 3,
+    ">" => 4
+  }
+
+  def score_lines(lines) do
+    lines
+    |> filter_incomplete()
+    |> Enum.map(&score_line/1)
+  end
+
+  def filter_incomplete(lines) do
+    lines
+    |> Enum.filter(fn
+      l when is_list(l) -> true
+      _ -> false
+    end)
+  end
+
+  def score_line(line) do
+    for x <- line, reduce: 0 do
+      acc -> acc * 5 + @points[x]
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Scorer, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:score_line, 1}}
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+list
+|> Syntax.scan()
+|> Scorer.score_lines()
+|> Enum.sort()
+|> then(fn list -> Enum.at(list, div(length(list), 2)) end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+2292863731
+```
+
+### What is the middle score?
+
+#### Your puzzle answer was `2292863731`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/10/input).
