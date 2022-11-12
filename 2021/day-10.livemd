@@ -102,3 +102,70 @@ list = input |> Kino.Input.read() |> String.split("\n", trim: true)
  "{<[[]]>}<{[{[{[]{()[[[]", "[<(<(<(<{}))><([]([]()", "<{([([[(<>()){}]>(<<{{",
  "<{([{{}}[<[[[<>{}]]]>[]]"]
 ```
+
+```elixir
+defmodule Syntax do
+  @openers ["[", "(", "<", "{"]
+  @closers ["]", ")", ">", "}"]
+
+  @map %{
+    "[" => "]",
+    "(" => ")",
+    "<" => ">",
+    "{" => "}"
+  }
+
+  @scores %{
+    ")" => 3,
+    "]" => 57,
+    "}" => 1197,
+    ">" => 25137
+  }
+
+  def scan(lines) do
+    Enum.map(lines, &scan_line/1)
+  end
+
+  def scan_line(line) do
+    line
+    |> String.split("", trim: true)
+    |> Enum.reduce_while([], fn
+      x, stack when x in @openers -> {:cont, [@map[x] | stack]}
+      x, [x | stack] when x in @closers -> {:cont, stack}
+      x, _ when x in @closers -> {:halt, {:corrupt, x}}
+      x, _ -> {:halt, {:unknown_error, x}}
+    end)
+  end
+
+  def total_score(results) when is_list(results) do
+    results |> Enum.map(&score/1) |> Enum.sum()
+  end
+
+  def score({:corrupt, char}), do: @scores[char]
+  def score(_), do: 0
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Syntax, <<70, 79, 82, 49, 0, 0, 12, ...>>, {:score, 1}}
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+list |> Syntax.scan() |> Syntax.total_score()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+26397
+```
+
+### What is the total syntax error score for those errors?
+
+#### Your puzzle answer was `415953`.
+
+The first half of this puzzle is complete! It provides one gold star: *
