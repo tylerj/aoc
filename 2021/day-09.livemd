@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Day 9: Smoke Basin
 
 * [AOC Link](https://adventofcode.com/2021/day/9)
@@ -248,3 +242,58 @@ The bottom-right basin, size 9:
 Find the three largest basins and multiply their sizes together. In the above example, this is `9 * 14 * 9 = 1134`.
 
 ### What do you get if you multiply together the sizes of the three largest basins?
+
+## Part Two: Solution
+
+```elixir
+find_basin = fn f, {x, y}, value, coord_map, count ->
+  [
+    {x + 1, y},
+    {x - 1, y},
+    {x, y + 1},
+    {x, y - 1}
+  ]
+  |> Enum.reduce({count, coord_map}, fn key, {count, coord_map} ->
+    this_value = Map.get(coord_map, key)
+
+    if this_value && this_value > value && this_value < 9 do
+      f.(f, key, this_value, Map.delete(coord_map, key), count + 1)
+    else
+      {count, coord_map}
+    end
+  end)
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+#Function<38.3316493/5 in :erl_eval.expr/6>
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+low_points
+|> Enum.map(fn {k, v} -> find_basin.(find_basin, k, v, coords, 1) end)
+|> Enum.map(fn {count, _} -> count end)
+|> Enum.sort_by(&(-&1))
+|> Enum.take(3)
+|> Enum.reduce(1, &(&1 * &2))
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1134
+```
+
+### What do you get if you multiply together the sizes of the three largest basins?
+
+#### Your puzzle answer was `1142757`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/9/input).
