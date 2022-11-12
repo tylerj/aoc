@@ -277,9 +277,9 @@ end
 low_points
 |> Enum.map(fn {k, v} -> find_basin.(find_basin, k, v, coords, 1) end)
 |> Enum.map(fn {count, _} -> count end)
-|> Enum.sort_by(&(-&1))
+|> Enum.sort(:desc)
 |> Enum.take(3)
-|> Enum.reduce(1, &(&1 * &2))
+|> Enum.product()
 ```
 
 <!-- livebook:{"output":true} -->
