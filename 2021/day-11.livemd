@@ -14,7 +14,7 @@ Mix.install([:kino])
 
 ## Day 11: Dumbo Octopus
 
-* [AOC Link](https://adventofcode.com/2021/day/11)
+* [Advent of Code](https://adventofcode.com/2021/day/11)
 * [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2021/day-11.livemd)
 * [José Valim GitHub](https://github.com/josevalim/aoc/blob/main/2021/day-11.livemd)
 * [José Valim Twitch Stream](https://www.twitch.tv/videos/1231618729?collection=k_DLnk2tvBa-fQ)
@@ -138,23 +138,9 @@ After step 10:
 0032240000
 ```
 
-After step 10, there have been a total of `204` flashes. Fast forwarding, here is the same configuration every 10 steps:
+After step 10, there have been a total of `204` flashes. Fast forwarding, here is the same configuration after 100 steps:
 
 ```
-After step 20:
-3936556452
-5686556806
-4496555690
-4448655580
-4456865570
-5680086577
-7000009896
-0000000344
-6000000364
-4600009543
-
-# ...
-
 After step 100:
 0397666866
 0749766918
@@ -189,6 +175,175 @@ list = input |> Kino.Input.read() |> String.split("\n", trim: true)
 <!-- livebook:{"output":true} -->
 
 ```
-["5483143223", "2745854711", "5264556173", "6141336146", "6357385478", "4167524645", "2176841721",
- "6882881134", "4846848554", "5283751526"]
+["8258741254", "3335286211", "8468661311", "6164578353", "2138414553", "1785385447", "3441133751",
+ "3586862837", "7568272878", "6833643144"]
 ```
+
+```elixir
+grid =
+  list
+  |> Enum.with_index()
+  |> Enum.reduce(%{}, fn {row, i}, acc ->
+    row
+    |> String.split("", trim: true)
+    |> Enum.with_index()
+    |> Enum.into(acc, fn {col, j} -> {{i, j}, String.to_integer(col)} end)
+  end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  {4, 5} => 1,
+  {5, 9} => 7,
+  {1, 2} => 3,
+  {8, 5} => 7,
+  {0, 9} => 4,
+  {8, 6} => 2,
+  {5, 2} => 8,
+  {3, 6} => 8,
+  {2, 4} => 6,
+  {4, 8} => 5,
+  {6, 5} => 3,
+  {0, 3} => 8,
+  {1, 1} => 3,
+  {9, 6} => 3,
+  {4, 3} => 8,
+  {3, 7} => 3,
+  {5, 0} => 1,
+  {0, 5} => 4,
+  {0, 1} => 2,
+  {8, 9} => 8,
+  {4, 0} => 2,
+  {3, 2} => 6,
+  {9, 8} => 4,
+  {8, 1} => 5,
+  {7, 3} => 6,
+  {7, 9} => 7,
+  {0, 8} => 5,
+  {3, 1} => 1,
+  {6, 1} => 4,
+  {2, 0} => 8,
+  {8, 3} => 8,
+  {8, 4} => 2,
+  {2, 7} => 3,
+  {4, 6} => 4,
+  {9, 4} => 6,
+  {6, 2} => 4,
+  {0, 7} => 2,
+  {9, 0} => 6,
+  {7, 2} => 8,
+  {0, 0} => 8,
+  {8, 7} => 8,
+  {5, 8} => 4,
+  {7, 6} => 2,
+  {2, 8} => 1,
+  {1, 4} => 2,
+  {5, 6} => 5,
+  {9, 5} => 4,
+  {6, 6} => 3,
+  {9, ...} => 3,
+  {...} => 7,
+  ...
+}
+```
+
+```elixir
+defmodule Octopus do
+  def perform_n_steps(grid, n, flash_count \\ 0) do
+    Enum.reduce(
+      1..n,
+      {flash_count, grid},
+      fn _n, {flash_count, grid} ->
+        perform_step(grid, flash_count)
+      end
+    )
+  end
+
+  def perform_step(grid, flash_count) do
+    grid
+    |> increase_grid_by_1()
+    |> execute_flashes()
+    |> count_and_reset_flashed(flash_count)
+  end
+
+  def increase_grid_by_1(grid) do
+    for {xy, value} <- grid, into: %{}, do: {xy, value + 1}
+  end
+
+  def execute_flashes(grid) do
+    Enum.reduce(grid, grid, &flash_xy(&2, &1))
+  end
+
+  defp flash_xy(grid, {xy, 10}) do
+    grid |> increase_xy(xy) |> increase_adjacent(xy)
+  end
+
+  defp flash_xy(grid, _), do: grid
+
+  defp increase_xy(grid, xy) do
+    case Map.has_key?(grid, xy) do
+      true -> Map.update!(grid, xy, &(&1 + 1))
+      false -> grid
+    end
+  end
+
+  defp increase_adjacent(grid, {x, y}) do
+    [
+      {x - 1, y - 1},
+      {x + 0, y - 1},
+      {x + 1, y - 1},
+      {x - 1, y + 0},
+      {x + 1, y + 0},
+      {x - 1, y + 1},
+      {x + 0, y + 1},
+      {x + 1, y + 1}
+    ]
+    |> Enum.reduce(grid, &increase_and_flash/2)
+  end
+
+  defp increase_and_flash(xy, grid) do
+    if Map.has_key?(grid, xy) do
+      grid
+      |> increase_xy(xy)
+      |> then(fn grid -> flash_xy(grid, {xy, grid[xy]}) end)
+    else
+      grid
+    end
+  end
+
+  def count_and_reset_flashed(grid, flash_count) do
+    Enum.reduce(grid, {flash_count, grid}, &count_and_reset_if_flashed/2)
+  end
+
+  defp count_and_reset_if_flashed({xy, value}, {flash_count, grid}) when value > 10,
+    do: {flash_count + 1, Map.put(grid, xy, 0)}
+
+  defp count_and_reset_if_flashed(_, input), do: input
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Octopus, <<70, 79, 82, 49, 0, 0, 20, ...>>, {:count_and_reset_if_flashed, 2}}
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+grid |> Octopus.perform_n_steps(100) |> elem(0)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1694
+```
+
+### How many total flashes are there after 100 steps?
+
+#### Your puzzle answer was `1694`.
+
+The first half of this puzzle is complete! It provides one gold star: *
