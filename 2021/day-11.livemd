@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Day 11: Dumbo Octopus
 
 * [Advent of Code](https://adventofcode.com/2021/day/11)
@@ -251,6 +245,16 @@ grid =
 
 ```elixir
 defmodule Octopus do
+  def find_simultaneous_flash(grid, step_count \\ 1, flash_count \\ 0) do
+    with {new_flash_count, new_grid} <- perform_step(grid, flash_count) do
+      if new_flash_count - flash_count == map_size(grid) do
+        {step_count, new_flash_count, new_grid}
+      else
+        find_simultaneous_flash(new_grid, step_count + 1, new_flash_count)
+      end
+    end
+  end
+
   def perform_n_steps(grid, n, flash_count \\ 0) do
     Enum.reduce(
       1..n,
@@ -327,7 +331,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Octopus, <<70, 79, 82, 49, 0, 0, 20, ...>>, {:count_and_reset_if_flashed, 2}}
+{:module, Octopus, <<70, 79, 82, 49, 0, 0, 23, ...>>, {:count_and_reset_if_flashed, 2}}
 ```
 
 <!-- livebook:{"reevaluate_automatically":true} -->
@@ -395,3 +399,45 @@ After step 195:
 If you can calculate the exact moments when the octopuses will all flash simultaneously, you should be able to navigate through the cavern.
 
 ### What is the first step during which all octopuses flash?
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+grid |> Octopus.find_simultaneous_flash() |> elem(0)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+346
+```
+
+## Part Two: Solution
+
+The following function was added to the `Octopus` module above:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+def find_simultaneous_flash(grid, step_count \\ 1, flash_count \\ 0) do
+  with {new_flash_count, new_grid} <- perform_step(grid, flash_count) do
+    if new_flash_count - flash_count == map_size(grid) do
+      {step_count, new_flash_count, new_grid}
+    else
+      find_simultaneous_flash(new_grid, step_count + 1, new_flash_count)
+    end
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+### What is the first step during which all octopuses flash?
+
+#### Your puzzle answer was `346`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/11/input).
