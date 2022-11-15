@@ -350,3 +350,154 @@ start,b,end
 The slightly larger example above now has 103 paths through it, and the even larger example now has 3509 paths through it.
 
 ### Given these new rules, how many paths through this cave system are there?
+
+## Part Two: Solution
+
+```elixir
+defmodule Caves2 do
+  defdelegate cave_type(cave), to: Caves
+
+  def find_paths(map) do
+    visit_cave(
+      map,
+      "start",
+      {"start"}
+    )
+  end
+
+  def visit_cave(map, cave, path, visited \\ MapSet.new(), visited_2x \\ false) do
+    Enum.map(map[cave], fn neighbor ->
+      cond do
+        neighbor == "start" ->
+          nil
+
+        neighbor == "end" ->
+          Tuple.append(path, "end")
+
+        neighbor in visited && visited_2x ->
+          nil
+
+        neighbor in visited ->
+          visit_cave(
+            map,
+            neighbor,
+            Tuple.append(path, neighbor),
+            visited,
+            true
+          )
+
+        cave_type(neighbor) == :small ->
+          visit_cave(
+            map,
+            neighbor,
+            Tuple.append(path, neighbor),
+            MapSet.put(visited, neighbor),
+            visited_2x
+          )
+
+        true ->
+          visit_cave(
+            map,
+            neighbor,
+            Tuple.append(path, neighbor),
+            visited,
+            visited_2x
+          )
+      end
+    end)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Caves2, <<70, 79, 82, 49, 0, 0, 13, ...>>, {:visit_cave, 5}}
+```
+
+```elixir
+paths =
+  Caves2.find_paths(caves)
+  |> List.flatten()
+  |> Enum.filter(& &1)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {"start", "wx", "kc", "nv", "XQ", "nv", "end"},
+  {"start", "wx", "kc", "nv", "XQ", "nv", "qy", "ZP", "yc", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "XQ", "nv", "qy", "ZP", "yc", "ZP", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "XQ", "nv", "qy", "ZP", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "XQ", "nv", "qy", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "XQ", "nv", "qy", "end"},
+  {"start", "wx", "kc", "nv", "XQ", "nv", "qy", "FN", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "XQ", "nv", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "FN", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "FN", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "yc", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "yc", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "ZP", "yc", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "li", "ZP", "yc", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "FN", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "FN", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "yc", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "yc", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "ZP", "yc", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "li", "ZP", "yc", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "qy", "ZP", "yc", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "qy", "ZP", "yc", "ZP", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "qy", "ZP", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "qy", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "qy", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "qy", "FN", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "FN", "qy", "FN", "end"},
+  {"start", "wx", "kc", "nv", "kc", "ZP", "qy", "ZP", "yc", "li", "FN", ...},
+  {"start", "wx", "kc", "nv", "kc", "ZP", "qy", "ZP", "yc", "ZP", ...},
+  {"start", "wx", "kc", "nv", "kc", "ZP", "qy", "ZP", "li", ...},
+  {"start", "wx", "kc", "nv", "kc", "ZP", "qy", "li", ...},
+  {"start", "wx", "kc", "nv", "kc", "ZP", "qy", ...},
+  {"start", "wx", "kc", "nv", "kc", "ZP", ...},
+  {"start", "wx", "kc", "nv", "kc", ...},
+  {"start", "wx", "kc", "nv", ...},
+  {"start", "wx", "kc", ...},
+  {"start", "wx", ...},
+  {"start", ...},
+  {...},
+  ...
+]
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+length(paths)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+153592
+```
+
+### Given these new rules, how many paths through this cave system are there?
+
+#### Your puzzle answer was `153592`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/12/input).
