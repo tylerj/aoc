@@ -19,7 +19,8 @@ With your submarine's subterranean subsystems subsisting suboptimally, the only 
 
 Fortunately, the sensors are still mostly working, and so you build a rough map of the remaining caves (your puzzle input). For example:
 
-```start-A
+```
+start-A
 start-b
 A-c
 A-b
@@ -134,11 +135,169 @@ input = Kino.Input.textarea("Please paste your input file:")
 ```
 
 ```elixir
-list = input |> Kino.Input.read() |> String.split("\n", trim: true)
+caves =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n", trim: true)
+  |> Enum.map(&String.split(&1, "-"))
+  |> Enum.reduce(%{}, fn [a, b], map ->
+    map
+    |> Map.update(a, [b], &[b | &1])
+    |> Map.update(b, [a], &[a | &1])
+  end)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-["start-A", "start-b", "A-c", "A-b", "b-d", "A-end", "b-end"]
+%{
+  "FN" => ["li", "kc", "end", "qy"],
+  "XQ" => ["nv"],
+  "ZP" => ["qy", "start", "wx", "yc", "li", "kc"],
+  "end" => ["nv", "qy", "FN"],
+  "kc" => ["nv", "li", "wx", "FN", "ZP", "qy"],
+  "li" => ["kc", "wx", "FN", "yc", "qy", "ZP"],
+  "nv" => ["XQ", "kc", "end", "xr", "qy"],
+  "qy" => ["ZP", "nv", "li", "end", "FN", "kc"],
+  "start" => ["wx", "ZP", "yc"],
+  "wx" => ["start", "kc", "li", "yc", "ZP"],
+  "xr" => ["nv"],
+  "yc" => ["wx", "li", "ZP", "start"]
+}
 ```
+
+```elixir
+defmodule Caves do
+  @cave_types [
+    {~r/\Astart\z/i, :start},
+    {~r/\Aend\z/i, :end},
+    {~r/\A[a-z]+\z/, :small},
+    {~r/\A[A-Z]+\z/, :big}
+  ]
+  def cave_type(cave) do
+    with {_regex, type} <-
+           Enum.find(
+             @cave_types,
+             fn {regex, _} -> String.match?(cave, regex) end
+           ) do
+      type
+    end
+  end
+
+  def find_paths(map) do
+    visit_cave(
+      map,
+      "start",
+      {"start"},
+      MapSet.new(["start"])
+    )
+  end
+
+  def visit_cave(map, cave, path, visited) do
+    Enum.map(map[cave], fn neighbor ->
+      cond do
+        neighbor == "end" ->
+          Tuple.append(path, "end")
+
+        neighbor in visited ->
+          nil
+
+        cave_type(neighbor) == :small ->
+          visit_cave(map, neighbor, Tuple.append(path, neighbor), MapSet.put(visited, neighbor))
+
+        true ->
+          visit_cave(map, neighbor, Tuple.append(path, neighbor), visited)
+      end
+    end)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Caves, <<70, 79, 82, 49, 0, 0, 14, ...>>, {:visit_cave, 4}}
+```
+
+```elixir
+paths =
+  Caves.find_paths(caves)
+  |> List.flatten()
+  |> Enum.filter(& &1)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {"start", "wx", "kc", "nv", "end"},
+  {"start", "wx", "kc", "nv", "qy", "ZP", "yc", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "qy", "ZP", "yc", "ZP", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "qy", "ZP", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "qy", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "qy", "end"},
+  {"start", "wx", "kc", "nv", "qy", "FN", "li", "FN", "end"},
+  {"start", "wx", "kc", "nv", "qy", "FN", "end"},
+  {"start", "wx", "kc", "li", "FN", "end"},
+  {"start", "wx", "kc", "li", "FN", "qy", "nv", "end"},
+  {"start", "wx", "kc", "li", "FN", "qy", "end"},
+  {"start", "wx", "kc", "li", "FN", "qy", "FN", "end"},
+  {"start", "wx", "kc", "li", "yc", "ZP", "qy", "nv", "end"},
+  {"start", "wx", "kc", "li", "yc", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "li", "yc", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "li", "qy", "nv", "end"},
+  {"start", "wx", "kc", "li", "qy", "end"},
+  {"start", "wx", "kc", "li", "qy", "FN", "end"},
+  {"start", "wx", "kc", "li", "ZP", "qy", "nv", "end"},
+  {"start", "wx", "kc", "li", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "li", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "li", "ZP", "yc", "ZP", "qy", "nv", "end"},
+  {"start", "wx", "kc", "li", "ZP", "yc", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "li", "ZP", "yc", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "FN", "li", "FN", "end"},
+  {"start", "wx", "kc", "FN", "li", "FN", "qy", "nv", "end"},
+  {"start", "wx", "kc", "FN", "li", "FN", "qy", "end"},
+  {"start", "wx", "kc", "FN", "li", "FN", "qy", "FN", "end"},
+  {"start", "wx", "kc", "FN", "li", "yc", "ZP", "qy", "nv", "end"},
+  {"start", "wx", "kc", "FN", "li", "yc", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "FN", "li", "yc", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "FN", "li", "qy", "nv", "end"},
+  {"start", "wx", "kc", "FN", "li", "qy", "end"},
+  {"start", "wx", "kc", "FN", "li", "qy", "FN", "end"},
+  {"start", "wx", "kc", "FN", "li", "ZP", "qy", "nv", "end"},
+  {"start", "wx", "kc", "FN", "li", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "FN", "li", "ZP", "qy", "FN", "end"},
+  {"start", "wx", "kc", "FN", "li", "ZP", "yc", "ZP", "qy", "nv", "end"},
+  {"start", "wx", "kc", "FN", "li", "ZP", "yc", "ZP", "qy", "end"},
+  {"start", "wx", "kc", "FN", "li", "ZP", "yc", "ZP", "qy", "FN", ...},
+  {"start", "wx", "kc", "FN", "end"},
+  {"start", "wx", "kc", "FN", "qy", "ZP", "yc", "li", ...},
+  {"start", "wx", "kc", "FN", "qy", "ZP", "yc", ...},
+  {"start", "wx", "kc", "FN", "qy", "ZP", ...},
+  {"start", "wx", "kc", "FN", "qy", ...},
+  {"start", "wx", "kc", "FN", ...},
+  {"start", "wx", "kc", ...},
+  {"start", "wx", ...},
+  {"start", ...},
+  {...},
+  ...
+]
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+length(paths)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+5874
+```
+
+### How many paths through this cave system are there that visit small caves at most once?
+
+#### Your puzzle answer was `5874`.
+
+The first half of this puzzle is complete! It provides one gold star: *
