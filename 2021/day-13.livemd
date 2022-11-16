@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Day 13: Transparent Origami
 
 * [Advent of Code](https://adventofcode.com/2021/day/13)
@@ -25,8 +19,8 @@ You reach another volcanically active part of the cave. It would be nice if you 
 
 Fortunately, the submarine seems to be equipped with a thermal camera! When you activate it, you are greeted with:
 
-Congratulations on your purchase! To activate this infrared thermal imaging
-camera system, please enter the code found on page 1 of the manual.
+> Congratulations on your purchase! To activate this infrared thermal imaging camera system, please enter the code found on page 1 of the manual.
+
 Apparently, the Elves have never used this feature. To your surprise, you manage to find the manual; as you go to open it, page 1 falls out. It's a large sheet of [transparent paper](https://en.wikipedia.org/wiki/Transparency_(projection))! The transparent paper is marked with random dots and includes instructions on how to fold it up (your puzzle input). For example:
 
 ```
@@ -150,12 +144,104 @@ input = Kino.Input.textarea("Please paste your input file:")
 ```
 
 ```elixir
-list = input |> Kino.Input.read() |> String.split("\n", trim: true)
+input = input |> Kino.Input.read() |> String.split("\n", trim: true)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-["6,10", "0,14", "9,10", "0,3", "10,4", "4,11", "6,0", "6,12", "4,1", "0,13", "10,12", "3,4", "3,0",
- "8,4", "1,10", "2,14", "8,10", "9,0", "fold along y=7", "fold along x=5"]
+["201,376", "706,92", "161,698", "970,597", "751,579", "1031,337", "975,73", "800,520", "782,427",
+ "316,332", "838,793", "388,653", "507,590", "1299,471", "547,368", "771,169", "152,562", "422,110",
+ "279,844", "338,556", "45,135", "447,560", "704,231", "759,586", "271,686", "505,141", "423,262",
+ "915,716", "730,52", "773,113", "1099,787", "821,157", "771,452", "940,95", "618,327", "1193,781",
+ "243,677", "907,427", "878,84", "13,576", "1068,705", "371,777", "617,518", "1308,304", "972,108",
+ "375,221", "213,481", "445,891", "576,427", "13,800", ...]
 ```
+
+```elixir
+grid =
+  for [x, y] <- Enum.map(input, &String.split(&1, ",")), reduce: MapSet.new() do
+    acc ->
+      MapSet.put(
+        acc,
+        {
+          String.to_integer(x),
+          String.to_integer(y)
+        }
+      )
+  end
+
+{max_x, _} = Enum.max_by(grid, fn {x, _} -> x end)
+{_, max_y} = Enum.max_by(grid, fn {_, y} -> y end)
+
+folds =
+  input
+  |> Enum.map(&Regex.run(~r/fold along ([xy])=(\d+)/, &1))
+  |> Enum.reject(&is_nil/1)
+  |> Enum.map(fn [_, xy, value] -> {xy, String.to_integer(value)} end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {"x", 655},
+  {"y", 447},
+  {"x", 327},
+  {"y", 223},
+  {"x", 163},
+  {"y", 111},
+  {"x", 81},
+  {"y", 55},
+  {"x", 40},
+  {"y", 27},
+  {"y", 13},
+  {"y", 6}
+]
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+[first_fold | _] = folds
+
+apply_fold = fn
+  grid, {"x", axis} ->
+    for x <- (axis + 1)..max_x, y <- 0..max_y, reduce: grid do
+      acc ->
+        if MapSet.member?(acc, {x, y}) do
+          acc
+          |> MapSet.delete({x, y})
+          |> MapSet.put({x - 2 * (x - axis), y})
+        else
+          acc
+        end
+    end
+
+  grid, {"y", axis} ->
+    for y <- (axis + 1)..max_y, x <- 0..max_x, reduce: grid do
+      acc ->
+        if MapSet.member?(acc, {x, y}) do
+          acc
+          |> MapSet.delete({x, y})
+          |> MapSet.put({x, y - 2 * (y - axis)})
+        else
+          acc
+        end
+    end
+end
+
+grid |> apply_fold.(first_fold) |> MapSet.size()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+731
+```
+
+### How many dots are visible after completing just the first fold instruction on your transparent paper?
+
+#### Your puzzle answer was `731`.
+
+The first half of this puzzle is complete! It provides one gold star: *
