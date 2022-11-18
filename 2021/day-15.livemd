@@ -215,23 +215,37 @@ If we're ever on a path that comes to a point that has already been seen by a sm
 
 ```elixir
 defmodule Mover do
-  def move_from_point(%{max: max} = map, max), do: map
-
-  def move_from_point(map, point) do
-    map
-    |> move(point, :up)
-    |> move(point, :down)
-    |> move(point, :left)
-    |> move(point, :right)
+  def navigate(%{max: max} = map) do
+    if Map.get(map, max), do: map, else: do_navigate(map)
   end
 
-  defp move(%{min: {_, y}} = map, {_, y}, :up), do: map
-  defp move(%{max: {_, y}} = map, {_, y}, :down), do: map
-  defp move(%{min: {x, _}} = map, {x, _}, :left), do: map
-  defp move(%{max: {x, _}} = map, {x, _}, :right), do: map
+  defp do_navigate(map) do
+    point = next_point(map)
+    sum = Map.get(map, point)
 
-  defp move(%{grid: grid} = map, {x, y} = point, direction) do
-    sum = Map.get(map, {x, y})
+    map
+    |> Map.delete(point)
+    |> move(point, sum, :up)
+    |> move(point, sum, :down)
+    |> move(point, sum, :left)
+    |> move(point, sum, :right)
+    |> navigate()
+  end
+
+  defp next_point(map) do
+    Enum.min_by(map, fn
+      {{_, _}, v} -> v
+      _ -> nil
+    end)
+    |> elem(0)
+  end
+
+  defp move(%{min: {_, y}} = map, {_, y}, _, :up), do: map
+  defp move(%{max: {_, y}} = map, {_, y}, _, :down), do: map
+  defp move(%{min: {x, _}} = map, {x, _}, _, :left), do: map
+  defp move(%{max: {x, _}} = map, {x, _}, _, :right), do: map
+
+  defp move(%{grid: grid} = map, point, sum, direction) do
     new_point = next_point(point, direction)
     new_value = Map.get(grid, new_point)
 
@@ -244,9 +258,7 @@ defmodule Mover do
   end
 
   defp do_move(map, point, sum, old_sum) when is_nil(old_sum) or old_sum > sum do
-    map
-    |> Map.put(point, sum)
-    |> move_from_point(point)
+    Map.put(map, point, sum)
   end
 
   defp do_move(map, _, _, _), do: map
@@ -261,7 +273,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Mover, <<70, 79, 82, 49, 0, 0, 12, ...>>, {:next_point, 2}}
+{:module, Mover, <<70, 79, 82, 49, 0, 0, 15, ...>>, {:next_point, 2}}
 ```
 
 ```elixir
@@ -274,9 +286,14 @@ map = %{
   {1, 1} => 0
 }
 
-map
-|> Mover.move_from_point({1, 1})
+Mover.navigate(map)
 |> Map.get(max_point)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+609
 ```
 
 ### What is the lowest total risk of any path from the top left to the bottom right?
