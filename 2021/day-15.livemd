@@ -215,46 +215,31 @@ If we're ever on a path that comes to a point that has already been seen by a sm
 
 ```elixir
 defmodule Mover do
-  def navigate(%{max: max} = map) do
-    if Map.get(map, max), do: map, else: do_navigate(map)
+  def navigate(map, grid, queue) do
+    if Enum.empty?(queue), do: map, else: do_navigate(map, grid, queue)
   end
 
-  defp do_navigate(map) do
-    point = next_point(map)
-    sum = Map.get(map, point)
+  defp do_navigate(map, grid, queue) do
+    point = Enum.min_by(queue, &Map.get(map, &1))
 
     map
-    |> Map.delete(point)
-    |> move(point, sum, :up)
-    |> move(point, sum, :down)
-    |> move(point, sum, :left)
-    |> move(point, sum, :right)
-    |> navigate()
+    |> move(grid, point, :up)
+    |> move(grid, point, :down)
+    |> move(grid, point, :left)
+    |> move(grid, point, :right)
+    |> navigate(grid, MapSet.delete(queue, point))
   end
 
-  defp next_point(map) do
-    Enum.min_by(map, fn
-      {{_, _}, v} -> v
-      _ -> nil
-    end)
-    |> elem(0)
-  end
+  defp move(%{min: {_, y}} = map, _, {_, y}, :up), do: map
+  defp move(%{max: {_, y}} = map, _, {_, y}, :down), do: map
+  defp move(%{min: {x, _}} = map, _, {x, _}, :left), do: map
+  defp move(%{max: {x, _}} = map, _, {x, _}, :right), do: map
 
-  defp move(%{min: {_, y}} = map, {_, y}, _, :up), do: map
-  defp move(%{max: {_, y}} = map, {_, y}, _, :down), do: map
-  defp move(%{min: {x, _}} = map, {x, _}, _, :left), do: map
-  defp move(%{max: {x, _}} = map, {x, _}, _, :right), do: map
-
-  defp move(%{grid: grid} = map, point, sum, direction) do
+  defp move(map, grid, point, direction) do
     new_point = next_point(point, direction)
-    new_value = Map.get(grid, new_point)
+    sum = Map.get(map, point) + Map.get(grid, new_point)
 
-    do_move(
-      map,
-      new_point,
-      sum + new_value,
-      Map.get(map, new_point)
-    )
+    do_move(map, new_point, sum, Map.get(map, new_point))
   end
 
   defp do_move(map, point, sum, old_sum) when is_nil(old_sum) or old_sum > sum do
@@ -273,20 +258,21 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Mover, <<70, 79, 82, 49, 0, 0, 15, ...>>, {:next_point, 2}}
+{:module, Mover, <<70, 79, 82, 49, 0, 0, 14, ...>>, {:next_point, 2}}
 ```
 
 ```elixir
 max_point = {max_x, max_y}
 
 map = %{
-  :grid => grid,
   :min => {1, 1},
   :max => max_point,
   {1, 1} => 0
 }
 
-Mover.navigate(map)
+queue = for x <- 1..max_x, y <- 1..max_y, into: MapSet.new(), do: {x, y}
+
+Mover.navigate(map, grid, queue)
 |> Map.get(max_point)
 ```
 
