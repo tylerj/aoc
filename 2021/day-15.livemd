@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Day 15: Chiton
 
 * [Advent of Code](https://adventofcode.com/2021/day/15)
@@ -142,70 +136,20 @@ max_y = lines |> length()
 grid =
   lines
   |> Enum.with_index(1)
-  |> Enum.reduce(%{}, fn {row, i}, acc ->
+  |> Enum.reduce(%{}, fn {row, y}, acc ->
     row
     |> String.split("", trim: true)
     |> Enum.with_index(1)
-    |> Enum.into(acc, fn {col, j} -> {{i, j}, String.to_integer(col)} end)
+    |> Enum.into(acc, fn {col, x} -> {{x, y}, String.to_integer(col)} end)
   end)
+
+{max_x, max_y} = max_point = Enum.max(Map.keys(grid))
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{
-  {76, 13} => 1,
-  {37, 47} => 3,
-  {65, 63} => 2,
-  {38, 2} => 2,
-  {1, 26} => 3,
-  {83, 76} => 1,
-  {32, 15} => 6,
-  {89, 14} => 9,
-  {35, 30} => 1,
-  {37, 53} => 1,
-  {4, 5} => 7,
-  {8, 50} => 2,
-  {78, 98} => 5,
-  {95, 56} => 3,
-  {74, 12} => 1,
-  {11, 39} => 7,
-  {65, 43} => 8,
-  {22, 38} => 8,
-  {14, 86} => 9,
-  {20, 41} => 1,
-  {29, 25} => 2,
-  {86, 10} => 9,
-  {83, 36} => 3,
-  {29, 26} => 6,
-  {47, 27} => 9,
-  {4, 81} => 9,
-  {31, 42} => 7,
-  {9, 34} => 8,
-  {67, 98} => 6,
-  {13, 85} => 1,
-  {63, 81} => 2,
-  {82, 60} => 8,
-  {47, 38} => 1,
-  {15, 92} => 9,
-  {58, 58} => 5,
-  {20, 3} => 4,
-  {61, 95} => 2,
-  {23, 67} => 9,
-  {78, 75} => 4,
-  {79, 17} => 7,
-  {16, 73} => 4,
-  {76, 2} => 1,
-  {58, 84} => 1,
-  {58, 33} => 3,
-  {47, 44} => 2,
-  {54, 31} => 2,
-  {13, 55} => 9,
-  {21, 84} => 9,
-  {22, ...} => 6,
-  {...} => 6,
-  ...
-}
+{100, 100}
 ```
 
 As we navigate, let's keep track of each point we've come to, and what the smallest total
@@ -214,36 +158,66 @@ As we navigate, let's keep track of each point we've come to, and what the small
 If we're ever on a path that comes to a point that has already been seen by a smaller total, let's drop the path we're on.
 
 ```elixir
-defmodule Mover do
-  def navigate(map, grid, queue) do
-    if Enum.empty?(queue), do: map, else: do_navigate(map, grid, queue)
+defmodule Queue do
+  def add([{lowest_weight, _} | _] = queue, xy, weight) when weight <= lowest_weight do
+    [{weight, xy} | queue]
   end
 
-  defp do_navigate(map, grid, queue) do
-    point = Enum.min_by(queue, &Map.get(map, &1))
+  def add([head | tail], xy, weight) do
+    [head | add(tail, xy, weight)]
+  end
 
-    map
+  def add([], xy, weight) do
+    [{weight, xy}]
+  end
+end
+
+defmodule Grid do
+  def print(grid) do
+    {max_x, max_y} = Enum.max(Map.keys(grid))
+
+    for y <- 1..max_y do
+      1..max_x
+      |> Enum.map(fn x -> Map.get(grid, {x, y}) end)
+      |> Enum.join()
+      |> IO.puts()
+    end
+
+    nil
+  end
+end
+
+defmodule Mover do
+  def navigate({map, queue}, grid) do
+    if Enum.empty?(queue), do: map, else: do_navigate({map, queue}, grid)
+  end
+
+  defp do_navigate({map, [{_, point} | queue]}, grid) do
+    {map, queue}
     |> move(grid, point, :up)
     |> move(grid, point, :down)
     |> move(grid, point, :left)
     |> move(grid, point, :right)
-    |> navigate(grid, MapSet.delete(queue, point))
+    |> navigate(grid)
   end
 
-  defp move(%{min: {_, y}} = map, _, {_, y}, :up), do: map
-  defp move(%{max: {_, y}} = map, _, {_, y}, :down), do: map
-  defp move(%{min: {x, _}} = map, _, {x, _}, :left), do: map
-  defp move(%{max: {x, _}} = map, _, {x, _}, :right), do: map
+  defp move({%{min: {_, y}} = map, queue}, _, {_, y}, :up), do: {map, queue}
+  defp move({%{max: {_, y}} = map, queue}, _, {_, y}, :down), do: {map, queue}
+  defp move({%{min: {x, _}} = map, queue}, _, {x, _}, :left), do: {map, queue}
+  defp move({%{max: {x, _}} = map, queue}, _, {x, _}, :right), do: {map, queue}
 
-  defp move(map, grid, point, direction) do
+  defp move({map, queue}, grid, point, direction) do
     new_point = next_point(point, direction)
     sum = Map.get(map, point) + Map.get(grid, new_point)
 
-    do_move(map, new_point, sum, Map.get(map, new_point))
+    do_move({map, queue}, new_point, sum, Map.get(map, new_point))
   end
 
-  defp do_move(map, point, sum, old_sum) when is_nil(old_sum) or old_sum > sum do
-    Map.put(map, point, sum)
+  defp do_move({map, queue}, point, sum, old_sum) when is_nil(old_sum) or old_sum > sum do
+    {
+      Map.put(map, point, sum),
+      Queue.add(queue, point, sum)
+    }
   end
 
   defp do_move(map, _, _, _), do: map
@@ -262,17 +236,16 @@ end
 ```
 
 ```elixir
-max_point = {max_x, max_y}
-
 map = %{
   :min => {1, 1},
   :max => max_point,
   {1, 1} => 0
 }
 
-queue = for x <- 1..max_x, y <- 1..max_y, into: MapSet.new(), do: {x, y}
+queue = Queue.add([], {1, 1}, 0)
 
-Mover.navigate(map, grid, queue)
+{map, queue}
+|> Mover.navigate(grid)
 |> Map.get(max_point)
 ```
 
@@ -287,3 +260,96 @@ Mover.navigate(map, grid, queue)
 #### Your puzzle answer was `609`.
 
 The first half of this puzzle is complete! It provides one gold star: *
+
+## Part Two: Prompt
+
+Now that you know how to find low-risk paths in the cave, you can try to find your way out.
+
+The entire cave is actually five times larger in both dimensions than you thought; the area you originally scanned is just one tile in a 5x5 tile area that forms the full map. Your original map tile repeats to the right and downward; each time the tile repeats to the right or downward, all of its risk levels are 1 higher than the tile immediately up or left of it. However, risk levels above 9 wrap back around to 1. So, if your original map had some position with a risk level of 8, then that same position on each of the 25 total tiles would be as follows:
+
+```
+8 9 1 2 3
+9 1 2 3 4
+1 2 3 4 5
+2 3 4 5 6
+3 4 5 6 7
+```
+
+Each single digit above corresponds to the example position with a value of 8 on the top-left tile. Because the full map is actually five times larger in both dimensions, that position appears a total of 25 times, once in each duplicated tile, with the values shown above.
+
+Equipped with the full map, you can now find a path from the top left corner to the bottom right corner with the lowest total risk.
+
+### Using the full map, what is the lowest total risk of any path from the top left to the bottom right?
+
+## Part Two: Solution
+
+```elixir
+# Increment grid 5 times in each direction
+new_value = fn value, incr ->
+  case rem(value + incr, 9) do
+    0 -> 9
+    r -> r
+  end
+end
+
+big_grid =
+  Enum.reduce(grid, %{}, fn
+    {{x, y}, value}, big_grid ->
+      for x_inc <- 0..4, y_inc <- 0..4, reduce: big_grid do
+        acc ->
+          Map.put(
+            acc,
+            {x + max_x * x_inc, y + max_y * y_inc},
+            new_value.(value, x_inc + y_inc)
+          )
+      end
+  end)
+
+{big_max_x, big_max_y} = max_point = Enum.max(Map.keys(big_grid))
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{500, 500}
+```
+
+```elixir
+# Grid.print(big_grid)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+map = %{
+  :min => {1, 1},
+  :max => max_point,
+  {1, 1} => 0
+}
+
+queue = Queue.add([], {1, 1}, 0)
+
+{map, queue}
+|> Mover.navigate(big_grid)
+|> Map.get(max_point)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+2925
+```
+
+### Using the full map, what is the lowest total risk of any path from the top left to the bottom right?
+
+#### Your puzzle answer was `2925`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2021) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2021/day/15/input).
