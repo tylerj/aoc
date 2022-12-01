@@ -74,9 +74,14 @@ input = input |> Kino.Input.read() |> String.split("\n")
 ```elixir
 input
 |> Enum.reduce({0, 0}, fn
-  "", {current, max} when current > max -> {0, current}
-  "", {_, max} -> {0, max}
-  amt, {current, max} -> {current + String.to_integer(amt), max}
+  "", {current, max} when current > max ->
+    {0, current}
+
+  "", {_, max} ->
+    {0, max}
+
+  amt, {current, max} ->
+    {current + String.to_integer(amt), max}
 end)
 |> then(fn {_, max} -> max end)
 ```
