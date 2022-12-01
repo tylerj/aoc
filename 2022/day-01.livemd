@@ -57,7 +57,8 @@ input = Kino.Input.textarea("Please paste your input file:")
 ```
 
 ```elixir
-input = input |> Kino.Input.read() |> String.split("\n")
+input_str = input |> Kino.Input.read()
+input_list = input_str |> String.split("\n")
 ```
 
 <!-- livebook:{"output":true} -->
@@ -72,7 +73,7 @@ input = input |> Kino.Input.read() |> String.split("\n")
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-input
+input_list
 |> Enum.reduce({0, 0}, fn
   "", {current, max} when current > max ->
     {0, current}
@@ -110,38 +111,53 @@ Find the top three Elves carrying the most Calories. **How many Calories are tho
 
 ## Part Two: Solution
 
+This solution was admittedly aiming for performance over clarity. See the newly added [Alternative Solution](http://localhost:8080/sessions/ukfq3nl2i3rkfxwqez3cqqnilx4tctmdjeyyynww#alternative-solution) section below for a more idiomatic approach.
+
+`Day01.find_top_elves/2` iterates over each input line only once, accumulating the total for each individual elf.
+
+When a newline (`""`) is reached, we add that elf's total to the current leaderboard list of totals, and drop the lowest value from the leaderboard.
+
+This leaders list initially holds zeroes for the number of leaders we want to keep (e.g. when looking for the top 3 totals, the initial leaders list is `[0, 0, 0]`).
+
+#### Bonus performance:
+
+Use `Day01.rank/1` instead of `Enum.sort(list, :asc)` if sorting performance is a concern.
+
+`Day01.rank/1` assumes the tail of the list is sorted ascending, so exits the recursion as soon as a larger item is met.
+
 ```elixir
-defmodule Calories do
+defmodule Day01 do
   def find_top_elves(input, top_n \\ 1) do
-    top = List.duplicate(0, top_n)
+    leaders = List.duplicate(0, top_n)
 
-    Enum.reduce(input, {0, top}, &apply_line/2)
+    Enum.reduce(input, {0, leaders}, &apply_line/2)
   end
 
-  defp apply_line("", {current, top}) do
-    minimum = Enum.min(top)
-
-    if current > minimum do
-      {0, [current | List.delete(top, minimum)]}
-    else
-      {0, top}
-    end
+  defp apply_line("", {elf_total, leaders}) do
+    {
+      0,
+      [elf_total | leaders] |> Enum.sort(:asc) |> Enum.drop(1)
+    }
   end
 
-  defp apply_line(amt, {current, top}) do
-    {current + String.to_integer(amt), top}
+  defp apply_line(line_amt, {acc, top}) do
+    {acc + String.to_integer(line_amt), top}
   end
+
+  def rank([a | [b | _]] = list) when a <= b, do: list
+  def rank([a | [b | rest]]), do: [b | rank([a | rest])]
+  def rank([_] = end_of_list), do: end_of_list
 end
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Calories, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:apply_line, 2}}
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:rank, 1}}
 ```
 
 ```elixir
-Calories.find_top_elves(input, 1)
+Day01.find_top_elves(input_list, 1)
 ```
 
 <!-- livebook:{"output":true} -->
@@ -150,20 +166,21 @@ Calories.find_top_elves(input, 1)
 {51969, [72017]}
 ```
 
-<!-- livebook:{"reevaluate_automatically":true} -->
-
 ```elixir
-Calories.find_top_elves(input, 3)
+Day01.find_top_elves(input_list, 3)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-{51969, [72017, 69359, 71144]}
+{51969, [69359, 71144, 72017]}
 ```
 
+<!-- livebook:{"reevaluate_automatically":true} -->
+
 ```elixir
-Calories.find_top_elves(input, 3)
+input_list
+|> Day01.find_top_elves(3)
 |> then(fn {_, top} -> Enum.sum(top) end)
 ```
 
@@ -182,3 +199,51 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+
+## Alternative Solution
+
+In the spirit of clarity over performance, it would be more idiomatic to simply calculate all the totals, then sort the list and take the desired number of "top" entries:
+
+```elixir
+sorted_totals = fn input ->
+  input
+  |> String.split("\n\n")
+  |> Enum.map(fn group ->
+    group
+    |> String.split("\n")
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.sum()
+  end)
+  |> Enum.sort(:desc)
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+#Function<42.3316493/1 in :erl_eval.expr/6>
+```
+
+```elixir
+# Part 1:
+input_str |> sorted_totals.() |> List.first()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+72017
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+# Part 2:
+input_str |> sorted_totals.() |> Enum.take(3) |> Enum.sum()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+212520
+```
