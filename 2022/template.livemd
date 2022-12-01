@@ -1,0 +1,39 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# 2022 Advent of Code - Day X: TBD
+
+```elixir
+Mix.install([:kino])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code](https://adventofcode.com/2022/day/1)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-01.livemd)
+
+## Part 1: Prompt
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+
+## Part 1: Solution
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+```elixir
+input_str = input |> Kino.Input.read()
+input_list = input_str |> String.split("\n")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
