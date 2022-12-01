@@ -6,6 +6,12 @@
 Mix.install([:kino])
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
 ## 2022 - Day 1: Calorie Counting
 
 * [Advent of Code](https://adventofcode.com/2022/day/1)
@@ -111,7 +117,7 @@ Find the top three Elves carrying the most Calories. **How many Calories are tho
 
 ## Part Two: Solution
 
-This solution was admittedly aiming for performance over clarity. See the newly added [Alternative Solution](http://localhost:8080/sessions/ukfq3nl2i3rkfxwqez3cqqnilx4tctmdjeyyynww#alternative-solution) section below for a more idiomatic approach.
+This solution was admittedly aiming for performance over clarity. See the newly added [Alternative Solution](#alternative-solution) section below for a more idiomatic approach.
 
 `Day01.find_top_elves/2` iterates over each input line only once, accumulating the total for each individual elf.
 
