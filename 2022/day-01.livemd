@@ -63,11 +63,38 @@ input = Kino.Input.textarea("Please paste your input file:")
 ```
 
 ```elixir
-input = input |> Kino.Input.read()
+input = input |> Kino.Input.read() |> String.split("\n")
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-""
+["5229", "1021", "2051", "4766", "2272", "5810", "4688", "2324", "2108", "1555", "1221", "4146",
+ "5044", "2238", "4504", "", "4800", "3333", "1171", "5362", "6213", "3200", "1185", "5839", "4075",
+ "3956", "6688", "4293", "2244", "", "6719", "2596", "5233", "5371", "4802", "5901", "6093", "2420",
+ "2593", "4093", "1909", "3851", "4143", "", "4353", "6425", "2546", "6368", "1939", "8550", ...]
 ```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input
+|> Enum.reduce({0, 0}, fn
+  "", {current, max} when current > max -> {0, current}
+  "", {_, max} -> {0, max}
+  amt, {current, max} -> {current + String.to_integer(amt), max}
+end)
+|> then(fn {_, max} -> max end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+72017
+```
+
+### How many total Calories is that Elf carrying?
+
+#### Your puzzle answer was `72017`.
+
+The first half of this puzzle is complete! It provides one gold star: *
