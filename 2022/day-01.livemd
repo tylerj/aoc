@@ -133,21 +133,30 @@ Use `Day01.rank/1` instead of `Enum.sort(list, :asc)` if sorting performance is 
 
 ```elixir
 defmodule Day01 do
-  def find_top_elves(input, top_n \\ 1) do
-    leaders = List.duplicate(0, top_n)
+  def find_top_n(input, top_n \\ 1)
 
-    Enum.reduce(input, {0, leaders}, &apply_line/2)
+  def find_top_n(input, top_n) when is_binary(input) do
+    input |> String.split("\n") |> find_top_n(top_n)
   end
 
-  defp apply_line("", {elf_total, leaders}) do
-    {
-      0,
-      [elf_total | leaders] |> Enum.sort(:asc) |> Enum.drop(1)
-    }
+  def find_top_n(input, top_n) when is_list(input) do
+    leaders = List.duplicate(0, top_n)
+
+    input
+    |> Enum.reduce({0, leaders}, &apply_line/2)
+    |> then(&update_leaders/1)
+  end
+
+  defp apply_line("", value_and_leaders) do
+    {0, update_leaders(value_and_leaders)}
   end
 
   defp apply_line(line_amt, {acc, top}) do
     {acc + String.to_integer(line_amt), top}
+  end
+
+  defp update_leaders({value, leaders}) do
+    [value | leaders] |> Enum.sort(:asc) |> Enum.drop(1)
   end
 
   def rank([a | [b | _]] = list) when a <= b, do: list
@@ -159,35 +168,23 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day01, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:rank, 1}}
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 12, ...>>, {:rank, 1}}
 ```
 
 ```elixir
-Day01.find_top_elves(input_list, 1)
+Day01.find_top_n(input_list, 1) |> List.first()
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-{51969, [72017]}
-```
-
-```elixir
-Day01.find_top_elves(input_list, 3)
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{51969, [69359, 71144, 72017]}
+72017
 ```
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-input_list
-|> Day01.find_top_elves(3)
-|> then(fn {_, top} -> Enum.sum(top) end)
+Day01.find_top_n(input_list, 3) |> Enum.take(3) |> Enum.sum()
 ```
 
 <!-- livebook:{"output":true} -->
@@ -252,4 +249,50 @@ input_str |> sorted_totals.() |> Enum.take(3) |> Enum.sum()
 
 ```
 212520
+```
+
+## ExUnit Exploration
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day01Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000"
+    ]
+  end
+
+  describe "find_top_n/2" do
+    test "returns top 1 total", %{input: input} do
+      assert Day01.find_top_n(input, 1) == [24000]
+    end
+
+    test "returns top 3 totals, in ascending order", %{input: input} do
+      assert Day01.find_top_n(input, 3) == [10000, 11000, 24000]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 712519
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
 ```
