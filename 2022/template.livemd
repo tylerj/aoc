@@ -37,3 +37,71 @@ input_list = input_str |> String.split("\n")
 ```
 [""]
 ```
+
+```elixir
+defmodule Day01 do
+  def call(_input) do
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 5, ...>>, {:call, 1}}
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.call(input_str)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day01Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "call/1" do
+    test "returns expected value", %{input: input} do
+      assert Day01.call(input) == nil
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+.
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+1 test, 0 failures
+
+Randomized with seed 317192
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 1}
+```
