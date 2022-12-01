@@ -110,9 +110,7 @@ defmodule Calories do
   def find_top_elves(input, top_n \\ 1) do
     top = List.duplicate(0, top_n)
 
-    input
-    |> Enum.reduce({0, top}, &apply_line/2)
-    |> then(fn {_, top} -> Enum.sum(top) end)
+    Enum.reduce(input, {0, top}, &apply_line/2)
   end
 
   defp apply_line("", {current, top}) do
@@ -144,13 +142,24 @@ Calories.find_top_elves(input, 1)
 <!-- livebook:{"output":true} -->
 
 ```
-72017
+{51969, [72017]}
 ```
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
 Calories.find_top_elves(input, 3)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{51969, [72017, 69359, 71144]}
+```
+
+```elixir
+Calories.find_top_elves(input, 3)
+|> then(fn {_, top} -> Enum.sum(top) end)
 ```
 
 <!-- livebook:{"output":true} -->
