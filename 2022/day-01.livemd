@@ -6,12 +6,6 @@
 Mix.install([:kino])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## 2022 - Day 1: Calorie Counting
 
 * [Advent of Code](https://adventofcode.com/2022/day/1)
@@ -98,3 +92,79 @@ end)
 #### Your puzzle answer was `72017`.
 
 The first half of this puzzle is complete! It provides one gold star: *
+
+## Part Two: Prompt
+
+By the time you calculate the answer to the Elves' question, they've already realized that the Elf carrying the most Calories of food might eventually **run out of snacks**.
+
+To avoid this unacceptable situation, the Elves would instead like to know the total Calories carried by the **top three** Elves carrying the most Calories. That way, even if one of those Elves runs out of snacks, they still have two backups.
+
+In the example above, the top three Elves are the fourth Elf (with `24000` Calories), then the third Elf (with `11000` Calories), then the fifth Elf (with `10000` Calories). The sum of the Calories carried by these three elves is `45000`.
+
+Find the top three Elves carrying the most Calories. **How many Calories are those Elves carrying in total?**
+
+## Part Two: Solution
+
+```elixir
+defmodule Calories do
+  def find_top_elves(input, top_n \\ 1) do
+    top = List.duplicate(0, top_n)
+
+    input
+    |> Enum.reduce({0, top}, &apply_line/2)
+    |> then(fn {_, top} -> Enum.sum(top) end)
+  end
+
+  defp apply_line("", {current, top}) do
+    minimum = Enum.min(top)
+
+    if current > minimum do
+      {0, [current | List.delete(top, minimum)]}
+    else
+      {0, top}
+    end
+  end
+
+  defp apply_line(amt, {current, top}) do
+    {current + String.to_integer(amt), top}
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Calories, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:apply_line, 2}}
+```
+
+```elixir
+Calories.find_top_elves(input, 1)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+72017
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Calories.find_top_elves(input, 3)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+212520
+```
+
+### How many Calories are those Elves carrying in total?
+
+#### Your puzzle answer was `212520`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/1/input).
