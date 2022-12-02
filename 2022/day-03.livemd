@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2022 Advent of Code - Day X: TBD
+# 2022 Advent of Code - Day 3: TBD
 
 ```elixir
 Mix.install([:kino])
@@ -14,8 +14,8 @@ Mix.install([:kino])
 
 ## Links
 
-* [Advent of Code](https://adventofcode.com/2022/day/1)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-01.livemd)
+* [Advent of Code](https://adventofcode.com/2022/day/3)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-03.livemd)
 
 ## Input
 
@@ -35,12 +35,12 @@ input = input |> Kino.Input.read()
 
 ## Part 1: Prompt
 
-To begin, [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/3/input).
 
 ## Part 1: Solution
 
 ```elixir
-defmodule Day01.Part1 do
+defmodule Day03.Part1 do
   def call(input) when is_binary(input) do
     input
     |> String.split("\n")
@@ -57,13 +57,13 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day01.Part1, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:call, 1}}
+{:module, Day03.Part1, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:call, 1}}
 ```
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day01.Part1.call(input)
+Day03.Part1.call(input)
 ```
 
 <!-- livebook:{"output":true} -->
@@ -79,7 +79,7 @@ Day01.Part1.call(input)
 ```elixir
 ExUnit.start(auto_run: false)
 
-defmodule Day01Test do
+defmodule Day03Test do
   use ExUnit.Case, async: false
 
   setup_all do
@@ -90,7 +90,7 @@ defmodule Day01Test do
 
   describe "Part1.call/1" do
     test "returns expected value", %{input: input} do
-      assert Day01.Part1.call(input) == [""]
+      assert Day03.Part1.call(input) == [""]
     end
   end
 end
