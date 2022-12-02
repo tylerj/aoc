@@ -69,13 +69,13 @@ input_str = input |> Kino.Input.read()
 
 ```elixir
 defmodule Day02.Part1 do
-  @values %{
+  @shape_values %{
     :rock => 1,
     :paper => 2,
     :scissors => 3
   }
 
-  @map %{
+  @shape_map %{
     "A" => :rock,
     "B" => :paper,
     "C" => :scissors,
@@ -107,11 +107,11 @@ defmodule Day02.Part1 do
   end
 
   def calculate_score([them, me]) when is_binary(them) and is_binary(me) do
-    calculate_score(@map[them], @map[me])
+    calculate_score(@shape_map[them], @shape_map[me])
   end
 
   def calculate_score(them, me) when is_atom(them) and is_atom(me) do
-    @outcome_values[win_lose_draw(them, me)] + @values[me]
+    @outcome_values[win_lose_draw(them, me)] + @shape_values[me]
   end
 
   defp win_lose_draw(a, a), do: :draw
@@ -164,7 +164,7 @@ Following the Elf's instructions for the second column, **what would your total 
 
 ```elixir
 defmodule Day02.Part2 do
-  @values %{
+  @shape_values %{
     :rock => 1,
     :paper => 2,
     :scissors => 3
@@ -209,7 +209,7 @@ defmodule Day02.Part2 do
   end
 
   def calculate_score(them, outcome) do
-    @values[my_shape(them, outcome)] + @outcome_values[outcome]
+    @outcome_values[outcome] + @shape_values[my_shape(them, outcome)]
   end
 
   defp my_shape(them_shape, :draw), do: them_shape
