@@ -84,6 +84,12 @@ defmodule Day02.Part1 do
     "Z" => :scissors
   }
 
+  @outcome_values %{
+    win: 6,
+    lose: 0,
+    draw: 3
+  }
+
   def score_lines(input) when is_binary(input) do
     input
     |> String.split("\n")
@@ -105,16 +111,16 @@ defmodule Day02.Part1 do
   end
 
   def calculate_score(them, me) when is_atom(them) and is_atom(me) do
-    win_lose_draw(them, me) + @values[me]
+    @outcome_values[win_lose_draw(them, me)] + @values[me]
   end
 
-  defp win_lose_draw(a, a), do: 3
-  defp win_lose_draw(:rock, :paper), do: 6
-  defp win_lose_draw(:paper, :scissors), do: 6
-  defp win_lose_draw(:scissors, :rock), do: 6
-  defp win_lose_draw(:rock, :scissors), do: 0
-  defp win_lose_draw(:paper, :rock), do: 0
-  defp win_lose_draw(:scissors, :paper), do: 0
+  defp win_lose_draw(a, a), do: :draw
+  defp win_lose_draw(:rock, :paper), do: :win
+  defp win_lose_draw(:rock, :scissors), do: :lose
+  defp win_lose_draw(:paper, :scissors), do: :win
+  defp win_lose_draw(:paper, :rock), do: :lose
+  defp win_lose_draw(:scissors, :rock), do: :win
+  defp win_lose_draw(:scissors, :paper), do: :lose
 end
 ```
 
