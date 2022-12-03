@@ -95,8 +95,8 @@ defmodule Day03.Part1 do
     Enum.find(left, &Enum.member?(right, &1))
   end
 
-  def char_value(x) when x in 97..122, do: x - 96
-  def char_value(x) when x in 65..90, do: x - 38
+  def char_value(x) when x in ?a..?z, do: x - 96
+  def char_value(x) when x in ?A..?Z, do: x - 38
 end
 ```
 
@@ -254,7 +254,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 783565
+Randomized with seed 389277
 ```
 
 <!-- livebook:{"output":true} -->
