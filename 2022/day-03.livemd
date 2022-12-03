@@ -181,17 +181,15 @@ defmodule Day03.Part2 do
       end
     )
     |> Enum.at(0)
-    |> char_value()
+    |> Day03.Part1.char_value()
   end
-
-  defdelegate char_value(x), to: Day03.Part1
 end
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day03.Part2, <<70, 79, 82, 49, 0, 0, 11, ...>>, [char_value: 1]}
+{:module, Day03.Part2, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:process_group, 1}}
 ```
 
 <!-- livebook:{"reevaluate_automatically":true} -->
