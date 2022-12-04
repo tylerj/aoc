@@ -1,0 +1,258 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# 2022 Advent of Code - Day 4: Camp Cleanup
+
+```elixir
+Mix.install([:kino])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code](https://adventofcode.com/2022/day/4)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-04.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"2-9,9-51\n33-51,45-73\n28-29,29-93\n37-47,37-48\n7-71,2-71\n18-20,19-54\n9-92,9-51\n23-83,82-83\n28-86,27-28\n43-43,42-78\n10-79,9-11\n19-97,19-74\n29-54,50-53\n15-94,20-93\n11-12,14-70\n8-96,8-8\n7-90,90-90\n32-59,32-60\n33-56,55-63\n53-77,34-52\n3-60,5-23\n76-95,93-95\n17-76,16-77\n50-64,25-49\n31-64,64-79\n71-91,71-72\n47-49,48-83\n1-99,2-99\n89-94,86-99\n52-79,79-79\n6-88,10-24\n16-53,17-53\n1-96,96-97\n10-11,11-43\n66-89,4-85\n69-70,33-70\n30-43,29-31\n4-50,9-51\n22-81,9-61\n7-80,79-98\n77-78,40-78\n36-99,36-98\n4-13,13-79\n90-98,14-93\n71-98,4-62\n74-87,73-87\n46-86,84-97\n1-57,36-58\n82-96,9-83\n27-96,2-96\n33-33,33-33\n93-94,45-94\n92-92,4-93\n3-70,1-77\n53-94,72-86\n84-85,39-85\n10-74,10-88\n59-95,72-83\n37-75,23-85\n17-19,10-19\n1-83,1-82\n2-93,94-94\n26-84,83-84\n35-57,34-58\n16-74,17-17\n38-88,38-89\n70-96,69-96\n43-76,77-88\n2-99,2-87\n33-56,74-81\n19-50,19-20\n26-94,94-97\n5-78,2-82\n27-77,26-77\n47-98,45-99\n6-89,5-5\n35-56,22-57\n3-96,1-3\n97-97,24-96\n4-35,5-68\n3-5,34-85\n89-90,82-91\n6-46,6-65\n17-34,17-35\n10-82,11-81\n4-53,2-4\n21-88,21-75\n67-99,22-68\n3-89,90-94\n4-97,2-98\n2-69,2-3\n41-62,42-61\n39-88,10-90\n3-43,18-42\n3-83,28-84\n74-87,22-86\n35-98,35-99\n11-92,10-10\n8-15,9-17\n10-17,55-94\n54-74,53-60\n3-96,3-4\n5-18,5-70\n6-88,3-3\n98-98,5-99\n60-87,59-84\n28-76,27-77\n17-26,26-70\n4-6,3-5\n83-99,83-97\n10-65,65-69\n6-73,2-74\n44-96,44-95\n89-89,10-88\n2-91,95-96\n13-60,12-59\n6-29,5-27\n57-57,12-58\n48-85,48-85\n97-98,20-85\n62-97,99-99\n3-6,8-99\n20-34,12-14\n18-84,17-85\n5-88,4-46\n63-67,32-64\n52-80,52-80\n35-97,3-9\n35-78,35-79\n42-65,66-66\n30-30,30-93\n35-44,36-41\n26-95,4-92\n5-5,5-30\n15-88,16-87\n14-54,55-55\n8-41,41-57\n11-93,20-84\n7-61,6-7\n16-37,37-89\n36-89,35-90\n9-39,9-40\n79-92,72-80\n39-97,97-98\n75-81,21-76\n3-70,71-71\n2-94,2-94\n4-5,5-80\n2-84,2-84\n44-57,45-56\n36-76,3-77\n48-54,53-98\n14-71,3-71\n18-98,2-98\n29-85,14-30\n5-88,4-6\n54-84,22-53\n11-75,61-79\n73-74,39-73\n61-98,61-62\n1-4,5-59\n66-94,88-94\n32-38,38-64\n4-59,1-5\n25-57,24-36\n45-69,46-68\n53-77,53-63\n1-94,4-93\n17-89,88-90\n9-90,21-39\n9-90,8-15\n65-82,66-81\n7-83,7-83\n24-98,24-77\n1-1,3-99\n16-18,17-47\n31-87,32-88\n96-98,34-95\n32-67,31-67\n16-58,57-57\n37-83,24-40\n4-66,3-66\n36-74,44-73\n22-81,22-23\n2-7,7-61\n20-21,21-76\n74-74,7-73\n12-46,4-11\n95-99,16-96\n38-80,39-39\n1-19,7-65\n39-53,39-84\n24-82,23-28\n43-44,43-92\n48-60,49-94\n66-85,31-65\n30-31,30-64\n56-95,36-55\n68-93,58-68\n47-59,46-46\n12-33,32-97\n57-75,62-84\n7-8,12-93\n42-75,76-76\n33-81,34-80\n4-5,4-97\n56-78,23-95\n53-53,54-67\n6-46,10-77\n55-87,87-88\n63-83,63-63\n1-1,1-43\n80-92,49-92\n95-99,11-95\n31-34,36-46\n25-83,84-96\n2-98,3-98\n1-3,2-69\n83-97,52-97\n35-93,37-78\n15-44,45-45\n1-99,2-99\n65-89,8-95\n23-59,28-60\n94-94,18-93\n3-44,12-90\n14-51,5-51\n13-38,12-14\n50-88,49-89\n46-69,47-47\n38-44,44-53\n11-73,87-88\n3-58,2-3\n42-89,90-98\n5-41,6-36\n48-90,47-49\n14-50,14-50\n16-24,3-16\n40-41,40-48\n37-37,1-38\n6-38,26-38\n8-96,17-95\n13-98,99-99\n2-57,3-56\n3-30,1-37\n4-68,4-67\n17-20,21-90\n13-17,16-23\n24-25,25-92\n2-2,1-96\n19-91,90-93\n6-79,7-50\n27-28,22-28\n12-98,9-98\n1-4,3-71\n10-20,19-51\n15-15,15-66\n95-95,30-96\n1-93,3-90\n41-43,42-86\n77-93,76-77\n87-99,96-99\n1-99,98-98\n13-70,2-64\n66-84,51-67\n24-89,43-92\n3-43,2-4\n46-48,47-82\n6-96,1-5\n13-76,13-76\n1-83,84-96\n42-60,3-21\n10-49,5-16\n42-95,96-97\n35-35,32-34\n5-7,6-27\n6-16,30-46\n98-99,14-97\n23-75,22-24\n16-18,17-90\n72-73,57-71\n13-78,10-98\n57-62,58-66\n22-57,58-58\n2-75,5-72\n7-24,11-66\n37-91,68-90\n57-94,6-93\n57-67,57-68\n6-18,17-85\n10-10,11-73\n19-35,34-34\n13-30,29-71\n78-78,68-79\n40-54,40-40\n14-60,13-60\n6-31,31-94\n25-76,55-75\n76-81,47-81\n34-58,43-57\n16-60,15-17\n95-97,9-96\n6-7,7-87\n99-99,3-98\n13-36,28-69\n13-26,12-26\n17-57,56-58\n20-95,27-44\n81-88,81-88\n29-45,28-45\n71-77,71-78\n4-17,28-82\n75-77,12-76\n40-44,39-41\n60-90,89-89\n28-43,28-48\n8-89,74-90\n1-4,6-77\n7-74,75-75\n84-94,6-93\n94-95,21-95\n10-63,64-87\n23-97,25-83\n11-68,11-74\n41-45,40-44\n30-88,83-87\n26-74,67-68\n2-6,7-60\n41-41,31-37\n91-91,20-90\n8-8,7-77\n66-77,74-77\n89-97,92-99\n63-70,64-70\n95-98,3-96\n14-79,78-78\n58-81,80-92\n59-94,58-58\n12-23,13-83\n9-85,9-9\n13-97,9-92\n56-73,16-57\n2-96,99-99\n31-73,30-41\n17-91,18-90\n74-94,64-75\n8-97,1-4\n6-95,5-6\n94-97,38-95\n9-80,53-69\n8-8,8-70\n11-94,11-93\n38-86,87-93\n7-85,6-7\n3-90,1-98\n18-88,14-73\n7-95,8-94\n27-77,7-26\n55-98,55-56\n49-90,85-91\n14-64,14-37\n91-95,8-9" <> ...
+```
+
+## Part 1: Prompt
+
+Space needs to be cleared before the last supplies can be unloaded from the ships, and so several Elves have been assigned the job of cleaning up sections of the camp. Every section has a unique **ID number**, and each Elf is assigned a range of section IDs.
+
+However, as some of the Elves compare their section assignments with each other, they've noticed that many of the assignments **overlap**. To try to quickly find overlaps and reduce duplicated effort, the Elves pair up and make a **big list of the section assignments for each pair** (your puzzle input).
+
+For example, consider the following list of section assignment pairs:
+
+```
+2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8
+```
+
+For the first few pairs, this list means:
+
+* Within the first pair of Elves, the first Elf was assigned sections 2-4 (sections 2, 3, and 4), while the second Elf was assigned sections 6-8 (sections 6, 7, 8).
+* The Elves in the second pair were each assigned two sections.
+* The Elves in the third pair were each assigned three sections: one got sections 5, 6, and 7, while the other also got 7, plus 8 and 9.
+
+This example list uses single-digit section IDs to make it easier to draw; your actual list might contain larger numbers. Visually, these pairs of section assignments look like this:
+
+```
+.234.....  2-4
+.....678.  6-8
+
+.23......  2-3
+...45....  4-5
+
+....567..  5-7
+......789  7-9
+
+.2345678.  2-8
+..34567..  3-7
+
+.....6...  6-6
+...456...  4-6
+
+.23456...  2-6
+...45678.  4-8
+```
+
+Some of the pairs have noticed that one of their assignments **fully contains** the other. For example, 2-8 fully contains 3-7, and 6-6 is fully contained by 4-6. In pairs where one assignment fully contains the other, one Elf in the pair would be exclusively cleaning sections their partner will already be cleaning, so these seem like the most in need of reconsideration. In this example, there are 2 such pairs.
+
+**In how many assignment pairs does one range fully contain the other?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/4/input).
+
+## Part 1: Solution
+
+```elixir
+defmodule Day04 do
+  def call(input, part) when is_binary(input) do
+    input
+    |> String.split("\n")
+    |> Stream.map(&parse_line/1)
+    |> call(part)
+  end
+
+  def call(input, :part1) do
+    Enum.count(input, &fully_contained?/1)
+  end
+
+  def call(input, :part2) do
+    Enum.count(input, &overlapping?/1)
+  end
+
+  defp parse_line(line) do
+    line
+    |> String.split(["-", ","])
+    |> Enum.map(&String.to_integer/1)
+  end
+
+  defp fully_contained?([a1, a2, b1, b2]) do
+    (a1 >= b1 and a2 <= b2) or (b1 >= a1 and b2 <= a2)
+  end
+
+  defp overlapping?([a1, a2, b1, b2]) do
+    (a1 >= b1 and a1 <= b2) or (b1 >= a1 and b1 <= a2)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day04, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:overlapping?, 1}}
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.call(input, :part1)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+450
+```
+
+**In how many assignment pairs does one range fully contain the other?**
+
+Your puzzle answer was `450`.
+
+## Part 2: Prompt
+
+It seems like there is still quite a bit of duplicate work planned. Instead, the Elves would like to know the number of pairs that **overlap at all**.
+
+In the above example, the first two pairs (2-4,6-8 and 2-3,4-5) don't overlap, while the remaining four pairs (5-7,7-9, 2-8,3-7, 6-6,4-6, and 2-6,4-8) do overlap:
+
+* 5-7,7-9 overlaps in a single section, 7.
+* 2-8,3-7 overlaps all of the sections 3 through 7.
+* 6-6,4-6 overlaps in a single section, 6.
+* 2-6,4-8 overlaps in sections 4, 5, and 6.
+
+So, in this example, the number of overlapping assignment pairs is 4.
+
+**In how many assignment pairs do the ranges overlap?**
+
+## Part 2: Solution
+
+Due to the similarities between parts 1 and 2, I wanted to keep the code for `overlapping?` right below `fully_contained?` so the differences can be more easily spotted:
+
+<!-- livebook:{"break_markdown":true} -->
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defp fully_contained?([a1, a2, b1, b2]) do
+  (a1 >= b1 and a2 <= b2) or (b1 >= a1 and b2 <= a2)
+end
+
+defp overlapping?([a1, a2, b1, b2]) do
+  (a1 >= b1 and a1 <= b2) or (b1 >= a1 and b1 <= a2)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+For `fully_contained?/1`, a1 and a2 need to be completely between b1 and b2.
+
+For `overlapping?/1`, only the beginning of one range needs to be within the other range. Note that you could also do this by checking that the end of one range is included in the other range.
+
+Consider the following example for the line `2-6,4-8`:
+
+```
+.23456...  2-6
+...45678.  4-8
+```
+
+In this example, `b1` is included in `a1..a2` and `a2` is included in `b1..b2`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.call(input, :part2)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+837
+```
+
+**In how many assignment pairs do the ranges overlap?**
+
+Your puzzle answer was `837`.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/4/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day04Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "2-4,6-8\n2-3,4-5\n5-7,7-9\n2-8,3-7\n6-6,4-6\n2-6,4-8"
+    ]
+  end
+
+  describe "call/2" do
+    test "returns expected value for part 1", %{input: input} do
+      assert Day04.call(input, :part1) == 2
+    end
+
+    test "returns expected value for part 2", %{input: input} do
+      assert Day04.call(input, :part2) == 4
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 360992
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
