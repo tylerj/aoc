@@ -172,24 +172,25 @@ defmodule Day03.Part2 do
     |> Enum.sum()
   end
 
-  def process_group([head | tail]) do
-    tail
-    |> Enum.reduce(
-      MapSet.new(head),
-      fn item, acc ->
-        MapSet.intersection(acc, MapSet.new(item))
-      end
-    )
+  def process_group(list) do
+    list
+    |> intersections()
     |> Enum.at(0)
     |> Day03.Part1.char_value()
   end
+
+  def intersections([last_item]),
+    do: MapSet.new(last_item)
+
+  def intersections([head | tail]),
+    do: MapSet.intersection(MapSet.new(head), intersections(tail))
 end
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day03.Part2, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:process_group, 1}}
+{:module, Day03.Part2, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:intersections, 1}}
 ```
 
 <!-- livebook:{"reevaluate_automatically":true} -->
