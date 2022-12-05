@@ -14,14 +14,23 @@ Mix.install([:kino])
 
 ## Links
 
-* [Advent of Code](https://adventofcode.com/2022/day/1)
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/1)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/1/input)
 * [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-01.livemd)
+
+## Prompt
+
+### Part 1
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/1/input).
 
 ## Input
 
 ```elixir
 input = Kino.Input.textarea("Please paste your input file:")
 ```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
 input = input |> Kino.Input.read()
@@ -33,23 +42,40 @@ input = input |> Kino.Input.read()
 ""
 ```
 
-## Part 1: Prompt
-
-To begin, [get your puzzle input](https://adventofcode.com/2022/day/1/input).
-
-## Part 1: Solution
+## Solution
 
 ```elixir
-defmodule Day01.Part1 do
-  def call(input) when is_binary(input) do
+defmodule Day01 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
     input
-    |> String.split("\n")
-    |> call()
+    |> parse()
+    |> Enum.map(& &1)
   end
 
-  def call(input) when is_list(input) do
+  def part2(input) do
     input
+    |> parse()
     |> Enum.map(& &1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      # |> String.split(["-", ","])
+      # |> Enum.map(&String.to_integer/1)
+    end
   end
 end
 ```
@@ -57,13 +83,14 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day01.Part1, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:call, 1}}
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 8, ...>>,
+ {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day01.Part1.call(input)
+Day01.part1(input)
 ```
 
 <!-- livebook:{"output":true} -->
@@ -88,9 +115,15 @@ defmodule Day01Test do
     ]
   end
 
-  describe "Part1.call/1" do
+  describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day01.Part1.call(input) == [""]
+      assert Day01.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day01.part2(input) == [""]
     end
   end
 end
@@ -101,15 +134,15 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-.
+..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-1 test, 0 failures
+2 tests, 0 failures
 
-Randomized with seed 642142
+Randomized with seed 533814
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 1}
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
 ```
