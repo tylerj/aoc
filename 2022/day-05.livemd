@@ -227,6 +227,7 @@ defmodule Day05 do
     def parse_crates(crates) do
       crates
       |> String.split("\n")
+      |> Enum.reverse()
       |> Enum.reduce(%{}, &parse_crate_line/2)
     end
 
@@ -235,7 +236,7 @@ defmodule Day05 do
       |> Enum.with_index(1)
       |> Enum.reduce(crate_map, fn
         {[""], _}, acc -> acc
-        {[letter], index}, acc -> Map.update(acc, index, [letter], &(&1 ++ [letter]))
+        {[letter], index}, acc -> Map.update(acc, index, [letter], &[letter | &1])
       end)
     end
 
@@ -422,7 +423,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 4 tests, 0 failures
 
-Randomized with seed 542547
+Randomized with seed 265646
 ```
 
 <!-- livebook:{"output":true} -->
