@@ -3,7 +3,7 @@
 # 2022 Advent of Code - Day 6: Tuning Trouble
 
 ```elixir
-Mix.install([:kino])
+Mix.install([:kino, :benchee])
 ```
 
 <!-- livebook:{"output":true} -->
@@ -158,12 +158,6 @@ Day06.part1(input)
 
 Your puzzle answer was `2773`.
 
-Both parts of this puzzle are complete! They provide two gold stars: **
-
-At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
-
-If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/6/input).
-
 ```elixir
 Day06.part2(input)
 ```
@@ -172,6 +166,180 @@ Day06.part2(input)
 
 ```
 2773
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/6/input).
+
+## Benchmarking
+
+```elixir
+defmodule Benchmark do
+  defdelegate parse(input), to: Day06.Input
+
+  def list_recursion(input, n) do
+    input |> parse() |> Day06.find_marker(n)
+  end
+
+  def chunk(input, n, module) do
+    input
+    |> parse()
+    |> module.chunk_every(n, 1)
+    |> module.with_index(n)
+    |> Enum.find(fn {list, _} ->
+      list |> Enum.uniq() |> length() == n
+    end)
+    |> elem(1)
+  end
+
+  def enum_slice(input, n) do
+    input = parse(input)
+
+    n..length(input)
+    |> Enum.find(fn i ->
+      n ==
+        input
+        |> Enum.slice((i - n)..(i - 1))
+        |> Enum.uniq()
+        |> length()
+    end)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 12, ...>>, {:enum_slice, 2}}
+```
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "list_recursion" => fn n -> Benchmark.list_recursion(input, n) end,
+    "enum_chunk" => fn n -> Benchmark.chunk(input, n, Enum) end,
+    "stream_chunk" => fn n -> Benchmark.chunk(input, n, Stream) end,
+    "enum_slice" => fn n -> Benchmark.enum_slice(input, n) end
+  },
+  time: 10,
+  memory_time: 2,
+  reduction_time: 2,
+  inputs: %{
+    "Part 1" => 4,
+    "Part 2" => 14
+  }
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.1
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 10 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: Part 1, Part 2
+Estimated total run time: 2.13 min
+
+Benchmarking enum_chunk with input Part 1 ...
+Benchmarking enum_chunk with input Part 2 ...
+Benchmarking enum_slice with input Part 1 ...
+Benchmarking enum_slice with input Part 2 ...
+Benchmarking list_recursion with input Part 1 ...
+Benchmarking list_recursion with input Part 2 ...
+Benchmarking stream_chunk with input Part 1 ...
+Benchmarking stream_chunk with input Part 2 ...
+
+##### With input Part 1 #####
+Name                     ips        average  deviation         median         99th %
+list_recursion        3.88 K      257.58 μs    ±17.59%      242.63 μs      467.46 μs
+stream_chunk          2.96 K      338.09 μs    ±25.90%      318.08 μs      626.87 μs
+enum_chunk            1.80 K      554.59 μs    ±11.78%      539.96 μs      724.22 μs
+enum_slice            0.31 K     3262.17 μs    ±15.77%     3112.66 μs     5422.84 μs
+
+Comparison: 
+list_recursion        3.88 K
+stream_chunk          2.96 K - 1.31x slower +80.51 μs
+enum_chunk            1.80 K - 2.15x slower +297.01 μs
+enum_slice            0.31 K - 12.66x slower +3004.60 μs
+
+Memory usage statistics:
+
+Name              Memory usage
+list_recursion         0.63 MB
+stream_chunk           1.40 MB - 2.21x memory usage +0.77 MB
+enum_chunk             1.69 MB - 2.68x memory usage +1.06 MB
+enum_slice             0.86 MB - 1.36x memory usage +0.22 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           Reduction count
+list_recursion         43.68 K
+stream_chunk           92.97 K - 2.13x reduction count +49.29 K
+enum_chunk            136.95 K - 3.14x reduction count +93.28 K
+enum_slice           2008.91 K - 45.99x reduction count +1965.24 K
+
+**All measurements for reduction count were the same**
+
+##### With input Part 2 #####
+Name                     ips        average  deviation         median         99th %
+list_recursion       1058.54        0.94 ms     ±5.11%        0.93 ms        1.13 ms
+stream_chunk          913.42        1.09 ms     ±7.70%        1.06 ms        1.47 ms
+enum_chunk            619.96        1.61 ms    ±11.47%        1.62 ms        2.11 ms
+enum_slice            152.28        6.57 ms     ±1.58%        6.54 ms        6.90 ms
+
+Comparison: 
+list_recursion       1058.54
+stream_chunk          913.42 - 1.16x slower +0.150 ms
+enum_chunk            619.96 - 1.71x slower +0.67 ms
+enum_slice            152.28 - 6.95x slower +5.62 ms
+
+Memory usage statistics:
+
+Name              Memory usage
+list_recursion         3.16 MB
+stream_chunk           4.66 MB - 1.47x memory usage +1.50 MB
+enum_chunk             4.94 MB - 1.56x memory usage +1.78 MB
+enum_slice             3.48 MB - 1.10x memory usage +0.32 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name                   average  deviation         median         99th %
+list_recursion        156.81 K     ±0.00%       156.81 K       156.81 K
+stream_chunk          281.60 K     ±0.00%       281.60 K       281.60 K
+enum_chunk            339.90 K     ±0.03%       339.89 K       340.09 K
+enum_slice           4077.65 K     ±0.00%      4077.65 K      4077.65 K
+
+Comparison: 
+list_recursion        156.81 K
+stream_chunk          281.60 K - 1.80x reduction count +124.78 K
+enum_chunk            339.90 K - 2.17x reduction count +183.09 K
+enum_slice           4077.65 K - 26.00x reduction count +3920.84 K
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
 ```
 
 ## Tests
@@ -202,6 +370,32 @@ defmodule Day06Test do
       assert Day06.part2("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw") == 26
     end
   end
+
+  describe "Benchmarks" do
+    setup do
+      [
+        input: "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw",
+        p1_n: 4,
+        p1_value: 11,
+        p2_n: 14,
+        p2_value: 26
+      ]
+    end
+
+    test "returns expected value for part 1", %{input: input, p1_value: x, p1_n: n} do
+      assert x == Benchmark.list_recursion(input, n)
+      assert x == Benchmark.chunk(input, n, Enum)
+      assert x == Benchmark.chunk(input, n, Stream)
+      assert x == Benchmark.enum_slice(input, n)
+    end
+
+    test "returns expected value for part 2", %{input: input, p2_value: x, p2_n: n} do
+      assert x == Benchmark.list_recursion(input, n)
+      assert x == Benchmark.chunk(input, n, Enum)
+      assert x == Benchmark.chunk(input, n, Stream)
+      assert x == Benchmark.enum_slice(input, n)
+    end
+  end
 end
 
 ExUnit.run()
@@ -210,15 +404,15 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-..
+....
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
+4 tests, 0 failures
 
-Randomized with seed 39497
+Randomized with seed 548399
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
+%{excluded: 0, failures: 0, skipped: 0, total: 4}
 ```
