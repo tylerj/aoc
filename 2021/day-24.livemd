@@ -1,0 +1,231 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# 2022 Advent of Code - Day X: TBD
+
+```elixir
+Mix.install([:kino])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/1)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/1/input)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-01.livemd)
+
+## Prompt
+
+### Part 1
+
+To begin, [get your puzzle input](https://adventofcode.com/2021/day/24/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"inp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 11\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 3\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 14\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 7\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 13\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 1\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -4\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 6\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 11\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 14\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 10\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 7\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -4\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 9\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -12\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 9\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 10\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 6\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -11\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 4\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 1\nadd x 12\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 0\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -1\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 7\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x 0\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 12\nmul y x\nadd z y\ninp w\nmul x 0\nadd x z\nmod x 26\ndiv z 26\nadd x -11\neql x w\neql x 0\nmul y 0\nadd y 25\nmul y x\nadd y 1\nmul z y\nmul y 0\nadd y w\nadd y 1\nmul y x\nadd z y"
+```
+
+## Solution
+
+```elixir
+defmodule Day24 do
+  defdelegate parse(input), to: __MODULE__.Input
+  defdelegate normalize_value(input), to: __MODULE__.Input
+
+  @starting_values %{
+    "w" => 0,
+    "x" => 0,
+    "y" => 0,
+    "z" => 0
+  }
+
+  def part1(input, digits \\ 14) do
+    input = parse(input)
+    max_value = List.duplicate(9, digits) |> Integer.undigits()
+
+    max_value..99_999_899_999_999//-1
+    |> Enum.chunk_every(100_000)
+    |> Task.async_stream(
+      fn chunk ->
+        Enum.find(chunk, fn x ->
+          Map.fetch!(process_part1(input, x), "z") == 0
+        end)
+      end,
+      timeout: :infinity
+    )
+    |> Enum.to_list()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  def process_part1(input, input_value) do
+    Enum.reduce(
+      input,
+      {@starting_values, normalize_value(input_value)},
+      &do_line/2
+    )
+    |> elem(0)
+  end
+
+  def do_line(["inp", key], {map, [head | digits]}) do
+    {
+      Map.put(map, key, head),
+      digits
+    }
+  end
+
+  def do_line([op, into, var], {map, digits}) do
+    {
+      Map.update!(map, into, &calc(op, &1, Map.get(map, var, var))),
+      digits
+    }
+  end
+
+  def calc("add", a, b), do: a + b
+  def calc("mul", a, b), do: a * b
+  def calc("div", a, b), do: div(a, b)
+  def calc("mod", a, b), do: Integer.mod(a, b)
+  def calc("eql", a, a), do: 1
+  def calc("eql", _, _), do: 0
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Enum.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split(" ")
+      |> Enum.map(fn x ->
+        with {int, ""} <- Integer.parse(x) do
+          int
+        else
+          _ -> x
+        end
+      end)
+    end
+
+    def normalize_value(value) when is_list(value),
+      do: value
+
+    def normalize_value(value) when is_integer(value),
+      do: Integer.digits(value)
+
+    def normalize_value(value) when is_binary(value),
+      do: value |> String.to_integer() |> normalize_value
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day24, <<70, 79, 82, 49, 0, 0, 19, ...>>,
+ {:module, Day24.Input, <<70, 79, 82, ...>>, {:normalize_value, 1}}}
+```
+
+```elixir
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+1000..1//-1
+|> Enum.chunk_every(10_000)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  [1000, 999, 998, 997, 996, 995, 994, 993, 992, 991, 990, 989, 988, 987, 986, 985, 984, 983, 982,
+   981, 980, 979, 978, 977, 976, 975, 974, 973, 972, 971, 970, 969, 968, 967, 966, 965, 964, 963,
+   962, 961, 960, 959, 958, 957, 956, 955, 954, 953, 952, ...]
+]
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day24.part1(input)
+```
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day01Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day01.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day01.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 533814
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
