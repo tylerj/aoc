@@ -348,10 +348,9 @@ Benchee.run(
     "Enum.uniq.length" => fn input -> Enum.uniq(input) |> length() end
   },
   inputs: %{
-    "1: 4" => Enum.to_list(1..4),
-    "2: 14" => Enum.to_list(1..14),
-    "3: 1000" => Enum.to_list(1..1000),
-    "4: 100_000" => Enum.to_list(1..100_000)
+    "1: 10" => Enum.to_list(1..10),
+    "2: 1000" => Enum.to_list(1..1000),
+    "3: 100_000" => Enum.to_list(1..100_000)
   },
   memory_time: 2,
   reduction_time: 2
@@ -376,76 +375,49 @@ time: 5 s
 memory time: 2 s
 reduction time: 2 s
 parallel: 1
-inputs: 1: 4, 2: 14, 3: 1000, 4: 100_000
-Estimated total run time: 1.47 min
+inputs: 1: 10, 2: 1000, 3: 100_000
+Estimated total run time: 1.10 min
 
-Benchmarking Enum.uniq.length with input 1: 4 ...
-Benchmarking Enum.uniq.length with input 2: 14 ...
-Benchmarking Enum.uniq.length with input 3: 1000 ...
-Benchmarking Enum.uniq.length with input 4: 100_000 ...
-Benchmarking MapSet.size with input 1: 4 ...
-Benchmarking MapSet.size with input 2: 14 ...
-Benchmarking MapSet.size with input 3: 1000 ...
-Benchmarking MapSet.size with input 4: 100_000 ...
+Benchmarking Enum.uniq.length with input 1: 10 ...
+Benchmarking Enum.uniq.length with input 2: 1000 ...
+Benchmarking Enum.uniq.length with input 3: 100_000 ...
+Benchmarking MapSet.size with input 1: 10 ...
+Benchmarking MapSet.size with input 2: 1000 ...
+Benchmarking MapSet.size with input 3: 100_000 ...
 
-##### With input 1: 4 #####
+##### With input 1: 10 #####
 Name                       ips        average  deviation         median         99th %
-Enum.uniq.length        1.73 M      577.85 ns  ±3961.31%         458 ns         625 ns
-MapSet.size             1.59 M      630.88 ns  ±3564.72%         417 ns       11834 ns
+MapSet.size             1.73 M      578.41 ns  ±3594.61%         417 ns         625 ns
+Enum.uniq.length        1.41 M      709.62 ns  ±3393.79%         583 ns         750 ns
 
 Comparison: 
-Enum.uniq.length        1.73 M
-MapSet.size             1.59 M - 1.09x slower +53.03 ns
+MapSet.size             1.73 M
+Enum.uniq.length        1.41 M - 1.23x slower +131.20 ns
 
 Memory usage statistics:
 
 Name                Memory usage
-Enum.uniq.length         1.45 KB
-MapSet.size              1.23 KB - 0.85x memory usage -0.21094 KB
+MapSet.size              1.36 KB
+Enum.uniq.length         2.46 KB - 1.81x memory usage +1.10 KB
 
 **All measurements for memory usage were the same**
 
 Reduction count statistics:
 
 Name             Reduction count
-Enum.uniq.length             164
-MapSet.size                  152 - 0.93x reduction count -12
+MapSet.size                  164
+Enum.uniq.length             202 - 1.23x reduction count +38
 
 **All measurements for reduction count were the same**
 
-##### With input 2: 14 #####
+##### With input 2: 1000 #####
 Name                       ips        average  deviation         median         99th %
-MapSet.size             1.71 M        0.58 μs  ±4083.24%        0.46 μs        0.63 μs
-Enum.uniq.length        0.98 M        1.02 μs  ±1995.58%        0.71 μs       12.25 μs
+MapSet.size            13.57 K       73.68 μs     ±6.35%       72.58 μs       90.29 μs
+Enum.uniq.length       12.33 K       81.09 μs     ±6.72%       80.46 μs       94.33 μs
 
 Comparison: 
-MapSet.size             1.71 M
-Enum.uniq.length        0.98 M - 1.75x slower +0.44 μs
-
-Memory usage statistics:
-
-Name                Memory usage
-MapSet.size              1.38 KB
-Enum.uniq.length         3.38 KB - 2.46x memory usage +2.01 KB
-
-**All measurements for memory usage were the same**
-
-Reduction count statistics:
-
-Name             Reduction count
-MapSet.size                  153
-Enum.uniq.length             220 - 1.44x reduction count +67
-
-**All measurements for reduction count were the same**
-
-##### With input 3: 1000 #####
-Name                       ips        average  deviation         median         99th %
-MapSet.size            13.39 K       74.66 μs    ±17.70%          73 μs      109.46 μs
-Enum.uniq.length       12.09 K       82.73 μs     ±9.45%       81.25 μs      103.35 μs
-
-Comparison: 
-MapSet.size            13.39 K
-Enum.uniq.length       12.09 K - 1.11x slower +8.07 μs
+MapSet.size            13.57 K
+Enum.uniq.length       12.33 K - 1.10x slower +7.41 μs
 
 Memory usage statistics:
 
@@ -458,21 +430,21 @@ Enum.uniq.length       283.48 KB - 87.23x memory usage +280.23 KB
 Reduction count statistics:
 
 Name                     average  deviation         median         99th %
-MapSet.size               1.37 K     ±1.17%         1.37 K         1.42 K
+MapSet.size               1.37 K     ±1.18%         1.37 K         1.42 K
 Enum.uniq.length          5.94 K     ±0.00%         5.94 K         5.94 K
 
 Comparison: 
 MapSet.size               1.37 K
 Enum.uniq.length          5.94 K - 4.34x reduction count +4.57 K
 
-##### With input 4: 100_000 #####
+##### With input 3: 100_000 #####
 Name                       ips        average  deviation         median         99th %
-MapSet.size              80.14       12.48 ms     ±6.26%       12.08 ms       14.21 ms
-Enum.uniq.length         40.69       24.58 ms     ±6.51%       23.99 ms       31.32 ms
+MapSet.size              81.59       12.26 ms     ±5.72%       11.84 ms       13.59 ms
+Enum.uniq.length         41.67       24.00 ms     ±5.35%       23.41 ms       27.86 ms
 
 Comparison: 
-MapSet.size              80.14
-Enum.uniq.length         40.69 - 1.97x slower +12.10 ms
+MapSet.size              81.59
+Enum.uniq.length         41.67 - 1.96x slower +11.74 ms
 
 Memory usage statistics:
 
@@ -485,12 +457,12 @@ Enum.uniq.length        50.47 MB - 56.05x memory usage +49.57 MB
 Reduction count statistics:
 
 Name                     average  deviation         median         99th %
-MapSet.size              94.71 K     ±1.75%        94.38 K        99.73 K
-Enum.uniq.length        451.90 K     ±1.41%       450.40 K       500.97 K
+MapSet.size              94.52 K     ±1.78%        94.38 K        99.96 K
+Enum.uniq.length        448.43 K     ±0.07%       448.35 K       450.47 K
 
 Comparison: 
 MapSet.size              94.38 K
-Enum.uniq.length        451.90 K - 4.77x reduction count +357.19 K
+Enum.uniq.length        448.43 K - 4.74x reduction count +353.91 K
 ```
 
 <!-- livebook:{"output":true} -->
