@@ -109,7 +109,7 @@ defmodule Day06 do
     input |> parse() |> find_marker(14)
   end
 
-  def find_marker(char_list, prior_chars \\ [], n, index \\ 0)
+  def find_marker(char_list, prior_chars \\ [], marker_size, index \\ 0)
 
   def find_marker([h1 | t1], prior, n, index) when length(prior) < n do
     find_marker(t1, prior ++ [h1], n, index + 1)
