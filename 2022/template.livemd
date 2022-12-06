@@ -3,7 +3,7 @@
 # 2022 Advent of Code - Day X: TBD
 
 ```elixir
-Mix.install([:kino])
+Mix.install([:kino, :benchee])
 ```
 
 <!-- livebook:{"output":true} -->
@@ -20,9 +20,23 @@ Mix.install([:kino])
 
 ## Prompt
 
-### Part 1
+### --- Day X: TBD ---
+
+Part One prompt
+
+**QUESTION ONE?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/1/input).
 
 ## Input
 
@@ -87,6 +101,10 @@ end
  {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
+**QUESTION ONE?**
+
+Your puzzle answer was `answer one`.
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
@@ -97,6 +115,79 @@ Day01.part1(input)
 
 ```
 [""]
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+
+## Benchmarking
+
+```elixir
+defmodule Benchmark do
+  def fun1(input) do
+    Day01.part1(input)
+  end
+
+  def fun2(input) do
+    Day01.part2(input)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
+```
+
+```elixir
+# https://github.com/bencheeorg/benchee
+input = Day01.Input.parse(input) |> Enum.to_list()
+
+Benchee.run(
+  %{
+    "fun1" => fn _ -> Benchmark.fun1(input) end,
+    "fun2" => fn _ -> Benchmark.fun2(input) end
+  },
+  inputs: %{
+    "Part 1" => 1
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
 ```
 
 ## Tests
@@ -138,7 +229,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 533814
+Randomized with seed 162351
 ```
 
 <!-- livebook:{"output":true} -->
