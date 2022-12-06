@@ -116,12 +116,12 @@ defmodule Day06 do
   end
 
   def find_marker([h1 | t1], [_ | t2] = prior, n, index) do
-    uniq_count = prior |> Enum.uniq() |> length()
-
-    if uniq_count < n,
+    if set_size(prior) < n,
       do: find_marker(t1, t2 ++ [h1], n, index + 1),
       else: index
   end
+
+  def set_size(list), do: list |> MapSet.new() |> MapSet.size()
 
   defmodule Input do
     def parse(input) when is_binary(input) do
@@ -134,7 +134,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day06, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+{:module, Day06, <<70, 79, 82, 49, 0, 0, 12, ...>>,
  {:module, Day06.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
 ```
 
@@ -158,6 +158,8 @@ Day06.part1(input)
 
 Your puzzle answer was `2773`.
 
+<!-- livebook:{"reevaluate_automatically":true} -->
+
 ```elixir
 Day06.part2(input)
 ```
@@ -178,6 +180,8 @@ If you still want to see it, you can [get your puzzle input](https://adventofcod
 
 ```elixir
 defmodule Benchmark do
+  defdelegate set_size(list), to: Day06
+
   def list_recursion(input, n) do
     Day06.find_marker(input, n)
   end
@@ -187,7 +191,7 @@ defmodule Benchmark do
     |> module.chunk_every(n, 1)
     |> module.with_index(n)
     |> Enum.find(fn {list, _} ->
-      list |> Enum.uniq() |> length() == n
+      n == set_size(list)
     end)
     |> elem(1)
   end
@@ -198,8 +202,7 @@ defmodule Benchmark do
       n ==
         input
         |> Enum.slice((i - n)..(i - 1))
-        |> Enum.uniq()
-        |> length()
+        |> set_size()
     end)
   end
 end
@@ -208,7 +211,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 11, ...>>, {:enum_slice, 2}}
+{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 12, ...>>, {:enum_slice, 2}}
 ```
 
 ```elixir
@@ -222,7 +225,6 @@ Benchee.run(
     "stream_chunk" => fn n -> Benchmark.chunk(input, n, Stream) end,
     "enum_slice" => fn n -> Benchmark.enum_slice(input, n) end
   },
-  time: 10,
   memory_time: 2,
   reduction_time: 2,
   inputs: %{
@@ -246,12 +248,12 @@ Erlang 25.1.2
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
-time: 10 s
+time: 5 s
 memory time: 2 s
 reduction time: 2 s
 parallel: 1
 inputs: Part 1, Part 2
-Estimated total run time: 2.13 min
+Estimated total run time: 1.47 min
 
 Benchmarking enum_chunk with input Part 1 ...
 Benchmarking enum_chunk with input Part 2 ...
@@ -264,73 +266,73 @@ Benchmarking stream_chunk with input Part 2 ...
 
 ##### With input Part 1 #####
 Name                     ips        average  deviation         median         99th %
-list_recursion        4.70 K      212.96 μs    ±10.55%      205.58 μs      273.96 μs
-stream_chunk          3.17 K      315.75 μs    ±21.15%      280.42 μs      479.29 μs
-enum_chunk            1.42 K      706.06 μs    ±13.52%      691.64 μs      924.23 μs
-enum_slice            0.28 K     3620.33 μs    ±25.66%     3118.22 μs     5480.60 μs
+list_recursion        5.70 K      175.41 μs    ±11.00%      172.25 μs      215.33 μs
+stream_chunk          4.68 K      213.74 μs     ±6.24%      211.33 μs      238.05 μs
+enum_chunk            2.24 K      447.10 μs    ±13.87%      425.04 μs      649.15 μs
+enum_slice            0.33 K     2993.49 μs     ±2.02%     2968.00 μs     3196.44 μs
 
 Comparison: 
-list_recursion        4.70 K
-stream_chunk          3.17 K - 1.48x slower +102.79 μs
-enum_chunk            1.42 K - 3.32x slower +493.10 μs
-enum_slice            0.28 K - 17.00x slower +3407.37 μs
+list_recursion        5.70 K
+stream_chunk          4.68 K - 1.22x slower +38.34 μs
+enum_chunk            2.24 K - 2.55x slower +271.69 μs
+enum_slice            0.33 K - 17.07x slower +2818.08 μs
 
 Memory usage statistics:
 
 Name              Memory usage
-list_recursion         0.63 MB
-stream_chunk           1.40 MB - 2.21x memory usage +0.77 MB
-enum_chunk             1.67 MB - 2.65x memory usage +1.04 MB
-enum_slice             0.86 MB - 1.36x memory usage +0.22 MB
+list_recursion         0.43 MB
+stream_chunk           1.20 MB - 2.76x memory usage +0.77 MB
+enum_chunk             1.47 MB - 3.40x memory usage +1.04 MB
+enum_slice             0.66 MB - 1.52x memory usage +0.22 MB
 
 **All measurements for memory usage were the same**
 
 Reduction count statistics:
 
 Name           Reduction count
-list_recursion         42.46 K
-stream_chunk           91.85 K - 2.16x reduction count +49.39 K
-enum_chunk            135.47 K - 3.19x reduction count +93.01 K
-enum_slice           2008.09 K - 47.30x reduction count +1965.63 K
+list_recursion         27.20 K
+stream_chunk           78.42 K - 2.88x reduction count +51.23 K
+enum_chunk            121.36 K - 4.46x reduction count +94.17 K
+enum_slice           1993.70 K - 73.31x reduction count +1966.50 K
 
 **All measurements for reduction count were the same**
 
 ##### With input Part 2 #####
 Name                     ips        average  deviation         median         99th %
-list_recursion       1063.76        0.94 ms     ±9.99%        0.89 ms        1.20 ms
-stream_chunk          852.36        1.17 ms    ±18.30%        1.03 ms        1.58 ms
-enum_chunk            635.23        1.57 ms    ±13.63%        1.57 ms        2.05 ms
-enum_slice            104.78        9.54 ms    ±20.31%       10.57 ms       11.34 ms
+list_recursion        1.61 K        0.62 ms     ±7.74%        0.60 ms        0.73 ms
+stream_chunk          1.36 K        0.74 ms     ±3.86%        0.73 ms        0.80 ms
+enum_chunk            0.84 K        1.19 ms     ±9.97%        1.16 ms        1.55 ms
+enum_slice           0.160 K        6.25 ms     ±1.99%        6.20 ms        6.64 ms
 
 Comparison: 
-list_recursion       1063.76
-stream_chunk          852.36 - 1.25x slower +0.23 ms
-enum_chunk            635.23 - 1.67x slower +0.63 ms
-enum_slice            104.78 - 10.15x slower +8.60 ms
+list_recursion        1.61 K
+stream_chunk          1.36 K - 1.18x slower +0.115 ms
+enum_chunk            0.84 K - 1.92x slower +0.57 ms
+enum_slice           0.160 K - 10.06x slower +5.63 ms
 
 Memory usage statistics:
 
 Name              Memory usage
-list_recursion         3.16 MB
-stream_chunk           4.66 MB - 1.47x memory usage +1.50 MB
-enum_chunk             5.00 MB - 1.58x memory usage +1.84 MB
-enum_slice             3.48 MB - 1.10x memory usage +0.32 MB
+list_recursion         1.34 MB
+stream_chunk           2.84 MB - 2.12x memory usage +1.50 MB
+enum_chunk             3.18 MB - 2.38x memory usage +1.84 MB
+enum_slice             1.66 MB - 1.24x memory usage +0.32 MB
 
 **All measurements for memory usage were the same**
 
 Reduction count statistics:
 
 Name                   average  deviation         median         99th %
-list_recursion        155.99 K     ±0.00%       155.99 K       155.99 K
-stream_chunk          280.40 K     ±0.00%       280.40 K       280.40 K
-enum_chunk            338.84 K     ±0.02%       338.82 K       339.14 K
-enum_slice           4076.83 K     ±0.00%      4076.83 K      4076.83 K
+list_recursion         37.51 K     ±0.00%        37.51 K        37.51 K
+stream_chunk          165.11 K     ±0.00%       165.11 K       165.11 K
+enum_chunk            223.39 K     ±0.02%       223.38 K       223.48 K
+enum_slice           3961.35 K     ±0.00%      3961.35 K      3961.35 K
 
 Comparison: 
-list_recursion        155.99 K
-stream_chunk          280.40 K - 1.80x reduction count +124.41 K
-enum_chunk            338.84 K - 2.17x reduction count +182.85 K
-enum_slice           4076.83 K - 26.14x reduction count +3920.85 K
+list_recursion         37.51 K
+stream_chunk          165.11 K - 4.40x reduction count +127.60 K
+enum_chunk            223.39 K - 5.96x reduction count +185.88 K
+enum_slice           3961.35 K - 105.61x reduction count +3923.85 K
 ```
 
 <!-- livebook:{"output":true} -->
