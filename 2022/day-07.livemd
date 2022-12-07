@@ -153,16 +153,6 @@ input = input |> Kino.Input.read()
 ## Solution
 
 ```elixir
-input
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-"$ cd /\n$ ls\ndir dpllhlcv\n284723 hznrlfhh.tnz\ndir mgjdlmrz\ndir njstc\ndir nzwbc\ndir qzzfvdh\ndir smvhphf\n$ cd dpllhlcv\n$ ls\n11223 bplz.rdp\ndir gpmlznd\ndir pgcctrb\ndir wmsl\n$ cd gpmlznd\n$ ls\ndir lwzcss\n83678 nzwbc.rgv\ndir rhdllvm\n94635 wpglzlrf.htl\n$ cd lwzcss\n$ ls\ndir bttplh\n$ cd bttplh\n$ ls\ndir rzj\n$ cd rzj\n$ ls\n59866 nzwbc.psj\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd rhdllvm\n$ ls\ndir mvqfrq\n$ cd mvqfrq\n$ ls\n41266 prvl\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd pgcctrb\n$ ls\ndir dgpfcftj\n$ cd dgpfcftj\n$ ls\n101757 tzjthwc\n$ cd ..\n$ cd ..\n$ cd wmsl\n$ ls\n215238 bvlvn.pgf\ndir hhtztpm\n197563 hznrlfhh.tnz\ndir tzjthwc\n$ cd hhtztpm\n$ ls\n196378 djfbm.djl\n203856 ltnwbvg.rqz\n266242 mjrlm\ndir ngjd\ndir wmsl\n$ cd ngjd\n$ ls\n289546 mjrlm\n$ cd ..\n$ cd wmsl\n$ ls\n153439 qqb.qmd\n25326 tzjthwc\n$ cd ..\n$ cd ..\n$ cd tzjthwc\n$ ls\ndir lhccf\n235335 nzwbc\ndir wgnhhl\ndir wmsl\n$ cd lhccf\n$ ls\ndir nzwbc\n100347 rrrj.wzl\ndir zfwffjn\n$ cd nzwbc\n$ ls\ndir wmsl\n$ cd wmsl\n$ ls\n102053 nzwbc.qbd\n$ cd ..\n$ cd ..\n$ cd zfwffjn\n$ ls\ndir mrd\n23992 rrrj.jcz\ndir vnwpddtf\n$ cd mrd\n$ ls\n139407 qqwlrbsw.zfn\n$ cd ..\n$ cd vnwpddtf\n$ ls\n287771 dgpfcftj.wpm\n59212 qqb.qmd\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd wgnhhl\n$ ls\n120460 rrrj\n$ cd ..\n$ cd wmsl\n$ ls\n17612 rlsswjw.wbr\n132954 ttbswbhs.ffs\ndir zpldfrj\n$ cd zpldfrj\n$ ls\n180679 qljrrlm.clw\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd mgjdlmrz\n$ ls\n79173 dng.qrc\ndir fnfw\ndir hwb\ndir nfqzjs\ndir qdgplmrt\ndir znrnj\n$ cd fnfw\n$ ls\ndir bhjm\n263282 bplz.rdp\ndir dhsvtfc\ndir hlh\ndir nzwbc\n177780 ttbswbhs.ffs\n28452 tzjthwc.wlq\n19548 wmsl.rmd\n$ cd bhjm\n$ ls\ndir bpl\n57561 dgpfcftj\ndir glplnd\n170692 hwsjhwvf.rmv\ndir rrrj\ndir tlltjd\ndir tzjthwc\ndir wmsl\n$ cd bpl\n$ ls\ndir btpglc\n275227 fmbpzn\n9798 mjztf.nlg\n190388 nzwbc\ndir tzjthwc\n$ cd btpglc\n$ ls\n276105 rrrj.rhl\n$ cd ..\n$ cd tzjthwc\n$ ls\ndir hqmw\n280196 hznrlfhh.tnz\n51545 mjrlm\n228230 wmsl\n$ cd hqmw\n$ ls\n163168 mchnt.pls\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd glplnd\n$ ls\n147261 bplz.rdp\n267191 hznrlfhh.tnz\n$ cd ..\n$ cd rrrj\n$ ls\ndir dgpfcftj\ndir fwdw\n277548 hnz\n164103 nvcsdq.tpj\n265477 qzwsg.ccl\ndir tnpjsgnq\ndir tpvttzv\n209300 wmsl.wtq\n$ cd dgpfcftj\n$ ls\ndir dqtbltwp\n$ cd dqtbltwp\n$ ls\n27856 tzjthwc.gnr\n$ cd ..\n$ cd ..\n$ cd fwdw\n$ ls\n166347 fgtfj.pnc\n140486 mspn.wcw\n26602 nzwbc.dhb\n81490 qqb.qmd\n$ cd ..\n$ cd tnpjsgnq\n$ ls\ndir gbddb\ndir gpqssnq\n$ cd gbddb\n$ ls\n1587 qqb.qmd\n$ cd ..\n$ cd gpqssnq\n$ ls\n33979 fmjpw.mtp\n$ cd ..\n$ cd ..\n$ cd tpvttzv\n$ ls\ndir bqvzmb\n$ cd bqvzmb\n$ ls\n79211 fdhjztlv\n72991 wgvqvdp.pzp\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd tlltjd\n$ ls\n58096 swqcsnw\n$ cd ..\n$ cd tzjthwc\n$ ls\n66628 pzrdpc.fpc\n$ cd ..\n$ cd wmsl\n$ ls\n43111 hznrlfhh.tnz\n114356 rrrj.rlf\n169873 zpwhgzvc.wql\n$ cd ..\n$ cd ..\n$ cd dhsvtfc\n$ ls\ndir cwbq\n201361 dgpfcftj\n291508 jjjjwcw\n445 pfdvf.pmj\n135732 qpc.gsw\n115597 wlgrtn.mjb\ndir wmsl\n$ cd cwbq\n$ ls\ndir ccgdn\ndir gcfbqh\n173860 hznrlfhh.tnz\n97790 mjrlm\ndir qtfhz\ndir tpgj\ndir tph\n$ cd ccgdn\n$ ls\ndir blnzrjm\n46502 fgmntg.crb\ndir fwdpw\ndir nbldsrfq\n11175 nwj.fht\n208129 qqb.qmd\ndir wpj\n$ cd blnzrjm\n$ ls\n121398 gvs\n201215 pdppzscr.vph\ndir pwj\n3861 smwrnw.hqp\ndir tzjthwc\n220659 wzccnw.lsc\n$ cd pwj\n$ ls\n279141 bwj.ntc\n15325 jvqwhwmh.brq\n$ cd ..\n$ cd tzjthwc\n$ ls\n25191 jdgphj\n70354 rrrj.szq\n256692 wmsl\n$ cd ..\n$ cd ..\n$ cd fwdpw\n$ ls\n28780 prhjf\n$ cd ..\n$ cd nbldsrfq\n$ ls\n57352 dcrhr\n$ cd ..\n$ cd wpj\n$ ls\n51243 jmdn.bzh\n$ cd ..\n$ cd ..\n$ cd gcfbqh\n$ ls\n92250 crmpsc.rbf\n284234 tzjthwc\n$ cd ..\n$ cd qtfhz\n$ ls\n164311 hznrlfhh.tnz\n137031 mjrlm\n$ cd ..\n$ cd tpgj\n$ ls\n210570 jdpv.fpw\n$ cd ..\n$ cd tph\n$ ls\ndir hptp\ndir rrrj\n$ cd hptp\n$ ls\n272964 qqb.qmd\n147435 svrcpb\n$ cd ..\n$ cd rrrj\n$ ls\n145269 btzl.vcs\n156500 tzjthwc.ddw\n236073 vsrghnhl.wdc\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd wmsl\n$ ls\n62697 mjrlm\ndir psndpb\n33688 tzjthwc.hjc\n100902 tzjthwc.rnm\n$ cd psndpb\n$ ls\ndir dbm\ndir fbmfpndf\ndir fstgbcrc\n272771 lszgqt\n136189 mjrlm\n166606 qqb.qmd\ndir vptjzdt\n$ cd dbm\n$ ls\ndir nzwbc\ndir tzjthwc\n$ cd nzwbc\n$ ls\ndir ffmrngmj\n$ cd ffmrngmj\n$ ls\n299742 nrwrptz.cmp\n$ cd ..\n$ cd ..\n$ cd tzjthwc\n$ ls\n268152 pln\n$ cd ..\n$ cd ..\n$ cd fbmfpndf\n$ ls\n186758 bplz.rdp\n$ cd ..\n$ cd fstgbcrc\n$ ls\n4975 hznrlfhh.tnz\n59093 mjrlm\ndir nzwbc\n279246 qqb.qmd\n$ cd nz" <> ...
-```
-
-```elixir
 defmodule Day07.Input do
   def parse(input) when is_binary(input) do
     input
@@ -306,6 +296,33 @@ end
 ```
 
 ```elixir
+defmodule Day07.Part2 do
+  @total_space 70_000_000
+  @desired 30_000_000
+
+  def call(input) do
+    dirs = Day07.Part1.build_directories_with_sizes(input)
+    file_size = Map.get(dirs["/"], :size)
+
+    unused = @total_space - file_size
+    deficit = max(0, @desired - unused)
+
+    dirs
+    |> Map.values()
+    |> Stream.filter(&(&1.size >= deficit))
+    |> Stream.map(& &1.size)
+    |> Enum.min()
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day07.Part2, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:call, 1}}
+```
+
+```elixir
 Day07.Input.parse(input) |> Enum.to_list() |> Enum.take(10)
 ```
 
@@ -359,33 +376,6 @@ Day07.Part1.call(input)
 
 ```
 1648397
-```
-
-```elixir
-defmodule Day07.Part2 do
-  @total_space 70_000_000
-  @desired 30_000_000
-
-  def call(input) do
-    dirs = Day07.Part1.build_directories_with_sizes(input)
-    file_size = Map.get(dirs["/"], :size)
-
-    unused = @total_space - file_size
-    deficit = max(0, @desired - unused)
-
-    dirs
-    |> Map.values()
-    |> Stream.filter(&(&1.size >= deficit))
-    |> Stream.map(& &1.size)
-    |> Enum.min()
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Day07.Part2, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:call, 1}}
 ```
 
 Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. **What is the total size of that directory?**
