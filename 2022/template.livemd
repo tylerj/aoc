@@ -124,7 +124,7 @@ Your puzzle answer was `answer two`.
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day01.part1(input)
+Day01.part2(input)
 ```
 
 <!-- livebook:{"output":true} -->
