@@ -174,15 +174,7 @@ defmodule Day07.Input do
     end
   end
 end
-```
 
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Day07.Input, <<70, 79, 82, 49, 0, 0, 9, ...>>, {:parse_line, 1}}
-```
-
-```elixir
 defmodule Day07.Directory do
   defstruct [:name, :parent, size: 0, files: [], children: []]
 
@@ -225,15 +217,7 @@ defmodule Day07.Directory do
     |> Enum.sum()
   end
 end
-```
 
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Day07.Directory, <<70, 79, 82, 49, 0, 0, 18, ...>>, {:children_size, 2}}
-```
-
-```elixir
 defmodule Day07.Part1 do
   alias Day07.{Directory, Input}
 
@@ -287,15 +271,7 @@ defmodule Day07.Part1 do
   defp dir_name("/", dir), do: "/" <> dir
   defp dir_name(a, b), do: a <> "/" <> b
 end
-```
 
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Day07.Part1, <<70, 79, 82, 49, 0, 0, 18, ...>>, {:dir_name, 2}}
-```
-
-```elixir
 defmodule Day07.Part2 do
   @total_space 70_000_000
   @desired 30_000_000
@@ -362,6 +338,8 @@ Day07.Part1.build_directories_with_sizes(input) |> Enum.at(1)
  }}
 ```
 
+### Part 1 Answer
+
 Find all of the directories with a total size of at most 100000. **What is the sum of the total sizes of those directories?**
 
 Your puzzle answer was `1648397`.
@@ -377,6 +355,8 @@ Day07.Part1.call(input)
 ```
 1648397
 ```
+
+### Part 2 Answer
 
 Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. **What is the total size of that directory?**
 
@@ -399,6 +379,55 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/7/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day07Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "$ cd /\n$ ls\ndir a\n14848514 b.txt\n8504156 c.dat\ndir d\n$ cd a\n$ ls\ndir e\n29116 f\n2557 g\n62596 h.lst\n$ cd e\n$ ls\n584 i\n$ cd ..\n$ cd ..\n$ cd d\n$ ls\n4060174 j\n8033020 d.log\n5626152 d.ext\n7214296 k"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.Part1.call(input) == 95437
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.Part2.call(input) == 24_933_642
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 721709
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
 
 ## Benchmarks
 
@@ -468,53 +497,4 @@ Part 1         70.70 K - 1.00x reduction count +0.00403 K
 
 ```
 nil
-```
-
-## Tests
-
-<!-- livebook:{"reevaluate_automatically":true} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Day07Test do
-  use ExUnit.Case, async: false
-
-  setup_all do
-    [
-      input:
-        "$ cd /\n$ ls\ndir a\n14848514 b.txt\n8504156 c.dat\ndir d\n$ cd a\n$ ls\ndir e\n29116 f\n2557 g\n62596 h.lst\n$ cd e\n$ ls\n584 i\n$ cd ..\n$ cd ..\n$ cd d\n$ ls\n4060174 j\n8033020 d.log\n5626152 d.ext\n7214296 k"
-    ]
-  end
-
-  describe "part1/1" do
-    test "returns expected value", %{input: input} do
-      assert Day07.Part1.call(input) == 95437
-    end
-  end
-
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day07.Part2.call(input) == 24_933_642
-    end
-  end
-end
-
-ExUnit.run()
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-..
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
-
-Randomized with seed 721709
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
 ```
