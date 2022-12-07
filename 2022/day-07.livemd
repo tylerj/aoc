@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2022 Advent of Code - Day X: TBD
+# Day 7 - Advent of Code 2022
 
 ```elixir
 Mix.install([:kino, :benchee])
@@ -20,11 +20,92 @@ Mix.install([:kino, :benchee])
 
 ## Prompt
 
-### --- Day X: TBD ---
+### --- Day 7: No Space Left On Device ---
 
-Part One prompt
+You can hear birds chirping and raindrops hitting leaves as the expedition proceeds. Occasionally, you can even hear much louder sounds in the distance; how big do the animals get out here, anyway?
 
-**QUESTION ONE?**
+The device the Elves gave you has problems with more than just its communication system. You try to run a system update:
+
+```
+$ system-update --please --pretty-please-with-sugar-on-top
+Error: No space left on device
+```
+
+Perhaps you can delete some files to make space for the update?
+
+You browse around the filesystem to assess the situation and save the resulting terminal output (your puzzle input). For example:
+
+```
+$ cd /
+$ ls
+dir a
+14848514 b.txt
+8504156 c.dat
+dir d
+$ cd a
+$ ls
+dir e
+29116 f
+2557 g
+62596 h.lst
+$ cd e
+$ ls
+584 i
+$ cd ..
+$ cd ..
+$ cd d
+$ ls
+4060174 j
+8033020 d.log
+5626152 d.ext
+7214296 k
+```
+
+The filesystem consists of a tree of files (plain data) and directories (which can contain other directories or files). The outermost directory is called `/`. You can navigate around the filesystem, moving into or out of directories and listing the contents of the directory you're currently in.
+
+Within the terminal output, lines that begin with `$` are **commands you executed**, very much like some modern computers:
+
+* `cd` means **change directory**. This changes which directory is the current directory, but the specific result depends on the argument:
+  * `cd x` moves **in** one level: it looks in the current directory for the directory named x and makes it the current directory.
+  * `cd ..` moves **out** one level: it finds the directory that contains the current directory, then makes that directory the current directory.
+  * `cd /` switches the current directory to the outermost directory, `/`.
+* `ls` means **list**. It prints out all of the files and directories immediately contained by the current directory:
+  * `123 abc` means that the current directory contains a file named `abc` with size `123`.
+  * `dir xyz` means that the current directory contains a directory named `xyz`.
+
+Given the commands and output in the example above, you can determine that the filesystem looks visually like this:
+
+```
+- / (dir)
+  - a (dir)
+    - e (dir)
+      - i (file, size=584)
+    - f (file, size=29116)
+    - g (file, size=2557)
+    - h.lst (file, size=62596)
+  - b.txt (file, size=14848514)
+  - c.dat (file, size=8504156)
+  - d (dir)
+    - j (file, size=4060174)
+    - d.log (file, size=8033020)
+    - d.ext (file, size=5626152)
+    - k (file, size=7214296)
+```
+
+Here, there are four directories: `/` (the outermost directory), `a` and `d` (which are in `/`), and `e` (which is in `a`). These directories also contain files of various sizes.
+
+Since the disk is full, your first step should probably be to find directories that are good candidates for deletion. To do this, you need to determine the **total size** of each directory. The total size of a directory is the sum of the sizes of the files it contains, directly or indirectly. (Directories themselves do not count as having any intrinsic size.)
+
+The total sizes of the directories above can be found as follows:
+
+* The total size of directory `e` is `584` because it contains a single file `i` of size `584` and no other directories.
+* The directory `a` has total size `94853` because it contains files `f` (size `29116`), `g` (size `2557`), and `h.lst` (size `62596`), plus file `i` indirectly (`a` contains `e` which contains `i`).
+* Directory `d` has total size `24933642`.
+* As the outermost directory, `/` contains every file. Its total size is `48381165`, the sum of the size of every file.
+
+To begin, find all of the directories with a total size of **at most 100000**, then calculate the sum of their total sizes. In the example above, these directories are a and e; the sum of their total sizes is `95437 (94853 + 584)`. (As in this example, this process can count files more than once!)
+
+Find all of the directories with a total size of at most `100000`. **What is the sum of the total sizes of those directories?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/7/input).
 
@@ -32,9 +113,22 @@ To begin, [get your puzzle input](https://adventofcode.com/2022/day/7/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+Now, you're ready to choose a directory to delete.
 
-**QUESTION TWO?**
+The total disk space available to the filesystem is `70000000`. To run the update, you need unused space of at least `30000000`. You need to find a directory you can delete that will **free up enough space** to run the update.
+
+In the example above, the total size of the outermost directory (and thus the total amount of used space) is `48381165`; this means that the size of the **unused** space must currently be `21618835`, which isn't quite the `30000000` required by the update. Therefore, the update still requires a directory with total size of at least `8381165` to be deleted before it can run.
+
+To achieve this, you have the following options:
+
+* Delete directory `e`, which would increase unused space by `584`.
+* Delete directory `a`, which would increase unused space by `94853`.
+* Delete directory `d`, which would increase unused space by `24933642`.
+* Delete directory `/`, which would increase unused space by `48381165`.
+
+Directories `e` and `a` are both too small; deleting them would not free up enough space. However, directories `d` and `/` are both big enough! Between these, choose the **smallest**: `d`, increasing unused space by `24933642`.
+
+Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. **What is the total size of that directory?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/7/input).
 
@@ -53,107 +147,40 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-"$ cd /\n$ ls\ndir a\n14848514 b.txt\n8504156 c.dat\ndir d\n$ cd a\n$ ls\ndir e\n29116 f\n2557 g\n62596 h.lst\n$ cd e\n$ ls\n584 i\n$ cd ..\n$ cd ..\n$ cd d\n$ ls\n4060174 j\n8033020 d.log\n5626152 d.ext\n7214296 k"
+"$ cd /\n$ ls\ndir dpllhlcv\n284723 hznrlfhh.tnz\ndir mgjdlmrz\ndir njstc\ndir nzwbc\ndir qzzfvdh\ndir smvhphf\n$ cd dpllhlcv\n$ ls\n11223 bplz.rdp\ndir gpmlznd\ndir pgcctrb\ndir wmsl\n$ cd gpmlznd\n$ ls\ndir lwzcss\n83678 nzwbc.rgv\ndir rhdllvm\n94635 wpglzlrf.htl\n$ cd lwzcss\n$ ls\ndir bttplh\n$ cd bttplh\n$ ls\ndir rzj\n$ cd rzj\n$ ls\n59866 nzwbc.psj\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd rhdllvm\n$ ls\ndir mvqfrq\n$ cd mvqfrq\n$ ls\n41266 prvl\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd pgcctrb\n$ ls\ndir dgpfcftj\n$ cd dgpfcftj\n$ ls\n101757 tzjthwc\n$ cd ..\n$ cd ..\n$ cd wmsl\n$ ls\n215238 bvlvn.pgf\ndir hhtztpm\n197563 hznrlfhh.tnz\ndir tzjthwc\n$ cd hhtztpm\n$ ls\n196378 djfbm.djl\n203856 ltnwbvg.rqz\n266242 mjrlm\ndir ngjd\ndir wmsl\n$ cd ngjd\n$ ls\n289546 mjrlm\n$ cd ..\n$ cd wmsl\n$ ls\n153439 qqb.qmd\n25326 tzjthwc\n$ cd ..\n$ cd ..\n$ cd tzjthwc\n$ ls\ndir lhccf\n235335 nzwbc\ndir wgnhhl\ndir wmsl\n$ cd lhccf\n$ ls\ndir nzwbc\n100347 rrrj.wzl\ndir zfwffjn\n$ cd nzwbc\n$ ls\ndir wmsl\n$ cd wmsl\n$ ls\n102053 nzwbc.qbd\n$ cd ..\n$ cd ..\n$ cd zfwffjn\n$ ls\ndir mrd\n23992 rrrj.jcz\ndir vnwpddtf\n$ cd mrd\n$ ls\n139407 qqwlrbsw.zfn\n$ cd ..\n$ cd vnwpddtf\n$ ls\n287771 dgpfcftj.wpm\n59212 qqb.qmd\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd wgnhhl\n$ ls\n120460 rrrj\n$ cd ..\n$ cd wmsl\n$ ls\n17612 rlsswjw.wbr\n132954 ttbswbhs.ffs\ndir zpldfrj\n$ cd zpldfrj\n$ ls\n180679 qljrrlm.clw\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd mgjdlmrz\n$ ls\n79173 dng.qrc\ndir fnfw\ndir hwb\ndir nfqzjs\ndir qdgplmrt\ndir znrnj\n$ cd fnfw\n$ ls\ndir bhjm\n263282 bplz.rdp\ndir dhsvtfc\ndir hlh\ndir nzwbc\n177780 ttbswbhs.ffs\n28452 tzjthwc.wlq\n19548 wmsl.rmd\n$ cd bhjm\n$ ls\ndir bpl\n57561 dgpfcftj\ndir glplnd\n170692 hwsjhwvf.rmv\ndir rrrj\ndir tlltjd\ndir tzjthwc\ndir wmsl\n$ cd bpl\n$ ls\ndir btpglc\n275227 fmbpzn\n9798 mjztf.nlg\n190388 nzwbc\ndir tzjthwc\n$ cd btpglc\n$ ls\n276105 rrrj.rhl\n$ cd ..\n$ cd tzjthwc\n$ ls\ndir hqmw\n280196 hznrlfhh.tnz\n51545 mjrlm\n228230 wmsl\n$ cd hqmw\n$ ls\n163168 mchnt.pls\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd glplnd\n$ ls\n147261 bplz.rdp\n267191 hznrlfhh.tnz\n$ cd ..\n$ cd rrrj\n$ ls\ndir dgpfcftj\ndir fwdw\n277548 hnz\n164103 nvcsdq.tpj\n265477 qzwsg.ccl\ndir tnpjsgnq\ndir tpvttzv\n209300 wmsl.wtq\n$ cd dgpfcftj\n$ ls\ndir dqtbltwp\n$ cd dqtbltwp\n$ ls\n27856 tzjthwc.gnr\n$ cd ..\n$ cd ..\n$ cd fwdw\n$ ls\n166347 fgtfj.pnc\n140486 mspn.wcw\n26602 nzwbc.dhb\n81490 qqb.qmd\n$ cd ..\n$ cd tnpjsgnq\n$ ls\ndir gbddb\ndir gpqssnq\n$ cd gbddb\n$ ls\n1587 qqb.qmd\n$ cd ..\n$ cd gpqssnq\n$ ls\n33979 fmjpw.mtp\n$ cd ..\n$ cd ..\n$ cd tpvttzv\n$ ls\ndir bqvzmb\n$ cd bqvzmb\n$ ls\n79211 fdhjztlv\n72991 wgvqvdp.pzp\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd tlltjd\n$ ls\n58096 swqcsnw\n$ cd ..\n$ cd tzjthwc\n$ ls\n66628 pzrdpc.fpc\n$ cd ..\n$ cd wmsl\n$ ls\n43111 hznrlfhh.tnz\n114356 rrrj.rlf\n169873 zpwhgzvc.wql\n$ cd ..\n$ cd ..\n$ cd dhsvtfc\n$ ls\ndir cwbq\n201361 dgpfcftj\n291508 jjjjwcw\n445 pfdvf.pmj\n135732 qpc.gsw\n115597 wlgrtn.mjb\ndir wmsl\n$ cd cwbq\n$ ls\ndir ccgdn\ndir gcfbqh\n173860 hznrlfhh.tnz\n97790 mjrlm\ndir qtfhz\ndir tpgj\ndir tph\n$ cd ccgdn\n$ ls\ndir blnzrjm\n46502 fgmntg.crb\ndir fwdpw\ndir nbldsrfq\n11175 nwj.fht\n208129 qqb.qmd\ndir wpj\n$ cd blnzrjm\n$ ls\n121398 gvs\n201215 pdppzscr.vph\ndir pwj\n3861 smwrnw.hqp\ndir tzjthwc\n220659 wzccnw.lsc\n$ cd pwj\n$ ls\n279141 bwj.ntc\n15325 jvqwhwmh.brq\n$ cd ..\n$ cd tzjthwc\n$ ls\n25191 jdgphj\n70354 rrrj.szq\n256692 wmsl\n$ cd ..\n$ cd ..\n$ cd fwdpw\n$ ls\n28780 prhjf\n$ cd ..\n$ cd nbldsrfq\n$ ls\n57352 dcrhr\n$ cd ..\n$ cd wpj\n$ ls\n51243 jmdn.bzh\n$ cd ..\n$ cd ..\n$ cd gcfbqh\n$ ls\n92250 crmpsc.rbf\n284234 tzjthwc\n$ cd ..\n$ cd qtfhz\n$ ls\n164311 hznrlfhh.tnz\n137031 mjrlm\n$ cd ..\n$ cd tpgj\n$ ls\n210570 jdpv.fpw\n$ cd ..\n$ cd tph\n$ ls\ndir hptp\ndir rrrj\n$ cd hptp\n$ ls\n272964 qqb.qmd\n147435 svrcpb\n$ cd ..\n$ cd rrrj\n$ ls\n145269 btzl.vcs\n156500 tzjthwc.ddw\n236073 vsrghnhl.wdc\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd wmsl\n$ ls\n62697 mjrlm\ndir psndpb\n33688 tzjthwc.hjc\n100902 tzjthwc.rnm\n$ cd psndpb\n$ ls\ndir dbm\ndir fbmfpndf\ndir fstgbcrc\n272771 lszgqt\n136189 mjrlm\n166606 qqb.qmd\ndir vptjzdt\n$ cd dbm\n$ ls\ndir nzwbc\ndir tzjthwc\n$ cd nzwbc\n$ ls\ndir ffmrngmj\n$ cd ffmrngmj\n$ ls\n299742 nrwrptz.cmp\n$ cd ..\n$ cd ..\n$ cd tzjthwc\n$ ls\n268152 pln\n$ cd ..\n$ cd ..\n$ cd fbmfpndf\n$ ls\n186758 bplz.rdp\n$ cd ..\n$ cd fstgbcrc\n$ ls\n4975 hznrlfhh.tnz\n59093 mjrlm\ndir nzwbc\n279246 qqb.qmd\n$ cd nz" <> ...
 ```
 
 ## Solution
 
 ```elixir
-defmodule Day07 do
-  alias __MODULE__.Directory
+input
+```
 
-  defdelegate parse(input), to: __MODULE__.Input
+<!-- livebook:{"output":true} -->
 
-  @dir_list %{
-    "/" => Directory.init("/")
-  }
+```
+"$ cd /\n$ ls\ndir dpllhlcv\n284723 hznrlfhh.tnz\ndir mgjdlmrz\ndir njstc\ndir nzwbc\ndir qzzfvdh\ndir smvhphf\n$ cd dpllhlcv\n$ ls\n11223 bplz.rdp\ndir gpmlznd\ndir pgcctrb\ndir wmsl\n$ cd gpmlznd\n$ ls\ndir lwzcss\n83678 nzwbc.rgv\ndir rhdllvm\n94635 wpglzlrf.htl\n$ cd lwzcss\n$ ls\ndir bttplh\n$ cd bttplh\n$ ls\ndir rzj\n$ cd rzj\n$ ls\n59866 nzwbc.psj\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd rhdllvm\n$ ls\ndir mvqfrq\n$ cd mvqfrq\n$ ls\n41266 prvl\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd pgcctrb\n$ ls\ndir dgpfcftj\n$ cd dgpfcftj\n$ ls\n101757 tzjthwc\n$ cd ..\n$ cd ..\n$ cd wmsl\n$ ls\n215238 bvlvn.pgf\ndir hhtztpm\n197563 hznrlfhh.tnz\ndir tzjthwc\n$ cd hhtztpm\n$ ls\n196378 djfbm.djl\n203856 ltnwbvg.rqz\n266242 mjrlm\ndir ngjd\ndir wmsl\n$ cd ngjd\n$ ls\n289546 mjrlm\n$ cd ..\n$ cd wmsl\n$ ls\n153439 qqb.qmd\n25326 tzjthwc\n$ cd ..\n$ cd ..\n$ cd tzjthwc\n$ ls\ndir lhccf\n235335 nzwbc\ndir wgnhhl\ndir wmsl\n$ cd lhccf\n$ ls\ndir nzwbc\n100347 rrrj.wzl\ndir zfwffjn\n$ cd nzwbc\n$ ls\ndir wmsl\n$ cd wmsl\n$ ls\n102053 nzwbc.qbd\n$ cd ..\n$ cd ..\n$ cd zfwffjn\n$ ls\ndir mrd\n23992 rrrj.jcz\ndir vnwpddtf\n$ cd mrd\n$ ls\n139407 qqwlrbsw.zfn\n$ cd ..\n$ cd vnwpddtf\n$ ls\n287771 dgpfcftj.wpm\n59212 qqb.qmd\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd wgnhhl\n$ ls\n120460 rrrj\n$ cd ..\n$ cd wmsl\n$ ls\n17612 rlsswjw.wbr\n132954 ttbswbhs.ffs\ndir zpldfrj\n$ cd zpldfrj\n$ ls\n180679 qljrrlm.clw\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd mgjdlmrz\n$ ls\n79173 dng.qrc\ndir fnfw\ndir hwb\ndir nfqzjs\ndir qdgplmrt\ndir znrnj\n$ cd fnfw\n$ ls\ndir bhjm\n263282 bplz.rdp\ndir dhsvtfc\ndir hlh\ndir nzwbc\n177780 ttbswbhs.ffs\n28452 tzjthwc.wlq\n19548 wmsl.rmd\n$ cd bhjm\n$ ls\ndir bpl\n57561 dgpfcftj\ndir glplnd\n170692 hwsjhwvf.rmv\ndir rrrj\ndir tlltjd\ndir tzjthwc\ndir wmsl\n$ cd bpl\n$ ls\ndir btpglc\n275227 fmbpzn\n9798 mjztf.nlg\n190388 nzwbc\ndir tzjthwc\n$ cd btpglc\n$ ls\n276105 rrrj.rhl\n$ cd ..\n$ cd tzjthwc\n$ ls\ndir hqmw\n280196 hznrlfhh.tnz\n51545 mjrlm\n228230 wmsl\n$ cd hqmw\n$ ls\n163168 mchnt.pls\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd glplnd\n$ ls\n147261 bplz.rdp\n267191 hznrlfhh.tnz\n$ cd ..\n$ cd rrrj\n$ ls\ndir dgpfcftj\ndir fwdw\n277548 hnz\n164103 nvcsdq.tpj\n265477 qzwsg.ccl\ndir tnpjsgnq\ndir tpvttzv\n209300 wmsl.wtq\n$ cd dgpfcftj\n$ ls\ndir dqtbltwp\n$ cd dqtbltwp\n$ ls\n27856 tzjthwc.gnr\n$ cd ..\n$ cd ..\n$ cd fwdw\n$ ls\n166347 fgtfj.pnc\n140486 mspn.wcw\n26602 nzwbc.dhb\n81490 qqb.qmd\n$ cd ..\n$ cd tnpjsgnq\n$ ls\ndir gbddb\ndir gpqssnq\n$ cd gbddb\n$ ls\n1587 qqb.qmd\n$ cd ..\n$ cd gpqssnq\n$ ls\n33979 fmjpw.mtp\n$ cd ..\n$ cd ..\n$ cd tpvttzv\n$ ls\ndir bqvzmb\n$ cd bqvzmb\n$ ls\n79211 fdhjztlv\n72991 wgvqvdp.pzp\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd tlltjd\n$ ls\n58096 swqcsnw\n$ cd ..\n$ cd tzjthwc\n$ ls\n66628 pzrdpc.fpc\n$ cd ..\n$ cd wmsl\n$ ls\n43111 hznrlfhh.tnz\n114356 rrrj.rlf\n169873 zpwhgzvc.wql\n$ cd ..\n$ cd ..\n$ cd dhsvtfc\n$ ls\ndir cwbq\n201361 dgpfcftj\n291508 jjjjwcw\n445 pfdvf.pmj\n135732 qpc.gsw\n115597 wlgrtn.mjb\ndir wmsl\n$ cd cwbq\n$ ls\ndir ccgdn\ndir gcfbqh\n173860 hznrlfhh.tnz\n97790 mjrlm\ndir qtfhz\ndir tpgj\ndir tph\n$ cd ccgdn\n$ ls\ndir blnzrjm\n46502 fgmntg.crb\ndir fwdpw\ndir nbldsrfq\n11175 nwj.fht\n208129 qqb.qmd\ndir wpj\n$ cd blnzrjm\n$ ls\n121398 gvs\n201215 pdppzscr.vph\ndir pwj\n3861 smwrnw.hqp\ndir tzjthwc\n220659 wzccnw.lsc\n$ cd pwj\n$ ls\n279141 bwj.ntc\n15325 jvqwhwmh.brq\n$ cd ..\n$ cd tzjthwc\n$ ls\n25191 jdgphj\n70354 rrrj.szq\n256692 wmsl\n$ cd ..\n$ cd ..\n$ cd fwdpw\n$ ls\n28780 prhjf\n$ cd ..\n$ cd nbldsrfq\n$ ls\n57352 dcrhr\n$ cd ..\n$ cd wpj\n$ ls\n51243 jmdn.bzh\n$ cd ..\n$ cd ..\n$ cd gcfbqh\n$ ls\n92250 crmpsc.rbf\n284234 tzjthwc\n$ cd ..\n$ cd qtfhz\n$ ls\n164311 hznrlfhh.tnz\n137031 mjrlm\n$ cd ..\n$ cd tpgj\n$ ls\n210570 jdpv.fpw\n$ cd ..\n$ cd tph\n$ ls\ndir hptp\ndir rrrj\n$ cd hptp\n$ ls\n272964 qqb.qmd\n147435 svrcpb\n$ cd ..\n$ cd rrrj\n$ ls\n145269 btzl.vcs\n156500 tzjthwc.ddw\n236073 vsrghnhl.wdc\n$ cd ..\n$ cd ..\n$ cd ..\n$ cd wmsl\n$ ls\n62697 mjrlm\ndir psndpb\n33688 tzjthwc.hjc\n100902 tzjthwc.rnm\n$ cd psndpb\n$ ls\ndir dbm\ndir fbmfpndf\ndir fstgbcrc\n272771 lszgqt\n136189 mjrlm\n166606 qqb.qmd\ndir vptjzdt\n$ cd dbm\n$ ls\ndir nzwbc\ndir tzjthwc\n$ cd nzwbc\n$ ls\ndir ffmrngmj\n$ cd ffmrngmj\n$ ls\n299742 nrwrptz.cmp\n$ cd ..\n$ cd ..\n$ cd tzjthwc\n$ ls\n268152 pln\n$ cd ..\n$ cd ..\n$ cd fbmfpndf\n$ ls\n186758 bplz.rdp\n$ cd ..\n$ cd fstgbcrc\n$ ls\n4975 hznrlfhh.tnz\n59093 mjrlm\ndir nzwbc\n279246 qqb.qmd\n$ cd nz" <> ...
+```
 
-  def part1(input) do
+```elixir
+defmodule Day07.Input do
+  def parse(input) when is_binary(input) do
     input
+    |> String.split("\n")
     |> parse()
-    |> Enum.reduce({"/", @dir_list}, &line/2)
   end
 
-  def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+  def parse(input) when is_list(input) do
+    Stream.map(input, &parse_line/1)
   end
 
-  # def line(line, {dir, %{} = directories})
-  def line(:ls, acc), do: acc
+  defp parse_line("$ ls"), do: :ls
+  defp parse_line("$ cd " <> dir), do: {:cd, dir}
+  defp parse_line("dir " <> dir), do: {:dir, dir}
 
-  def line({:cd, ".."}, {dir, map}),
-    do: {parent_name(map, dir), map}
-
-  def line({:cd, new_dir}, {dir, map}),
-    do: {dir_name([dir, new_dir]), map}
-
-  def line({:dir, new_dir}, {dir, map}) do
-    new_dir = dir_name(dir, new_dir)
-
-    IO.inspect(dir, label: "DIR")
-    IO.inspect(new_dir, label: "NEW DIR")
-
-    {
-      dir,
-      map
-      |> Map.update!(dir, &add_child(&1, new_dir))
-      |> Map.put(new_dir, Directory.init(new_dir))
-    }
-  end
-
-  def line(_, acc), do: acc
-
-  defp add_child(dir, child) do
-    Map.update!(dir, :children, &[child | &1])
-  end
-
-  defp parent_name(map, dir) do
-    Map.get(map, dir).parent
-  end
-
-  defp dir_name(a, b), do: dir_name([a, b])
-
-  defp dir_name(list) when is_list(list),
-    do: Enum.join(list, "/")
-
-  defmodule Directory do
-    defstruct [:name, :parent, files: [], children: []]
-
-    def init(name) do
-      %__MODULE__{
-        name: name,
-        parent: parent_from_name(name)
-      }
-    end
-
-    def parent_from_name("/"), do: nil
-
-    def parent_from_name(name) do
-      String.replace(name, ~r/\/[^\/]+$/, "")
-    end
-  end
-
-  defmodule Input do
-    def parse(input) when is_binary(input) do
-      input
-      |> String.split("\n")
-      |> parse()
-    end
-
-    def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
-    end
-
-    def parse_line("$ ls"), do: :ls
-    def parse_line("$ cd " <> dir), do: {:cd, dir}
-    def parse_line("dir " <> dir), do: {:dir, dir}
-
-    def parse_line(file) do
-      with [size, name] <- String.split(file, " ") do
-        {:file, name, String.to_integer(size)}
-      end
+  defp parse_line(file) do
+    with [size, name] <- String.split(file, " ") do
+      {:file, {name, String.to_integer(size)}}
     end
   end
 end
@@ -162,33 +189,151 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day07, <<70, 79, 82, 49, 0, 0, 16, ...>>,
- {:module, Day07.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day07.Input, <<70, 79, 82, 49, 0, 0, 9, ...>>, {:parse_line, 1}}
 ```
 
 ```elixir
-Day07.part1(input)
+defmodule Day07.Directory do
+  defstruct [:name, :parent, size: 0, files: [], children: []]
+
+  def init(name) do
+    %__MODULE__{
+      name: name,
+      parent: parent_from_name(name)
+    }
+  end
+
+  def parent_from_name("/"), do: nil
+
+  def parent_from_name(name) do
+    String.replace(name, ~r/(^\/.*)\/?[^\/]+$/U, "\\1")
+  end
+
+  def update_sizes(directory_map) do
+    for {name, dir} <- directory_map, into: %{} do
+      {name, update_size(dir, directory_map)}
+    end
+  end
+
+  defp update_size(%{} = directory, map) do
+    %{directory | size: calculate_size(directory, map)}
+  end
+
+  defp calculate_size(%{children: children} = directory, map) do
+    files_size(directory) + children_size(children, map)
+  end
+
+  defp files_size(%{files: files}) do
+    files
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.sum()
+  end
+
+  defp children_size(children, map) do
+    children
+    |> Enum.map(&calculate_size(map[&1], map))
+    |> Enum.sum()
+  end
+end
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-DIR: "///"
-NEW DIR: "////a"
+{:module, Day07.Directory, <<70, 79, 82, 49, 0, 0, 18, ...>>, {:children_size, 2}}
 ```
 
 ```elixir
-Day07.Directory.init("/")
+defmodule Day07.Part1 do
+  alias Day07.{Directory, Input}
+
+  @dir_list %{
+    "/" => Directory.init("/")
+  }
+
+  def call(input) do
+    build_directories_with_sizes(input)
+    |> Map.values()
+    |> Stream.filter(&(&1.size <= 100_000))
+    |> Stream.map(& &1.size)
+    |> Enum.sum()
+  end
+
+  def build_directories_with_sizes(input) do
+    input
+    |> Input.parse()
+    |> Enum.reduce({"/", @dir_list}, &process_line/2)
+    |> elem(1)
+    |> Directory.update_sizes()
+  end
+
+  def process_line(:ls, noop), do: noop
+  def process_line({:cd, "/"}, {_, map}), do: {"/", map}
+  def process_line({:cd, ".."}, {dir, map}), do: {map[dir].parent, map}
+  def process_line({:cd, cd}, {dir, map}), do: {dir_name(dir, cd), map}
+
+  def process_line({:file, file}, {dir, map}) do
+    {
+      dir,
+      Map.update!(map, dir, &add_item(&1, :files, file))
+    }
+  end
+
+  def process_line({:dir, new_dir}, {dir, map}) do
+    new_dir = dir_name(dir, new_dir)
+
+    {
+      dir,
+      map
+      |> Map.update!(dir, &add_item(&1, :children, new_dir))
+      |> Map.put(new_dir, Directory.init(new_dir))
+    }
+  end
+
+  defp add_item(map, key, item) do
+    Map.update!(map, key, &[item | &1])
+  end
+
+  defp dir_name("/", dir), do: "/" <> dir
+  defp dir_name(a, b), do: a <> "/" <> b
+end
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%Day07.Directory{name: "/", parent: "/", files: [], children: []}
+{:module, Day07.Part1, <<70, 79, 82, 49, 0, 0, 18, ...>>, {:dir_name, 2}}
 ```
 
 ```elixir
-Day07.Input.parse(input) |> Enum.to_list()
+defmodule Day07.Part2 do
+  @total_space 70_000_000
+  @desired 30_000_000
+
+  def call(input) do
+    dirs = Day07.Part1.build_directories_with_sizes(input)
+    file_size = Map.get(dirs["/"], :size)
+
+    unused = @total_space - file_size
+    deficit = max(0, @desired - unused)
+
+    dirs
+    |> Map.values()
+    |> Stream.filter(&(&1.size >= deficit))
+    |> Stream.map(& &1.size)
+    |> Enum.min()
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day07.Part2, <<70, 79, 82, 49, 0, 0, 10, ...>>, {:call, 1}}
+```
+
+```elixir
+Day07.Input.parse(input) |> Enum.to_list() |> Enum.take(10)
 ```
 
 <!-- livebook:{"output":true} -->
@@ -197,60 +342,47 @@ Day07.Input.parse(input) |> Enum.to_list()
 [
   {:cd, "/"},
   :ls,
-  {:dir, "a"},
-  {:file, "b.txt", 14848514},
-  {:file, "c.dat", 8504156},
-  {:dir, "d"},
-  {:cd, "a"},
-  :ls,
-  {:dir, "e"},
-  {:file, "f", 29116},
-  {:file, "g", 2557},
-  {:file, "h.lst", 62596},
-  {:cd, "e"},
-  :ls,
-  {:file, "i", 584},
-  {:cd, ".."},
-  {:cd, ".."},
-  {:cd, "d"},
-  :ls,
-  {:file, "j", 4060174},
-  {:file, "d.log", 8033020},
-  {:file, "d.ext", 5626152},
-  {:file, "k", 7214296}
+  {:dir, "dpllhlcv"},
+  {:file, {"hznrlfhh.tnz", 284723}},
+  {:dir, "mgjdlmrz"},
+  {:dir, "njstc"},
+  {:dir, "nzwbc"},
+  {:dir, "qzzfvdh"},
+  {:dir, "smvhphf"},
+  {:cd, "dpllhlcv"}
 ]
 ```
 
-**QUESTION ONE?**
+Find all of the directories with a total size of at most 100000. **What is the sum of the total sizes of those directories?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `1648397`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day07.part1(input)
+Day07.Part1.call(input)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+1648397
 ```
 
-**QUESTION TWO?**
+Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. **What is the total size of that directory?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `1815525`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day07.part1(input)
+Day07.Part2.call(input)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+1815525
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -258,57 +390,6 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/7/input).
-
-## Benchmarking
-
-```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day07.part1(input)
-  end
-
-  def fun2(input) do
-    Day07.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
-# https://github.com/bencheeorg/benchee
-input = Day07.Input.parse(input) |> Enum.to_list()
-
-Benchee.run(
-  %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
-
-nil
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-nil
-```
 
 ## Tests
 
@@ -322,19 +403,20 @@ defmodule Day07Test do
 
   setup_all do
     [
-      input: ""
+      input:
+        "$ cd /\n$ ls\ndir a\n14848514 b.txt\n8504156 c.dat\ndir d\n$ cd a\n$ ls\ndir e\n29116 f\n2557 g\n62596 h.lst\n$ cd e\n$ ls\n584 i\n$ cd ..\n$ cd ..\n$ cd d\n$ ls\n4060174 j\n8033020 d.log\n5626152 d.ext\n7214296 k"
     ]
   end
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day07.part1(input) == [""]
+      assert Day07.Part1.call(input) == 95437
     end
   end
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day07.part2(input) == [""]
+      assert Day07.Part2.call(input) == 24_933_642
     end
   end
 end
@@ -349,7 +431,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 721709
 ```
 
 <!-- livebook:{"output":true} -->
