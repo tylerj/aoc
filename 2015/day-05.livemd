@@ -1,0 +1,287 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# 2015 Advent of Code - Day 5: Doesn't He Have Intern-Elves For This?
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/5)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/5/input)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2015/day-05.livemd)
+
+## Prompt
+
+### --- Day 5: Doesn't He Have Intern-Elves For This? ---
+
+Santa needs help figuring out which strings in his text file are naughty or nice.
+
+A **nice string** is one with all of the following properties:
+
+* It contains at least three vowels (aeiou only), like `aei`, `xazegov`, or `aeiouaeiouaeiou`.
+* It contains at least one letter that appears twice in a row, like `xx`, `abcdde` (`dd`), or `aabbccdd` (`aa`, `bb`, `cc`, or `dd`).
+* It does not contain the strings `ab`, `cd`, `pq`, or `xy`, even if they are part of one of the other requirements.
+
+For example:
+
+* `ugknbfddgicrmopn` is nice because it has at least three vowels (u...i...o...), a double letter (...dd...), and none of the disallowed substrings.
+* `aaa` is nice because it has at least three vowels and a double letter, even though the letters used by different rules overlap.
+* `jchzalrnumimnmhp` is naughty because it has no double letter.
+* `haegwjzuvuyypxyu` is naughty because it contains the string xy.
+* `dvszwmarrgswjxmb` is naughty because it contains only one vowel.
+
+**How many strings are nice?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/5/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Realizing the error of his ways, Santa has switched to a better model of determining whether a string is naughty or nice. None of the old rules apply, as they are all clearly ridiculous.
+
+Now, a nice string is one with all of the following properties:
+
+* It contains a pair of any two letters that appears at least twice in the string without overlapping, like `xyxy` (`xy`) or `aabcdefgaa` (`aa`), but not like `aaa` (`aa`, but it overlaps).
+* It contains at least one letter which repeats with exactly one letter between them, like `xyx`, `abcdefeghi` (`efe`), or even `aaa`.
+
+For example:
+
+* `qjhvhtzxzqqjkmpb` is nice because is has a pair that appears twice (`qj`) and a letter that repeats with exactly one letter between them (`zxz`).
+* `xxyxx` is nice because it has a pair that appears twice and a letter that repeats with one between, even though the letters used by each rule overlap.
+* `uurcxstgmygtbstg` is naughty because it has a pair (`tg`) but no repeat with a single letter between them.
+* `ieodomkazucvgmuy` is naughty because it has a repeating letter with one between (`odo`), but no pair that appears twice.
+
+**How many strings are nice under these new rules?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/5/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"zgsnvdmlfuplrubt\nvlhagaovgqjmgvwq\nffumlmqwfcsyqpss\nzztdcqzqddaazdjp\neavfzjajkjesnlsb\nurrvucyrzzzooxhx\nxdwduffwgcptfwad\norbryxwrmvkrsxsr\njzfeybjlgqikjcow\nmayoqiswqqryvqdi\niiyrkoujhgpgkcvx\negcgupjkqwfiwsjl\nzbgtglaqqolttgng\neytquncjituzzhsx\ndtfkgggvqadhqbwb\nzettygjpcoedwyio\nrwgwbwzebsnjmtln\nesbplxhvzzgawctn\nvnvshqgmbotvoine\nwflxwmvbhflkqxvo\ntwdjikcgtpvlctte\nminfkyocskvgubvm\nsfxhhdhaopajbzof\nsofkjdtalvhgwpql\nuqfpeauqzumccnrc\ntdflsbtiiepijanf\ndhfespzrhecigzqb\nxobfthcuuzhvhzpn\nolgjglxaotocvrhw\njhkzpfcskutwlwge\nzurkakkkpchzxjhq\nhekxiofhalvmmkdl\nazvxuwwfmjdpjskj\narsvmfznblsqngvb\nldhkzhejofreaucc\nadrphwlkehqkrdmo\nwmveqrezfkaivvaw\niyphmphgntinfezg\nblomkvgslfnvspem\ncgpaqjvzhbumckwo\nydhqjcuotkeyurpx\nsbtzboxypnmdaefr\nvxrkhvglynljgqrg\nttgrkjjrxnxherxd\nhinyfrjdiwytetkw\nsufltffwqbugmozk\ntohmqlzxxqzinwxr\njbqkhxfokaljgrlg\nfvjeprbxyjemyvuq\ngmlondgqmlselwah\nubpwixgxdloqnvjp\nlxjfhihcsajxtomj\nqouairhvrgpjorgh\nnloszcwcxgullvxb\nmyhsndsttanohnjn\nzjvivcgtjwenyilz\nqaqlyoyouotsmamm\ntadsdceadifqthag\nmafgrbmdhpnlbnks\naohjxahenxaermrq\novvqestjhbuhrwlr\nlnakerdnvequfnqb\nagwpwsgjrtcjjikz\nlhlysrshsmzryzes\nxopwzoaqtlukwwdu\nxsmfrfteyddrqufn\nohnxbykuvvlbbxpf\nbbdlivmchvzfuhoc\nvtacidimfcfyobhf\ntinyzzddgcnmiabd\ntcjzxftqcqrivqhn\nvgnduqyfpokbmzim\nrevkvaxnsxospyow\nydpgwxxoxlywxcgi\nwzuxupbzlpzmikel\nnscghlafavnsycjh\nxorwbquzmgmcapon\nasmtiycegeobfxrn\neqjzvgkxgtlyuxok\nmmjrskloposgjoqu\ngceqosugbkvytfto\nkhivvoxkvhrgwzjl\nqtmejuxbafroifjt\nttmukbmpoagthtfl\nbxqkvuzdbehtduwv\ngvblrpzjylanoggj\ncltewhyjxdbmbtqj\nfbkgedqvomdipklj\nuxvuplhenqawfcjt\nfkdjmayiawdkycva\ngnloqfgbnibzyidh\nkyzorvtopjiyyyqg\ndrckpekhpgrioblt\ntvhrkmbnpmkkrtki\nkhaldwntissbijiz\naoojqakosnaxosom\nxfptccznbgnpfyqw\nmoqdwobwhjxhtrow\nchfwivedutskovri\ngprkyalfnpljcrmi\npwyshpwjndasykst\nxuejivogihttzimd\nbugepxgpgahtsttl\nzufmkmuujavcskpq\nurybkdyvsrosrfro\nisjxqmlxwtqmulbg\npxctldxgqjqhulgz\nhclsekryiwhqqhir\nhbuihpalwuidjpcq\nejyqcxmfczqfhbxa\nxljdvbucuxnnaysv\nirqceqtqwemostbb\nanfziqtpqzqdttnz\ncgfklbljeneeqfub\nzudyqkuqqtdcpmuo\niuvhylvznmhbkbgg\nmpgppmgfdzihulnd\nargwmgcvqqkxkrdi\npdhrfvdldkfihlou\ncbvqnjrvrsnqzfob\nlkvovtsqanohzcmm\nvxoxjdyoylqcnyzt\nkurdpaqiaagiwjle\ngwklwnazaxfkuekn\nrbaamufphjsjhbdl\ntzbrvaqvizhsisbd\npbcqlbfjvlideiub\nhiwoetbfywaeddtx\nfjirczxtuupfywyf\nomeoegeyyospreem\nozbbpupqpsskvrjh\npzvcxkvjdiyeyhxa\nodclumkenabcsfzr\nnpdyqezqdjqaszvm\nyodkwzmrhtexfrqa\nrjcmmggjtactfrxz\nmioxfingsfoimual\naqskaxjjborspfaa\nwientdsttkevjtkf\ntdaswkzckmxnfnct\nvoucjhzvkkhuwoqk\nboaaruhalgaamqmh\niufzxutxymorltvb\npfbyvbayvnrpijpo\nobztirulgyfthgcg\nntrenvhwxypgtjwy\nephlkipjfnjfjrns\npkjhurzbmobhszpx\ngqbnjvienzqfbzvj\nwjelolsrbginwnno\nvotanpqpccxqricj\nbxyuyiglnmbtvehi\nqyophcjfknbcbjrb\nanoqkkbcdropskhj\ntcnyqaczcfffkrtl\nrsvqimuqbuddozrf\nmeppxdrenexxksdt\ntyfhfiynzwadcord\nwayrnykevdmywycf\nmhowloqnppswyzbu\ntserychksuwrgkxz\nxycjvvsuaxsbrqal\nfkrdsgaoqdcqwlpn\nvrabcmlhuktigecp\nxgxtdsvpaymzhurx\nciabcqymnchhsxkc\neqxadalcxzocsgtr\ntsligrgsjtrnzrex\nqeqgmwipbspkbbfq\nvzkzsjujltnqwliw\nldrohvodgbxokjxz\njkoricsxhipcibrq\nqzquxawqmupeujrr\nmizpuwqyzkdbahvk\nsuupfxbtoojqvdca\nywfmuogvicpywpwm\nuevmznxmsxozhobl\nvjbyhsemwfwdxfxk\niyouatgejvecmtin\ntcchwpuouypllcxe\nlgnacnphdiobdsef\nuoxjfzmdrmpojgbf\nlqbxsxbqqhpjhfxj\nknpwpcnnimyjlsyz\nfezotpoicsrshfnh\ndkiwkgpmhudghyhk\nyzptxekgldksridv\npckmzqzyiyzdbcts\noqshafncvftvwvsi\nyynihvdywxupqmbt\niwmbeunfiuhjaaic\npkpkrqjvgocvaxjs\nieqspassuvquvlyz\nxshhahjaxjoqsjtl\nfxrrnaxlqezdcdvd\npksrohfwlaqzpkdd\nravytrdnbxvnnoyy\natkwaifeobgztbgo\ninkcabgfdobyeeom\nywpfwectajohqizp\namcgorhxjcybbisv\nmbbwmnznhafsofvr\nwofcubucymnhuhrv\nmrsamnwvftzqcgta\ntlfyqoxmsiyzyvgv\nydceguvgotylwtea\nbtyvcjqhsygunvle\nusquiquspcdppqeq\nkifnymikhhehgote\nybvkayvtdpgxfpyn\noulxagvbavzmewnx\ntvvpekhnbhjskzpj\nazzxtstaevxurboa\nnfmwtfgrggmqyhdf\nynyzypdmysfwyxgr\niaobtgubrcyqrgmk\nuyxcauvpyzabbzgv\nfbasfnwiguasoedc\nmgmjoalkbvtljilq\nszgkxiqkufdvtksb\nxgfzborpavdmhiuj\nhmuiwnsonvfgcrva\nzolcffdtobfntifb\nmvzgcsortkugvqjr\npbbpgraaldqvzwhs\nzvsxegchksgnhpuv\nkdpdboaxsuxfswhx\njdfggigejfupabth\ntpeddioybqemyvqz\nmxsntwuesonybjby\ntzltdsiojfvocige\nubtdrneozoejiqrv\nfusyucnhncoxqzql\nnlifgomoftdvkpby\npyikzbxoapffbqjw\nhzballplvzcsgjug\nymjyigsfehmdsvgz\nvpqgyxknniunksko\nffkmaqsjxgzclsnq\njcuxthbedplxhslk\nymlevgofmharicfs" <> ...
+```
+
+```elixir
+~c(aeiou)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+'aeiou'
+```
+
+## Solution
+
+```elixir
+defmodule Day05 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  @vowels ~c(aeiou)
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.count(&nice_part1?/1)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.count(&nice_part2?/1)
+  end
+
+  def nice_part1?(input) do
+    has_n_vowels?(input, 3) and
+      has_double_letter?(input) and
+      no_bad_strings?(input)
+  end
+
+  def nice_part2?(input) do
+    pair_twice?(input) and sandwich?(input)
+  end
+
+  def has_n_vowels?(input, num) do
+    Enum.count(input, &(&1 in @vowels)) >= num
+  end
+
+  def has_double_letter?([a | [a | _]]), do: true
+  def has_double_letter?([_ | tail]), do: has_double_letter?(tail)
+  def has_double_letter?([]), do: false
+
+  def no_bad_strings?([?a | [?b | _]]), do: false
+  def no_bad_strings?([?c | [?d | _]]), do: false
+  def no_bad_strings?([?p | [?q | _]]), do: false
+  def no_bad_strings?([?x | [?y | _]]), do: false
+  def no_bad_strings?([_ | tail]), do: no_bad_strings?(tail)
+  def no_bad_strings?([]), do: true
+
+  def pair_twice?(list, set \\ MapSet.new())
+
+  def pair_twice?([a | [a | [a | _] = tail]], set) do
+    if MapSet.member?(set, [a, a]),
+      do: true,
+      else: pair_twice?(tail, MapSet.put(set, [a, a]))
+  end
+
+  def pair_twice?([a | [b | _] = tail], set) do
+    if MapSet.member?(set, [a, b]),
+      do: true,
+      else: pair_twice?(tail, MapSet.put(set, [a, b]))
+  end
+
+  def pair_twice?([_ | tail], set), do: pair_twice?(tail, set)
+  def pair_twice?([], _), do: false
+
+  def sandwich?([a | [_ | [a | _]]]), do: true
+  def sandwich?([_ | tail]), do: sandwich?(tail)
+  def sandwich?([]), do: false
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.to_charlist(line)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day05, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+ {:module, Day05.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**How many strings are nice?**
+
+Your puzzle answer was `238`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day05.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+238
+```
+
+**How many strings are nice under these new rules?**
+
+Your puzzle answer was `69`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day05.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+69
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/5/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day05Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ~w(
+        ugknbfddgicrmopn
+        aaa
+        jchzalrnumimnmhp
+        haegwjzuvuyypxyu
+        dvszwmarrgswjxmb
+      )
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day05.nice_part1?('ugknbfddgicrmopn') == true
+      assert Day05.nice_part1?('aaa') == true
+      assert Day05.nice_part1?('jchzalrnumimnmhp') == false
+      assert Day05.nice_part1?('haegwjzuvuyypxyu') == false
+      assert Day05.nice_part1?('dvszwmarrgswjxmb') == false
+
+      assert Day05.part1(input) == 2
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value" do
+      assert Day05.nice_part2?('qjhvhtzxzqqjkmpb') == true
+      assert Day05.nice_part2?('xxyxx') == true
+      assert Day05.nice_part2?('aaaa') == true
+      assert Day05.nice_part2?('aaa') == false
+      assert Day05.nice_part2?('uurcxstgmygtbstg') == false
+      assert Day05.nice_part2?('ieodomkazucvgmuy') == false
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 933279
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```

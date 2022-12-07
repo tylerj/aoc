@@ -1,0 +1,210 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# 2015 Advent of Code - Day 1: Not Quite Lisp
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/1)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/1/input)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2015/day-01.livemd)
+
+## Prompt
+
+### --- Day 1: Not Quite Lisp ---
+
+Santa was hoping for a white Christmas, but his weather machine's "snow" function is powered by stars, and he's fresh out! To save Christmas, he needs you to collect **fifty stars** by December 25th.
+
+Collect stars by helping Santa solve puzzles. Two puzzles will be made available on each day in the Advent calendar; the second puzzle is unlocked when you complete the first. Each puzzle grants **one star**. Good luck!
+
+Here's an easy puzzle to warm you up.
+
+Santa is trying to deliver presents in a large apartment building, but he can't find the right floor - the directions he got are a little confusing. He starts on the ground floor (floor 0) and then follows the instructions one character at a time.
+
+An opening parenthesis, (, means he should go up one floor, and a closing parenthesis, ), means he should go down one floor.
+
+The apartment building is very tall, and the basement is very deep; he will never find the top or bottom floors.
+
+For example:
+
+* `(())` and `()()` both result in floor `0`.
+* `(((` and `(()(()(` both result in floor `3`.
+* `))(((((` also results in floor `3`.
+* `())` and `))(` both result in floor `-1` (the first basement level).
+* `)))` and `)())())` both result in floor `-3`.
+
+**To what floor do the instructions take Santa?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/1/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Now, given the same instructions, find the **position** of the first character that causes him to enter the basement (floor -1). The first character in the instructions has position 1, the second character has position 2, and so on.
+
+For example:
+
+* `)` causes him to enter the basement at character position `1`.
+* `()())` causes him to enter the basement at character position `5`.
+
+**What is the position of the character that causes Santa to first enter the basement?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/1/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"()()(()()()(()()((()((()))((()((((()()((((()))()((((())(((((((()(((((((((()(((())(()()(()((()()(()(())(()((((()((()()()((((())((((((()(()(((()())(()((((()))())(())(()(()()))))))))((((((((((((()())()())())(())))(((()()()((((()(((()(()(()()(()(()()(()(((((((())(())(())())))((()())()((((()()((()))(((()()()())))(())))((((())(((()())(())(()))(()((((()())))())((()(())(((()((((()((()(())())))((()))()()(()(()))))((((((((()())((((()()((((()(()())(((((()(()())()))())(((()))()(()(()(()((((()(())(()))(((((()()(()()()(()(((())())(((()()(()()))(((()()(((())())(()(())())()()(())()()()((()(((()(())((()()((())()))((()()))((()()())((((()(()()(()(((()))()(()))))((()(((()()()))(()(((())()(()((()())(()(()()(()())(())()(((()(()())()((((()((()))))())()))((()()()()(())()())()()()((((()))))(()(((()()(((((((())()))()((((()((())()(()())(())()))(()(()())(((((((())))(((()))())))))()))())((())(()()((())()())()))))()((()()())(())((())((((()())())()()()(((()))())))()()))())(()()()(()((((((()()))())()))()(((()(((())((((()()()(()))())()()))))())()))())((())()())(((((())())((())())))(((())(((())(((((()(((((())(()(()())())(()(())(()))(()((((()))())()))))())))((()(()))))())))(((((())()))())()))))()))))(((()))()))))((()))((()((()(()(())()())))(()()()(())()))()((((())))))))(())(()((()()))(()))(()))(()((()))))))()()((((()()))()())()))))))()()()))(()((())(()))((()()()())()(((()((((())())))()((((()(()))))))())))()()())()))(()))))(()())()))))))((())))))))())()))()((())())))(()((()))()))(())))))(()))()())()()))((()(()))()()()()))))())()()))())(())()()))()))((()))))()()(()())))))()()()))((((()))()))))(()(())))(()())))((())())(()))()))))()())))()())()())))))))))()()))))())))((())((()))))())))(((()())))))))(()))()()))(()))()))))()())))))())((((()())))))))())))()()))))))))()))()))))()))))))(())))))))))())))))))))))))))())())((())))))))))()))((())))()))))))))())()(()))))))())))))()()()())()(()()()(()())(()))()()()(()())))())())))()))))())))))))()()()()())(())())()())()))))(()()()()()))))()))())())))((()())()())))()))()))))(()())))()))))))))(((()))()()))))))))))))))))))))(()))(()((()))())))())(()))(()(()(())))))()(()))()))()()))))))))))))()((()())(())())()(())))))())()())((()()))))(()()))))())()(())()))))))))))))))))))))()))(()(()())))))))()()((()))()))))))((())))()))))))))((()))())()()))())()()))((()))())))))))))))(()())()))(())((()(()()))(()())(())))()())(()(())()()))))()))()(()))))))(()))))))))))(()))())))))))))())))))())))(())))))()))))(())())))))))))()(()))))()())))())(()))()())))))))))))))())()()))))()))))))())))))()))))(())(()()()()((())()))())(()))((())()))())())(())(()()))))()))(())()()((())(())))(())))()))())))))))))()(((((())())))(())()))))(())))((()))()(((((((()))))()()))(())))))()(()))))(()()))()))())))))))(()())()))))))))())))(()))())()))(())()((())())()())())(()(()))))()))))))((()())(())()()(()())))()()))(())(())(()))())))()))(()))()()))((((()))))()))((()()()))))()))()))())))(()))()))))(())))()))())()(()))()())))())))))))())))())))()()))))))(()))())())))()))()()())())))))))))))))())))()))(()()))))())))())()(())))())))))))))))))))))()()())())))))()()()((()(()))()()(())()())()))()))))()()()))))))((()))))))))()(()(()((((((()()((()())))))))))))()))())))))((())())(()))())))())))))())()()())(())))())))()())())(())))))))()()(())))()))())))())())())()))))))))()))(()()()())())())))(())())))))))()()())()))))())))())()(())())))))))()())()))(()()(())())))()(()((()()((()()(((((())(()())()))(())()))(())))(())))))))()))()))((()))()))()))))))))()))))))))((()()())(()))(((()))(())))()))((())(((())))()())))())))))((())))))(())())((((((())())()(()))()(()((()())))((())()(()(()))))(())(()()())(())))())((()(((())())))(((()())())))())()(())())((((()()))))())((()))()()()()(())(((((((()()()((()))())(()())))(())())((((()()(()))))()((())))((())()))()(((()))())))()))((()(()))(())(()((((())((((()()(()()))(((())(()))))((((()(()))(())))))((()))(()))((()(((()(()))(()(()((()(())(()(()(()(()()((()))())(((())(()(()))))(()))()()))(())))(())()(((())(()))()((((()()))))())(()))))((())()((((()(((()))())())(((()))()())((())(())())(())()(())()(()()((((((()()))))()()(((()()))))()())()(((()(()))(()(" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day01 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.reduce(0, fn
+      ?(, floor -> floor + 1
+      ?), floor -> floor - 1
+    end)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.reduce_while({0, 0}, fn
+      _, {floor, pos} when floor < 0 -> {:halt, {floor, pos}}
+      ?(, {floor, pos} -> {:cont, {floor + 1, pos + 1}}
+      ?), {floor, pos} -> {:cont, {floor - 1, pos + 1}}
+    end)
+    |> elem(1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      String.to_charlist(input)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 10, ...>>,
+ {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
+```
+
+**To `what floor` do the instructions take Santa??**
+
+Your puzzle answer was `280`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+280
+```
+
+**What is the `position` of the character that causes Santa to first enter the basement??**
+
+Your puzzle answer was `1797`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1797
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/1/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day01Test do
+  use ExUnit.Case, async: false
+
+  describe "part1/1" do
+    test "returns expected value" do
+      assert Day01.part1("(())") == 0
+      assert Day01.part1("()()") == 0
+      assert Day01.part1("(((") == 3
+      assert Day01.part1("(()(()(") == 3
+      assert Day01.part1("))(((((") == 3
+      assert Day01.part1("())") == -1
+      assert Day01.part1("))(") == -1
+      assert Day01.part1(")))") == -3
+      assert Day01.part1(")())())") == -3
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value" do
+      assert Day01.part2(")") == 1
+      assert Day01.part2("()())") == 5
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 21522
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```

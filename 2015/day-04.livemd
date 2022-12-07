@@ -1,0 +1,176 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# 2015 Advent of Code - Day 4: The Ideal Stocking Stuffer
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/4)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/4/input)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2015/day-04.livemd)
+
+## Prompt
+
+### --- Day 4: The Ideal Stocking Stuffer ---
+
+Santa needs help [mining](https://en.wikipedia.org/wiki/Bitcoin#Mining) some AdventCoins (very similar to [bitcoins](https://en.wikipedia.org/wiki/Bitcoin)) to use as gifts for all the economically forward-thinking little girls and boys.
+
+To do this, he needs to find [MD5](https://en.wikipedia.org/wiki/MD5) hashes which, in [hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal), start with at least **five zeroes**. The input to the MD5 hash is some secret key (your puzzle input, given below) followed by a number in decimal. To mine AdventCoins, you must find Santa the lowest positive number (no leading zeroes: 1, 2, 3, ...) that produces such a hash.
+
+For example:
+
+* If your secret key is `abcdef`, the answer is `609043`, because the MD5 hash of `abcdef609043` starts with five zeroes (`000001dbbfa...`), and it is the lowest such number to do so.
+* If your secret key is `pqrstuv`, the lowest number it combines with to make an MD5 hash starting with five zeroes is `1048970`; that is, the MD5 hash of `pqrstuv1048970` looks like `000006136ef....`
+
+Your puzzle input is `bgvyzdsv`.
+
+**To mine AdventCoins, you must find Santa the lowest positive number that produces such a hash.**
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+**Now find one that starts with `six zeroes`.**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/4/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"bgvyzdsv"
+```
+
+## Solution
+
+```elixir
+(input <> to_string(6))
+|> :erlang.md5()
+|> Base.encode16(case: :lower)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"b464a797636cb5862b776679f22b1223"
+```
+
+```elixir
+defmodule Day04 do
+  def find_lowest_suffix(prefix, suffix \\ 1, desired_prefix) do
+    hash =
+      (prefix <> to_string(suffix))
+      |> :erlang.md5()
+      |> Base.encode16(case: :lower)
+
+    if String.starts_with?(hash, desired_prefix),
+      do: suffix,
+      else: find_lowest_suffix(prefix, suffix + 1, desired_prefix)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day04, <<70, 79, 82, 49, 0, 0, 9, ...>>, {:find_lowest_suffix, 3}}
+```
+
+**To do this, he needs to find MD5 hashes which, in hexadecimal, start with at least `five zeroes`. To mine AdventCoins, you must find Santa the lowest positive number that produces such a hash.**
+
+Your puzzle answer was `254575`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.find_lowest_suffix(input, "00000")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+254575
+```
+
+**Now find one that starts with `six zeroes`.**
+
+Your puzzle answer was `1038736`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.find_lowest_suffix(input, "000000")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1038736
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/4/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day04Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [prefix: "00000"]
+  end
+
+  describe "find_lowest_suffix/1" do
+    test "returns expected value", %{prefix: prefix} do
+      assert Day04.find_lowest_suffix("abcdef", prefix) == 609_043
+      assert Day04.find_lowest_suffix("pqrstuv", prefix) == 1_048_970
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+.
+Finished in 0.9 seconds (0.00s async, 0.9s sync)
+1 test, 0 failures
+
+Randomized with seed 367531
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 1}
+```
