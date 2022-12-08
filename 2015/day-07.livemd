@@ -1,0 +1,376 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 7 - Advent of Code 2015
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/7)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/7/input)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2015/day-07.livemd)
+
+## Prompt
+
+### --- Day 7: Some Assembly Required ---
+
+This year, Santa brought little Bobby Tables a set of wires and [bitwise logic gates](https://en.wikipedia.org/wiki/Bitwise_operation)! Unfortunately, little Bobby is a little under the recommended age range, and he needs help assembling the circuit.
+
+Each wire has an identifier (some lowercase letters) and can carry a [16-bit](https://en.wikipedia.org/wiki/16-bit) signal (a number from `0` to `65535`). A signal is provided to each wire by a gate, another wire, or some specific value. Each wire can only get a signal from one source, but can provide its signal to multiple destinations. A gate provides no signal until all of its inputs have a signal.
+
+The included instructions booklet describes how to connect the parts together: `x AND y -> z` means to connect wires `x` and `y` to an AND gate, and then connect its output to wire `z`.
+
+For example:
+
+* `123 -> x` means that the signal `123` is provided to wire `x`.
+* `x AND y -> z` means that the [bitwise AND](https://en.wikipedia.org/wiki/Bitwise_operation#AND) of wire `x` and wire `y` is provided to wire `z`.
+* `p LSHIFT 2 -> q` means that the value from wire p is [left-shifted](https://en.wikipedia.org/wiki/Logical_shift) by 2 and then provided to wire q.
+* `NOT e -> f` means that the [bitwise complement](https://en.wikipedia.org/wiki/Bitwise_operation#NOT) of the value from wire `e` is provided to wire `f`.
+
+Other possible gates include `OR` ([bitwise OR](https://en.wikipedia.org/wiki/Bitwise_operation#OR)) and `RSHIFT` ([right-shift](https://en.wikipedia.org/wiki/Logical_shift)). If, for some reason, you'd like to **emulate** the circuit instead, almost all programming languages (for example, [C](https://en.wikipedia.org/wiki/Bitwise_operations_in_C), [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators), or [Python](https://wiki.python.org/moin/BitwiseOperators)) provide operators for these gates.
+
+For example, here is a simple circuit:
+
+```
+123 -> x
+456 -> y
+x AND y -> d
+x OR y -> e
+x LSHIFT 2 -> f
+y RSHIFT 2 -> g
+NOT x -> h
+NOT y -> i
+```
+
+After it is run, these are the signals on the wires:
+
+```
+d: 72
+e: 507
+f: 492
+g: 114
+h: 65412
+i: 65079
+x: 123
+y: 456
+```
+
+In little Bobby's kit's instructions booklet (provided as your puzzle input), **what signal is ultimately provided to wire a?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/7/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Now, take the signal you got on wire a, override wire b to that signal, and reset the other wires (including wire a). **What new signal is ultimately provided to wire a?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/7/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"bn RSHIFT 2 -> bo\nlf RSHIFT 1 -> ly\nfo RSHIFT 3 -> fq\ncj OR cp -> cq\nfo OR fz -> ga\nt OR s -> u\nlx -> a\nNOT ax -> ay\nhe RSHIFT 2 -> hf\nlf OR lq -> lr\nlr AND lt -> lu\ndy OR ej -> ek\n1 AND cx -> cy\nhb LSHIFT 1 -> hv\n1 AND bh -> bi\nih AND ij -> ik\nc LSHIFT 1 -> t\nea AND eb -> ed\nkm OR kn -> ko\nNOT bw -> bx\nci OR ct -> cu\nNOT p -> q\nlw OR lv -> lx\nNOT lo -> lp\nfp OR fv -> fw\no AND q -> r\ndh AND dj -> dk\nap LSHIFT 1 -> bj\nbk LSHIFT 1 -> ce\nNOT ii -> ij\ngh OR gi -> gj\nkk RSHIFT 1 -> ld\nlc LSHIFT 1 -> lw\nlb OR la -> lc\n1 AND am -> an\ngn AND gp -> gq\nlf RSHIFT 3 -> lh\ne OR f -> g\nlg AND lm -> lo\nci RSHIFT 1 -> db\ncf LSHIFT 1 -> cz\nbn RSHIFT 1 -> cg\net AND fe -> fg\nis OR it -> iu\nkw AND ky -> kz\nck AND cl -> cn\nbj OR bi -> bk\ngj RSHIFT 1 -> hc\niu AND jf -> jh\nNOT bs -> bt\nkk OR kv -> kw\nks AND ku -> kv\nhz OR ik -> il\nb RSHIFT 1 -> v\niu RSHIFT 1 -> jn\nfo RSHIFT 5 -> fr\nbe AND bg -> bh\nga AND gc -> gd\nhf OR hl -> hm\nld OR le -> lf\nas RSHIFT 5 -> av\nfm OR fn -> fo\nhm AND ho -> hp\nlg OR lm -> ln\nNOT kx -> ky\nkk RSHIFT 3 -> km\nek AND em -> en\nNOT ft -> fu\nNOT jh -> ji\njn OR jo -> jp\ngj AND gu -> gw\nd AND j -> l\net RSHIFT 1 -> fm\njq OR jw -> jx\nep OR eo -> eq\nlv LSHIFT 15 -> lz\nNOT ey -> ez\njp RSHIFT 2 -> jq\neg AND ei -> ej\nNOT dm -> dn\njp AND ka -> kc\nas AND bd -> bf\nfk OR fj -> fl\ndw OR dx -> dy\nlj AND ll -> lm\nec AND ee -> ef\nfq AND fr -> ft\nNOT kp -> kq\nki OR kj -> kk\ncz OR cy -> da\nas RSHIFT 3 -> au\nan LSHIFT 15 -> ar\nfj LSHIFT 15 -> fn\n1 AND fi -> fj\nhe RSHIFT 1 -> hx\nlf RSHIFT 2 -> lg\nkf LSHIFT 15 -> kj\ndz AND ef -> eh\nib OR ic -> id\nlf RSHIFT 5 -> li\nbp OR bq -> br\nNOT gs -> gt\nfo RSHIFT 1 -> gh\nbz AND cb -> cc\nea OR eb -> ec\nlf AND lq -> ls\nNOT l -> m\nhz RSHIFT 3 -> ib\nNOT di -> dj\nNOT lk -> ll\njp RSHIFT 3 -> jr\njp RSHIFT 5 -> js\nNOT bf -> bg\ns LSHIFT 15 -> w\neq LSHIFT 1 -> fk\njl OR jk -> jm\nhz AND ik -> im\ndz OR ef -> eg\n1 AND gy -> gz\nla LSHIFT 15 -> le\nbr AND bt -> bu\nNOT cn -> co\nv OR w -> x\nd OR j -> k\n1 AND gd -> ge\nia OR ig -> ih\nNOT go -> gp\nNOT ed -> ee\njq AND jw -> jy\net OR fe -> ff\naw AND ay -> az\nff AND fh -> fi\nir LSHIFT 1 -> jl\ngg LSHIFT 1 -> ha\nx RSHIFT 2 -> y\ndb OR dc -> dd\nbl OR bm -> bn\nib AND ic -> ie\nx RSHIFT 3 -> z\nlh AND li -> lk\nce OR cd -> cf\nNOT bb -> bc\nhi AND hk -> hl\nNOT gb -> gc\n1 AND r -> s\nfw AND fy -> fz\nfb AND fd -> fe\n1 AND en -> eo\nz OR aa -> ab\nbi LSHIFT 15 -> bm\nhg OR hh -> hi\nkh LSHIFT 1 -> lb\ncg OR ch -> ci\n1 AND kz -> la\ngf OR ge -> gg\ngj RSHIFT 2 -> gk\ndd RSHIFT 2 -> de\nNOT ls -> lt\nlh OR li -> lj\njr OR js -> jt\nau AND av -> ax\n0 -> c\nhe AND hp -> hr\nid AND if -> ig\net RSHIFT 5 -> ew\nbp AND bq -> bs\ne AND f -> h\nly OR lz -> ma\n1 AND lu -> lv\nNOT jd -> je\nha OR gz -> hb\ndy RSHIFT 1 -> er\niu RSHIFT 2 -> iv\nNOT hr -> hs\nas RSHIFT 1 -> bl\nkk RSHIFT 2 -> kl\nb AND n -> p\nln AND lp -> lq\ncj AND cp -> cr\ndl AND dn -> do\nci RSHIFT 2 -> cj\nas OR bd -> be\nge LSHIFT 15 -> gi\nhz RSHIFT 5 -> ic\ndv LSHIFT 1 -> ep\nkl OR kr -> ks\ngj OR gu -> gv\nhe RSHIFT 5 -> hh\nNOT fg -> fh\nhg AND hh -> hj\nb OR n -> o\njk LSHIFT 15 -> jo\ngz LSHIFT 15 -> hd\ncy LSHIFT 15 -> dc\nkk RSHIFT 5 -> kn\nci RSHIFT 3 -> ck\nat OR az -> ba\niu RSHIFT 3 -> iw\nko AND kq -> kr\nNOT eh -> ei\naq OR ar -> as\niy AND ja -> jb\ndd RSHIFT 3 -> df\nbn RSHIFT 3 -> bp\n1 AND cc -> cd\nat AND az -> bb\nx OR ai -> aj\nkk AND kv -> kx\nao OR an -> ap\ndy RSHIFT 3 -> ea\nx RSHIFT 1 -> aq\neu AND fa -> fc\nkl AND kr -> kt\nia AND ig -> ii\ndf AND dg -> di\nNOT fx -> fy\nk AND m -> n\nbn RSHIFT 5 -> bq\nkm AND kn -> kp\ndt LSHIFT 15 -> dx\nhz RSHIFT 2 -> ia\naj AND al -> am\ncd LSHIFT 15 -> ch\nhc OR hd -> he\nhe RSHIFT 3 -> hg\nbn OR by -> bz\nNOT kt -> ku\nz AND aa -> ac\nNOT ak -> al\ncu AND cw -> cx\nNOT ie -> if\ndy RSHIFT 2 -> dz\nip LSHIFT 15 -> it\nde OR dk -> dl\nau OR av -> aw\njg AND ji -> jj\nci AND ct -> cv\ndy RSHIFT 5 -> eb\nhx OR hy -> hz\neu OR fa -> fb\ngj RSHIFT 3 -> gl\nfo AND fz -> gb\n1 AND jj -> jk\njp OR ka -> kb\nde AND dk -> dm\nex AND ez -> fa\ndf OR dg -> dh\niv OR jb -> jc\nx RSHIFT 5 -> aa\nNOT hj -> hk\nNOT im -> in\nfl LSHIFT 1 -> gf\nhu LSHIFT 15 -> hy\niq OR ip -> ir\niu RSHIFT 5 -> ix\nNOT fc -> fd\nNOT el -> em\nck OR cl -> cm\net RSHIFT 3 -> ev\nhw LSHIFT 1 -> iq\nci RSHIFT 5 " <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day07 do
+  import Bitwise
+
+  @base 65535
+
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> process_inputs()
+  end
+
+  def part2(input, map) do
+    input
+    |> parse()
+    |> Enum.reject(fn {op, _} ->
+      List.last(Tuple.to_list(op)) in Map.keys(map)
+    end)
+    |> process_inputs(map)
+  end
+
+  def process_inputs(inputs, map \\ %{})
+  def process_inputs([], map), do: map
+
+  def process_inputs(inputs, map) do
+    inputs
+    |> Enum.reduce({map, inputs}, &process_line/2)
+    |> then(fn {map, i} -> process_inputs(i, map) end)
+  end
+
+  def process_line({instr, vars} = input, {map, inputs}) do
+    if Enum.all?(vars, &map[&1]) do
+      {
+        do_process_line(instr, map),
+        List.delete(inputs, input)
+      }
+    else
+      {map, inputs}
+    end
+  end
+
+  def get(_, x) when is_integer(x), do: x
+  def get(map, x) when is_binary(x), do: map[x]
+
+  def do_process_line({a, "AND", b, key}, map),
+    do: Map.put(map, key, get(map, a) &&& get(map, b))
+
+  def do_process_line({a, "OR", b, key}, map),
+    do: Map.put(map, key, get(map, a) ||| get(map, b))
+
+  def do_process_line({a, "LSHIFT", b, key}, map),
+    do: Map.put(map, key, get(map, a) <<< get(map, b))
+
+  def do_process_line({a, "RSHIFT", b, key}, map),
+    do: Map.put(map, key, get(map, a) >>> get(map, b))
+
+  def do_process_line({"NOT", a, key}, map),
+    do: Map.put(map, key, bnot(get(map, a)) &&& @base)
+
+  def do_process_line({a, key}, map),
+    do: Map.put(map, key, get(map, a))
+
+  defmodule Input do
+    @ops ~w(AND OR NOT LSHIFT RSHIFT)
+
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Enum.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split([" -> ", " "])
+      |> Stream.map(&String.trim/1)
+      |> Enum.map(fn x ->
+        case Integer.parse(x) do
+          {int, ""} -> int
+          _ -> x
+        end
+      end)
+      |> normalize_line()
+    end
+
+    def normalize_line(list) do
+      {
+        List.to_tuple(list),
+        list
+        |> Enum.slice(0..-2)
+        |> Enum.filter(fn
+          x when is_integer(x) -> false
+          x when x in @ops -> false
+          _ -> true
+        end)
+      }
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day07, <<70, 79, 82, 49, 0, 0, 21, ...>>,
+ {:module, Day07.Input, <<70, 79, 82, ...>>, {:normalize_line, 1}}}
+```
+
+**In little Bobby's kit's instructions booklet (provided as your puzzle input), what signal is ultimately provided to wire a?**
+
+Your puzzle answer was `46065`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+part1_map = Day07.part1(input)
+part1_map["a"]
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+46065
+```
+
+Now, take the signal you got on wire `a`, override wire `b` to that signal, and reset the other wires (including wire `a`). **What new signal is ultimately provided to wire a?**
+
+Your puzzle answer was `14134`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+part2_map = Day07.part2(input, %{"b" => part1_map["a"]})
+part2_map["a"]
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+14134
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/7/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day07Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "123 -> x\n456 -> y\nx AND y -> d\nx OR y -> e\nx LSHIFT 2 -> f\ny RSHIFT 2 -> g\nNOT x -> h\nNOT y -> i",
+      output1: %{
+        "d" => 72,
+        "e" => 507,
+        "f" => 492,
+        "g" => 114,
+        "h" => 65412,
+        "i" => 65079,
+        "x" => 123,
+        "y" => 456
+      }
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input, output1: output} do
+      assert Day07.part1(input) == output
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+.
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+1 test, 0 failures
+
+Randomized with seed 989226
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 1}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmark do
+  def fun1(input) do
+    Day07.part1(input)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun1, 1}}
+```
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "fun" => fn -> Benchmark.fun1(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.1
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 11 s
+
+Benchmarking fun ...
+
+Name           ips        average  deviation         median         99th %
+fun         296.28        3.38 ms     ±1.36%        3.37 ms        3.47 ms
+
+Memory usage statistics:
+
+Name    Memory usage
+fun          2.06 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name Reduction count
+fun         316.74 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
