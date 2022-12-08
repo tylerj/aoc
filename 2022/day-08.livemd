@@ -223,6 +223,32 @@ end
  {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
+Small sample of the parsed grid output: a map with `{x, y}` coordinates as the key, and `height` of the tree as the value.
+
+```elixir
+grid = Day08.parse(input)
+keys = grid |> Map.keys() |> Enum.sort() |> Enum.take(10)
+
+Map.take(grid, keys)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  {0, 0} => 2,
+  {0, 1} => 0,
+  {0, 2} => 1,
+  {0, 3} => 1,
+  {0, 4} => 1,
+  {0, 5} => 0,
+  {0, 6} => 0,
+  {0, 7} => 0,
+  {0, 8} => 1,
+  {0, 9} => 1
+}
+```
+
 Consider your map; **how many trees are visible from outside the grid?**
 
 Your puzzle answer was `1818`.
