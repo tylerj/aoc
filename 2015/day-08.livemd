@@ -1,0 +1,230 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 8 - Advent of Code 2015
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/8)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/8/input)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2015/day-08.livemd)
+
+## Prompt
+
+### --- Day 8: Matchsticks ---
+
+Space on the sleigh is limited this year, and so Santa will be bringing his list as a digital copy. He needs to know how much space it will take up when stored.
+
+It is common in many programming languages to provide a way to escape special characters in strings. For example, [C](https://en.wikipedia.org/wiki/Escape_sequences_in_C), [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [Perl](https://perldoc.perl.org/perlop#Quote-and-Quote-like-Operators), [Python](https://docs.python.org/2.0/ref/strings.html), and even [PHP](https://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.double) handle special characters in very similar ways.
+
+However, it is important to realize the difference between the number of characters **in the code representation of the string literal** and the number of characters **in the in-memory string itself**.
+
+For example:
+
+* `""` is `2` characters of code (the two double quotes), but the string contains `zero` characters.
+* `"abc"` is `5` characters of code, but `3` characters in the string data.
+* `"aaa\"aaa"` is `10` characters of code, but the string itself contains six "a" characters and a single, escaped quote character, for a total of `7` characters in the string data.
+* `"\x27"` is `6` characters of code, but the string itself contains just `one` - an apostrophe (`'`), escaped using hexadecimal notation.
+
+Santa's list is a file that contains many double-quoted string literals, one on each line. The only escape sequences used are `\\` (which represents a single backslash), `\"` (which represents a lone double-quote character), and `\x` plus two hexadecimal characters (which represents a single character with that ASCII code).
+
+**Disregarding the whitespace in the file, what is the number of characters of code for string literals minus the number of characters in memory for the values of the strings in total for the entire file?**
+
+For example, given the four strings above, the total number of characters of string code `(2 + 5 + 10 + 6 = 23)` minus the total number of characters in memory for string values `(0 + 3 + 7 + 1 = 11)` is `23 - 11 = 12`.
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/8/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Now, let's go the other way. In addition to finding the number of characters of code, you should now **encode each code representation as a new string** and find the number of characters of the new encoded representation, including the surrounding double quotes.
+
+For example:
+
+* `""` encodes to `"\"\""`, an increase from `2` characters to `6`.
+* `"abc"` encodes to `"\"abc\""`, an increase from `5` characters to `9`.
+* `"aaa\"aaa"` encodes to `"\"aaa\\\"aaa\""`, an increase from `10` characters to `16`.
+* `"\x27"` encodes to `"\"\\x27\""`, an increase from `6` characters to `11`.
+
+Your task is to **find the total number of characters to represent the newly encoded strings** minus **the number of characters of code in each original string literal**. For example, for the strings above, the total encoded length (6 + 9 + 16 + 11 = 42) minus the characters in the original code representation (23, just like in the first part of this puzzle) is 42 - 23 = 19.
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/8/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"\"qxfcsmh\"\n\"ffsfyxbyuhqkpwatkjgudo\"\n\"byc\\x9dyxuafof\\\\\\xa6uf\\\\axfozomj\\\\olh\\x6a\"\n\"jtqvz\"\n\"uzezxa\\\"jgbmojtwyfbfguz\"\n\"vqsremfk\\x8fxiknektafj\"\n\"wzntebpxnnt\\\"vqndz\\\"i\\x47vvjqo\\\"\"\n\"higvez\\\"k\\\"riewqk\"\n\"dlkrbhbrlfrp\\\\damiauyucwhty\"\n\"d\\\"\"\n\"qlz\"\n\"ku\"\n\"yy\\\"\\\"uoao\\\"uripabop\"\n\"saduyrntuswlnlkuppdro\\\\sicxosted\"\n\"tj\"\n\"zzphopswlwdhebwkxeurvizdv\"\n\"xfoheirjoakrpofles\\\"nfu\"\n\"q\\xb7oh\\\"p\\xce\\\"n\"\n\"qeendp\\\"ercwgywdjeylxcv\"\n\"dcmem\"\n\"\\\"i\\x13r\\\"l\"\n\"ikso\\xdcbvqnbrjduh\\\"uqudzki\\xderwk\"\n\"wfdsn\"\n\"pwynglklryhtsqbno\"\n\"hcoj\\x63iccz\\\"v\\\"ttr\"\n\"zf\\x23\\\\hlj\\\\kkce\\\\d\\\\asy\\\"yyfestwcdxyfj\"\n\"xs\"\n\"m\\\"tvltapxdvtrxiy\"\n\"bmud\"\n\"k\\\"a\"\n\"b\\\"oas\"\n\"\\\"yexnjjupoqsxyqnquy\\\"uzfdvetqrc\"\n\"vdw\\xe3olxfgujaj\"\n\"qomcxdnd\\\"\\\\cfoe\\\"\"\n\"fpul\"\n\"m\\\"avamefphkpv\"\n\"vvdnb\\\\x\\\\uhnxfw\\\"dpubfkxfmeuhnxisd\"\n\"hey\\\\\"\n\"ldaeigghlfey\"\n\"eure\\\"hoy\\xa5iezjp\\\\tm\"\n\"yygb\\\"twbj\\\\r\\\"\\x10gmxuhmp\\\"\"\n\"weirebp\\x39mqonbtmfmd\"\n\"ltuz\\\\hs\\\"e\"\n\"ysvmpc\"\n\"g\\x8amjtt\\\"megl\\\"omsaihifwa\"\n\"yimmm\"\n\"iiyqfalh\"\n\"cwknlaaf\"\n\"q\\x37feg\\xc6s\\\"xx\"\n\"uayrgeurgyp\\\\oi\"\n\"xhug\\\"pt\\\"axugllbdiggzhvy\"\n\"kdaarqmsjfx\\xc3d\"\n\"\\\"vkwla\"\n\"d\\\"\"\n\"tmroz\\\"bvfinxoe\\\\mum\\\"wmm\"\n\"\\\"n\\\"bbswxne\\\\p\\\\yr\\\"qhwpdd\"\n\"skzlkietklkqovjhvj\\xfe\"\n\"pbg\\\\pab\\\"bubqaf\\\"obzcwxwywbs\\\\dhtq\"\n\"xxjidvqh\\\"lx\\\\wu\\\"ij\"\n\"daef\\x5fe\\x5b\\\\kbeeb\\x13qnydtboof\"\n\"ogvazaqy\\\"j\\x73\"\n\"y\"\n\"n\\\"tibetedldy\\\\gsamm\\\"nwu\"\n\"wldkvgdtqulwkad\"\n\"dpmxnj\"\n\"twybw\\\"cdvf\\\"mjdajurokbce\"\n\"ru\\\"\\\\lasij\\\"i\"\n\"roc\\\\vra\\\\lhrm\"\n\"pbkt\\x60booz\\\"fjlkc\"\n\"j\\x4dytvjwrzt\"\n\"\\\\uiwjkniumxcs\"\n\"cbhm\\\"nexccior\\\"v\\\"j\\\"nazxilmfp\\x47\"\n\"qdxngevzrlgoq\"\n\"\\\"lrzxftytpobsdfyrtdqpjbpuwmm\\x9e\"\n\"mdag\\x0asnck\\xc2ggj\\\"slb\\\"fjy\"\n\"wyqkhjuazdtcgkcxvjkpnjdae\"\n\"aixfk\\xc0iom\\x21vueob\"\n\"dkiiakyjpkffqlluhaetires\"\n\"ysspv\\\"lysgkvnmwbbsy\"\n\"gy\\\"ryexcjjxdm\\\"xswssgtr\"\n\"s\"\n\"ddxv\"\n\"qwt\\\"\\x27puilb\\\"pslmbrsxhrz\"\n\"qdg\\xc9e\\\\qwtknlvkol\\x54oqvmchn\\\\\"\n\"lvo\"\n\"b\"\n\"fk\\\"aa\\\"\\\"yenwch\\\\\\\\on\"\n\"srig\\x63hpwaavs\\\\\\x80qzk\\\"xa\\\"\\xe6u\\\\wr\"\n\"yxjxuj\\\"ghyhhxfj\\\"\\xa6qvatre\"\n\"yoktqxjxkzrklkoeroil\"\n\"\\\"jfmik\\\"\"\n\"smgseztzdwldikbqrh\\\"\"\n\"jftahgctf\\\"hoqy\"\n\"tcnhicr\\\"znpgckt\\\"ble\"\n\"vqktnkodh\\\"lo\\\"a\\\\bkmdjqqnsqr\"\n\"ztnirfzqq\"\n\"s\"\n\"xx\"\n\"iqj\\\"y\\\\hqgzflwrdsusasekyrxbp\\\\ad\"\n\"\\\\xzjhlaiynkioz\\\"\\\"bxepzimvgwt\"\n\"s\\x36rbw\"\n\"mniieztwrisvdx\"\n\"atyfxioy\\x2b\\\\\"\n\"irde\\x85\\x5cvbah\\\\jekw\\\"ia\"\n\"bdmftlhkwrprmpat\\\"prfaocvp\"\n\"w\\\\k\"\n\"umbpausy\"\n\"zfauhpsangy\"\n\"p\\\"zqyw\"\n\"wtztypyqvnnxzvlvipnq\\\"zu\"\n\"deicgwq\\\\oqvajpbov\\\\or\\\"kgplwu\"\n\"mbzlfgpi\\\\\\\\zqcidjpzqdzxityxa\"\n\"lfkxvhma\"\n\"\\xf2yduqzqr\\\"\\\\fak\\\"p\\\"n\"\n\"mpajacfuxotonpadvng\"\n\"anb\\\\telzvcdu\\\\a\\xf2flfq\"\n\"lrs\\\"ebethwpmuuc\\\"\\x86ygr\"\n\"qmvdbhtumzc\\\"ci\"\n\"meet\"\n\"yopg\\x0fdxdq\\\"h\\\\ugsu\\xffmolxjv\"\n\"uhy\"\n\"fzgidrtzycsireghazscvmwcfmw\\\\t\"\n\"cqohkhpgvpru\"\n\"bihyigtnvmevx\\\"xx\"\n\"xz\"\n\"zofomwotzuxsjk\\\"q\\\"mc\\\"js\\\"dnmalhxd\"\n\"\\\\ktnddux\\\\fqvt\\\"ibnjntjcbn\"\n\"ia\"\n\"htjadnefwetyp\\xd5kbrwfycbyy\"\n\"\\\"\\\\hkuxqddnao\"\n\"meqqsz\\x83luecpgaem\"\n\"cvks\\x87frvxo\\\"svqivqsdpgwhukmju\"\n\"sgmxiai\\\\o\\\"riufxwjfigr\\xdf\"\n\"fgywdfecqufccpcdn\"\n\"faghjoq\\x28abxnpxj\"\n\"zuppgzcfb\\\"dctvp\\\"elup\\\"zxkopx\"\n\"xqs\\x45xxdqcihbwghmzoa\"\n\"anbnlp\\\\cgcvm\\\"hc\"\n\"xf\\\"fgrngwzys\"\n\"nrxsjduedcy\\x24\"\n\"\\x71sxl\\\"gj\\\"sds\\\"ulcruguz\\\\t\\\\ssvjcwhi\"\n\"jhj\\\"msch\"\n\"qpovolktfwyiuyicbfeeju\\x01\"\n\"nkyxmb\\\"qyqultgt\\\"nmvzvvnxnb\"\n\"ycsrkbstgzqb\\\"uv\\\\cisn\"\n\"s\"\n\"ueptjnn\\\"\\\"sh\"\n\"lp\\\"z\\\"d\\\"mxtxiy\"\n\"yzjtvockdnvbubqabjourf\\\"k\\\"uoxwle\"\n\"\\x82\\\"wqm\\\"\"\n\"\\xb5cwtuks\\x5fpgh\"\n\"wd\"\n\"tbvf\"\n\"ttbmzdgn\"\n\"vfpiyfdejyrlbgcdtwzbnm\"\n\"uc\"\n\"otdcmhpjagqix\"\n\"\\\\\\xb1qso\\\"s\"\n\"scowax\"\n\"behpstjdh\\xccqlgnqjyz\\\"eesn\"\n\"r\\xe1cbnjwzveoomkzlo\\\\kxlfouhm\"\n\"jgrl\"\n\"kzqs\\\\r\"\n\"ctscb\\x7fthwkdyko\\\"\\x62pkf\\\"d\\xe6knmhurg\"\n\"tc\\\"kw\\x3ftt\"\n\"bxb\\x5ccl\"\n\"jyrmfbphsldwpq\"\n\"jylpvysl\\\"\\\"juducjg\"\n\"en\\\\m\\\"kxpq\\\"wpb\\\\\\\"\"\n\"madouht\\\"bmdwvnyqvpnawiphgac\\\"\"\n\"vuxpk\\\"ltucrw\"\n\"aae\\x60arr\"\n\"ttitnne\\\"kilkrgssnr\\xfdurzh\"\n\"oalw\"\n\"pc\\\"\\\"gktkdykzbdpkwigucqni\\\"nxiqx\"\n\"dbrsaj\"\n\"bgzsowyxcbrvhtvekhsh\\\"qgd\"\n\"kudfemvk\\\"\\\"\\\"hkbrbil\\\"chkqoa\"\n\"zjzgj\\\\ekbhyfzufy\"\n\"\\\\acos\\\"fqekuxqzxbmkbnn\\x1ejzwrm\"\n\"elxahvudn\\\"txtmomotgw\"\n\"\\x2eoxmwdhelpr\\\"cgi\\xf7pzvb\"\n\"eapheklx\"\n\"hfvma\\\"mietvc\\\"tszbbm\\\"czex\"\n\"h\\\"iiockj\\\\\\xc1et\"\n\"d\\\"rmjjftm\"\n\"qlvhdcbqtyrhlc\\\\\"\n\"yy\\\"rsucjtulm\\\"coryri\\\"eqjlbmk\"\n\"tv\"\n\"r\\\"bfuht\\\\jjgujp\\\"\"\n\"kukxvuauamtdosngdjlkauylttaokaj\"\n\"srgost\\\"\\\"rbkcqtlccu\\x65ohjptstrjkzy\"\n\"yxwxl\\\\yjilwwxffrjjuazmzjs\"\n\"dxlw\\\\fkstu\\\"hjrtiafhyuoh\\\"sewabne\"\n\"\\x88sj\\\"v\"\n\"rfzprz\\xec\\\"oxqc" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day08 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Stream.map(&count_line/1)
+    |> Stream.map(fn {_, {code, mem}} -> code - mem end)
+    |> Enum.sum()
+  end
+
+  def count_line(line, counts \\ {0, 0})
+
+  def count_line("\\x" <> rest, {code, mem}) do
+    count_line(rest, {code + 2, mem - 1})
+  end
+
+  def count_line("\\\\" <> rest, {code, mem}) do
+    count_line(rest, {code + 2, mem + 1})
+  end
+
+  def count_line("\\\"" <> rest, {code, mem}) do
+    count_line(rest, {code + 2, mem + 1})
+  end
+
+  def count_line("\"" <> rest, {code, mem}) do
+    count_line(rest, {code + 1, mem})
+  end
+
+  def count_line(<<_, rest::binary>>, {code, mem}) do
+    count_line(rest, {code + 1, mem + 1})
+  end
+
+  def count_line(line, acc) do
+    {line, acc}
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input |> String.split("\n")
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day08, <<70, 79, 82, 49, 0, 0, 12, ...>>,
+ {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
+```
+
+**What is the number of characters of code for string literals minus the number of characters in memory for the values of the strings in total for the entire file?**
+
+Your puzzle answer was `1350`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day08.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1350
+```
+
+```elixir
+defmodule Day08.Part2 do
+  defdelegate parse(input), to: Day08.Input
+
+  def part2(input) do
+    my_sum(input) - other_sum(input)
+  end
+
+  def my_sum(input) do
+    input
+    |> parse()
+    |> Stream.map(&count_line/1)
+    |> Stream.map(fn {_, {code, _mem}} -> code end)
+    |> Enum.sum()
+  end
+
+  def other_sum(input) do
+    input
+    |> parse()
+    |> Stream.map(&Day08.count_line/1)
+    |> Stream.map(fn {_, {code, _mem}} -> code end)
+    |> Enum.sum()
+  end
+
+  def count_line(line, counts \\ {0, 0})
+
+  def count_line("\\x" <> rest, {code, mem}) do
+    count_line(rest, {code + 3, mem})
+  end
+
+  def count_line("\\\\" <> rest, {code, mem}) do
+    count_line(rest, {code + 4, mem + 3})
+  end
+
+  def count_line("\\\"" <> rest, {code, mem}) do
+    count_line(rest, {code + 4, mem + 2})
+  end
+
+  def count_line("\"" <> rest, {code, mem}) do
+    count_line(rest, {code + 3, mem + 2})
+  end
+
+  def count_line(<<_, rest::binary>>, {code, mem}) do
+    count_line(rest, {code + 1, mem + 1})
+  end
+
+  def count_line(line, acc) do
+    {line, acc}
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day08.Part2, <<70, 79, 82, 49, 0, 0, 15, ...>>, {:count_line, 2}}
+```
+
+Your task is to find **the total number of characters to represent the newly encoded strings** minus **the number of characters of code in each original string literal**.
+
+Your puzzle answer was `2085`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day08.Part2.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+2085
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/8/input).
