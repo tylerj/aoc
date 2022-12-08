@@ -1,0 +1,339 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 8 - Advent of Code 2022
+
+```elixir
+Mix.install([:kino, :benchee, :nx])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/8)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/8/input)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-08.livemd)
+
+## Prompt
+
+### --- Day 8: TBD ---
+
+Part One prompt
+
+**QUESTION ONE?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/8/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/8/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"30373\n25512\n65332\n33549\n35390"
+```
+
+## Solution
+
+```elixir
+defmodule Day08 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    tensor = parse(input)
+
+    find_visible({0, 0}, MapSet.new(), tensor, :incy)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defp find_visible(xy, height \\ -1, set, grid, dir) do
+    case grid[xy] do
+      nil ->
+        next_row_or_column(dir, xy, set, grid)
+
+      h when h > height ->
+        IO.inspect("FOUND TREE. XY: {#{elem(xy, 0)}, #{elem(xy, 1)}}, HEIGHT: #{h}")
+        find_visible(next(dir, xy), h, MapSet.put(set, xy), grid, dir)
+
+      _ ->
+        find_visible(next(dir, xy), height, set, grid, dir)
+    end
+  end
+
+  defp next(:incx, {x, y}), do: {x + 1, y}
+  defp next(:decx, {x, y}), do: {x - 1, y}
+  defp next(:incy, {x, y}), do: {x, y + 1}
+  defp next(:decy, {x, y}), do: {x, y - 1}
+
+  defp next_rc(:incy, {x, _}), do: {x + 1, 0}
+  defp next_rc(:decx, {x, y}), do: {0, y + 1}
+  # defp next_rc(dir, {x, _}) when dir in ~w(incy decy)a, do: {x + 1, 0}
+
+  # Let's start in top-left and work our way around the grid clockwise:
+  # - :incy (go down each column, then increment to the next column)
+  # - :decx (go left across each row, then increment to the next row)
+  # - :decy (go up each column, then decrement to the prior column)
+  # - :decy (go right across each row, then decrement to the prior row)
+  defp next_direction(:incy, {x, y}, set, grid) do
+    # find_visible(:)
+  end
+
+  defp next_row_or_column(dir, xy, set, grid) do
+    {nx, ny} = next_rc(dir, xy)
+
+    if grid[next] do
+      find_visible(next, set, grid, dir)
+    else
+      next_direction(dir, xy, set, grid)
+    end
+  end
+
+  # defp visible?({0, _}, _), do: true
+  # defp visible?({_, 0}, _), do: true
+  # defp visible?({x, _}, %{max_x: x}), do: true
+  # defp visible?({_, y}, %{max_y: y}), do: true
+  # defp visible?(coord, %{max_x: x, max_y: y}) do
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      input
+      |> Enum.map(&parse_line/1)
+      |> Nx.tensor(names: [:row, :col], type: :u8)
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split("", trim: true)
+      |> Enum.map(&String.to_integer/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+warning: variable "x" is unused (if the variable is not meant to be used, prefix it with an underscore)
+  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:34: Day08.next_rc/2
+
+warning: variable "grid" is unused (if the variable is not meant to be used, prefix it with an underscore)
+  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:42: Day08.next_direction/4
+
+warning: variable "set" is unused (if the variable is not meant to be used, prefix it with an underscore)
+  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:42: Day08.next_direction/4
+
+warning: variable "x" is unused (if the variable is not meant to be used, prefix it with an underscore)
+  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:42: Day08.next_direction/4
+
+warning: variable "y" is unused (if the variable is not meant to be used, prefix it with an underscore)
+  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:42: Day08.next_direction/4
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day08, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+ {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+tensor = Day08.parse(input)
+{x, y} = {0, -2}
+tensor[x][y]
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+#Nx.Tensor<
+  u8
+  7
+>
+```
+
+```elixir
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+#Nx.Tensor<
+  u8
+  3
+>
+```
+
+**QUESTION ONE?**
+
+Your puzzle answer was `answer one`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day08.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day08.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/8/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day08Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day08.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day08.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmark do
+  def fun1(input) do
+    Day08.part1(input)
+  end
+
+  def fun2(input) do
+    Day08.part2(input)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
+```
+
+```elixir
+# https://github.com/bencheeorg/benchee
+input = Day08.Input.parse(input) |> Enum.to_list()
+
+Benchee.run(
+  %{
+    "fun1" => fn _ -> Benchmark.fun1(input) end,
+    "fun2" => fn _ -> Benchmark.fun2(input) end
+  },
+  inputs: %{
+    "Part 1" => 1
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
