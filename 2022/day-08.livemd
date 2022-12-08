@@ -20,11 +20,39 @@ Mix.install([:kino, :benchee, :nx])
 
 ## Prompt
 
-### --- Day 8: TBD ---
+### --- Day 8: Treetop Tree House ---
 
-Part One prompt
+The expedition comes across a peculiar patch of tall trees all planted carefully in a grid. The Elves explain that a previous expedition planted these trees as a reforestation effort. Now, they're curious if this would be a good location for a [tree house](https://en.wikipedia.org/wiki/Tree_house).
 
-**QUESTION ONE?**
+First, determine whether there is enough tree cover here to keep a tree house **hidden**. To do this, you need to count the number of trees that are **visible from outside the grid** when looking directly along a row or column.
+
+The Elves have already launched a [quadcopter](https://en.wikipedia.org/wiki/Quadcopter) to generate a map with the height of each tree (your puzzle input). For example:
+
+```
+30373
+25512
+65332
+33549
+35390
+```
+
+Each tree is represented as a single digit whose value is its height, where 0 is the shortest and `9` is the tallest.
+
+A tree is **visible** if all of the other trees between it and an edge of the grid are **shorter** than it. Only consider trees in the same row or column; that is, only look up, down, left, or right from any given tree.
+
+All of the trees around the edge of the grid are **visible** - since they are already on the edge, there are no trees to block the view. In this example, that only leaves the **interior nine trees** to consider:
+
+* The top-left `5` is **visible** from the left and top. (It isn't visible from the right or bottom since other trees of height `5` are in the way.)
+* The top-middle `5` is **visible** from the top and right.
+* The top-right `1` is not visible from any direction; for it to be visible, there would need to only be trees of height **0** between it and an edge.
+* The left-middle `5` is **visible**, but only from the right.
+* The center `3` is not visible from any direction; for it to be visible, there would need to be only trees of at most height `2` between it and an edge.
+* The right-middle `3` is **visible** from the right.
+* In the bottom row, the middle `5` is **visible**, but the `3` and `4` are not.
+
+With 16 trees visible on the edge and another 5 visible in the interior, a total of `21` trees are visible in this arrangement.
+
+Consider your map; **how many trees are visible from outside the grid?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/8/input).
 
@@ -32,9 +60,47 @@ To begin, [get your puzzle input](https://adventofcode.com/2022/day/8/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+Content with the amount of tree cover available, the Elves just need to know the best spot to build their tree house: they would like to be able to see a lot of **trees**.
 
-**QUESTION TWO?**
+To measure the viewing distance from a given tree, look up, down, left, and right from that tree; stop if you reach an edge or at the first tree that is the same height or taller than the tree under consideration. (If a tree is right on the edge, at least one of its viewing distances will be zero.)
+
+The Elves don't care about distant trees taller than those found by the rules above; the proposed tree house has large [eaves](https://en.wikipedia.org/wiki/Eaves) to keep it dry, so they wouldn't be able to see higher than the tree house anyway.
+
+In the example above, consider the middle `5` in the second row:
+
+```
+30373
+25_12
+65332
+33549
+35390
+```
+
+* Looking up, its view is not blocked; it can see `1` tree (of height 3).
+* Looking left, its view is blocked immediately; it can see only `1` tree (of height 5, right next to it).
+* Looking right, its view is not blocked; it can see `2` trees.
+* Looking down, its view is blocked eventually; it can see `2` trees (one of height 3, then the tree of height 5 that blocks its view).
+
+A tree's **scenic score** is found by **multiplying together** its viewing distance in each of the four directions. For this tree, this is `4` (found by multiplying `1 * 1 * 2 * 2`).
+
+However, you can do even better: consider the tree of height `5` in the middle of the fourth row:
+
+```
+30373
+25512
+65332
+33_49
+35390
+```
+
+* Looking up, its view is blocked at `2` trees (by another tree with a height of 5).
+* Looking left, its view is not blocked; it can see `2` trees.
+* Looking down, its view is also not blocked; it can see `1` tree.
+* Looking right, its view is blocked at `2` trees (by a massive tree of height 9).
+
+This tree's scenic score is **8** (`2 * 2 * 1 * 2`); this is the ideal spot for the tree house.
+
+Consider each tree on your map. **What is the highest scenic score possible for any tree?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/8/input).
 
@@ -53,7 +119,7 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-"30373\n25512\n65332\n33549\n35390"
+"200200221023111313131033314121142013103432145142351212334232423210101340410243413011333312111010010\n021002023301222221234134021422342024344555521535143232341414552024224120114233210330203002020100112\n120000123021210023111321143114331115334535223455511513445233523154411102203411040133312002213001021\n110211312303200204232110124204135453554533435152342542252215415141133330323032234114310011301232202\n112002122201001100330432244432552555524445123151222142521452233321152332132412434434431321322021220\n000131233030332102140440124221314455255431113413445553414144524134315351524134030112312012102102122\n011002120310213142402320144522121125454423123245535451115134412543215113433312403430132101003202030\n001221312201314442411333454131552331253553254425236334643151355314514413411344034432330410221101023\n133033302114012204213054544541124453214232545523665466356466451514332142121512400041213432211332332\n122103100320433433403313515121232352332442555253656542336644235234542522322522414400320014312110331\n220032121143103434234531224315451255225362634256634623342624242245654341134514413144333113211200033\n320112113344013332224131114231235263526556625325625352254643224563365551253353323542200003301120011\n130332114433413215333445212514445445656665256554333534422554442522234433415533124353022320300112030\n122220320003402342433443415465352622564252264442264334335624365224645544545412124352220434440211220\n012123032311134245212342233263346563632453535355553473445564362634252543555515242444423232000444220\n210332422344222154315435122245243633424643346345734336333746422324336263624544151122442021330341202\n122113144440445232235222443563362625543565533465377647363543377645634552632254214531354231413432430\n312340402310532324322313244522226622547366756445444754767335355365264622465662241215332253310001232\n203342203201331433144542522354633356376457563745333765735577477354743263423666625212251354244021004\n023132211325442531332565334564256663665357767653737436565453774766335532544656254552332354313323032\n104344140125552254523443534436547653753334746356364664565677777637444474643245425325454224440231203\n030303323422144551254256535247737377634445575474654433333453643564664344462332353234553115322142242\n043342223454513255464263333566337576377476354884845654658465735544446646436232534263314313142020101\n340311214411551345423466343646644336367654787858788857666654635337366537645634644263323112331404131\n040141315333331565455545334767475747755574585547567756844746644445646736447635456236413253453410130\n211021153443415666656253646443465373878486485664464485545486846643475567536535465634262415153200040\n434443334231526223353563373464374574547886487867474546748668788886554566336675234542522151345414431\n342100553111533623655466757467553555676668887764575574556755884875687334634675256256443425223423211\n421145141552463255552236436455476686566587654558577848647854485587448337355756554555544211113112433\n401034232152434624233754647737667758845867866675595798957488447876578774367337742646625521543244120\n201414142512656264345465456536564477766677986565767776589758477664747866666435364642236343442335143\n422042442525465325256445643735574646548578959977866889666586787677748745536646677524242544332243420\n101531424154626224664754337344565457557999965875599965977796778866568855445766577565632633451545144\n111515354125252635577747557658555488765757696767797558565755699985844788764347763523465333315513212\n222334234142233522754645544788567846579566995878775676667979868685866578655574543564453254615121150\n121552233464445256557546467767485865866888757989977669966767877786686475874646454752632664243132511\n412242332564644335747746348878865677677797755798669796798699855757865564547645373677564252625352445\n104135225262634344357677645645458796767865979969889676688676788669777674757634454746666526341145313\n021542323626266573437334685574765967759968767697666876767887775889896866845887736736426556541522241\n321245255565266675757675486554868969567677786789686889669988776968557656488476534636744443443445532\n424153123565322534465577464547665888797687899787966868666667897595997786576655333657432563645515" <> ...
 ```
 
 ## Solution
@@ -62,67 +128,73 @@ input = input |> Kino.Input.read()
 defmodule Day08 do
   defdelegate parse(input), to: __MODULE__.Input
 
-  def part1(input) do
-    tensor = parse(input)
+  @directions ~w(up dn lt rt)a
 
-    find_visible({0, 0}, MapSet.new(), tensor, :incy)
+  def part1(input) do
+    grid = input |> parse()
+
+    grid
+    |> Map.keys()
+    |> Enum.filter(&visible?(&1, grid))
+    |> length()
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    grid = input |> parse()
+
+    grid
+    |> Map.keys()
+    |> Stream.map(&view_count(&1, grid))
+    |> Stream.map(&Enum.product/1)
+    |> Enum.max()
   end
 
-  defp find_visible(xy, height \\ -1, set, grid, dir) do
+  defp visible?({0, _}, _), do: true
+  defp visible?({_, 0}, _), do: true
+
+  defp visible?(xy, grid) do
+    Enum.any?(@directions, &tallest_in_direction?(&1, xy, grid))
+  end
+
+  defp view_count({0, _}, _), do: [0]
+  defp view_count({_, 0}, _), do: [0]
+
+  defp view_count(xy, grid) do
+    Enum.map(@directions, &count_in_direction(&1, xy, grid))
+  end
+
+  defp next({x, y}, :up), do: {x, y - 1}
+  defp next({x, y}, :dn), do: {x, y + 1}
+  defp next({x, y}, :lt), do: {x - 1, y}
+  defp next({x, y}, :rt), do: {x + 1, y}
+
+  def tallest_in_direction?(dir, xy, grid) do
+    tallest_in_direction?(dir, next(xy, dir), grid[xy], grid)
+  end
+
+  defp tallest_in_direction?(dir, xy, height, grid) do
     case grid[xy] do
-      nil ->
-        next_row_or_column(dir, xy, set, grid)
-
-      h when h > height ->
-        IO.inspect("FOUND TREE. XY: {#{elem(xy, 0)}, #{elem(xy, 1)}}, HEIGHT: #{h}")
-        find_visible(next(dir, xy), h, MapSet.put(set, xy), grid, dir)
-
-      _ ->
-        find_visible(next(dir, xy), height, set, grid, dir)
+      nil -> true
+      x when x >= height -> false
+      _ -> tallest_in_direction?(dir, next(xy, dir), height, grid)
     end
   end
 
-  defp next(:incx, {x, y}), do: {x + 1, y}
-  defp next(:decx, {x, y}), do: {x - 1, y}
-  defp next(:incy, {x, y}), do: {x, y + 1}
-  defp next(:decy, {x, y}), do: {x, y - 1}
-
-  defp next_rc(:incy, {x, _}), do: {x + 1, 0}
-  defp next_rc(:decx, {x, y}), do: {0, y + 1}
-  # defp next_rc(dir, {x, _}) when dir in ~w(incy decy)a, do: {x + 1, 0}
-
-  # Let's start in top-left and work our way around the grid clockwise:
-  # - :incy (go down each column, then increment to the next column)
-  # - :decx (go left across each row, then increment to the next row)
-  # - :decy (go up each column, then decrement to the prior column)
-  # - :decy (go right across each row, then decrement to the prior row)
-  defp next_direction(:incy, {x, y}, set, grid) do
-    find_visible({})
+  defp count_in_direction(dir, xy, grid) do
+    count_in_direction(dir, next(xy, dir), grid[xy], 0, grid)
   end
 
-  defp next_row_or_column(dir, xy, set, grid) do
-    next = next_rc(dir, xy)
-
-    if grid[next] do
-      find_visible(next, set, grid, dir)
-    else
-      next_direction(dir, xy, set, grid)
+  defp count_in_direction(dir, xy, height, count, grid) do
+    case grid[xy] do
+      nil -> count
+      x when x >= height -> count + 1
+      _ -> count_in_direction(dir, next(xy, dir), height, count + 1, grid)
     end
   end
-
-  # defp visible?({0, _}, _), do: true
-  # defp visible?({_, 0}, _), do: true
-  # defp visible?({x, _}, %{max_x: x}), do: true
-  # defp visible?({_, y}, %{max_y: y}), do: true
-  # defp visible?(coord, %{max_x: x, max_y: y}) do
 
   defmodule Input do
+    def parse(input) when is_map(input), do: input
+
     def parse(input) when is_binary(input) do
       input
       |> String.split("\n", trim: true)
@@ -140,12 +212,8 @@ defmodule Day08 do
       line
       |> String.split("", trim: true)
       |> Stream.with_index()
-      |> Enum.flat_map(fn {height, idx_x} ->
-        [
-          {{idx_x, idx_y}, String.to_integer(height)},
-          max_x: idx_x,
-          max_y: idx_y
-        ]
+      |> Enum.map(fn {height, idx_x} ->
+        {{idx_x, idx_y}, String.to_integer(height)}
       end)
     end
   end
@@ -155,43 +223,13 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-warning: variable "x" is unused (if the variable is not meant to be used, prefix it with an underscore)
-  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:34: Day08.next_rc/2
-
-warning: variable "grid" is unused (if the variable is not meant to be used, prefix it with an underscore)
-  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:42: Day08.next_direction/4
-
-warning: variable "set" is unused (if the variable is not meant to be used, prefix it with an underscore)
-  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:42: Day08.next_direction/4
-
-warning: variable "x" is unused (if the variable is not meant to be used, prefix it with an underscore)
-  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:42: Day08.next_direction/4
-
-warning: variable "y" is unused (if the variable is not meant to be used, prefix it with an underscore)
-  2022/day-08.livemd#cell:7pvpamzgfnlmfl7gpbv5xylbd3aygwf2:42: Day08.next_direction/4
-
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Day08, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+{:module, Day08, <<70, 79, 82, 49, 0, 0, 18, ...>>,
  {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
-```elixir
-Day08.parse(input)[:max_y]
-```
+Consider your map; **how many trees are visible from outside the grid?**
 
-<!-- livebook:{"output":true} -->
-
-```
-4
-```
-
-**QUESTION ONE?**
-
-Your puzzle answer was `answer one`.
+Your puzzle answer was `1818`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -202,12 +240,12 @@ Day08.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+1818
 ```
 
-**QUESTION TWO?**
+Consider each tree on your map. **What is the highest scenic score possible for any tree?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `368368`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -218,7 +256,7 @@ Day08.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+368368
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -239,19 +277,19 @@ defmodule Day08Test do
 
   setup_all do
     [
-      input: ""
+      input: "30373\n25512\n65332\n33549\n35390"
     ]
   end
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day08.part1(input) == [""]
+      assert Day08.part1(input) == 21
     end
   end
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day08.part2(input) == [""]
+      assert Day08.part2(input) == 8
     end
   end
 end
@@ -266,7 +304,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 745053
 ```
 
 <!-- livebook:{"output":true} -->
@@ -278,37 +316,17 @@ Randomized with seed 162351
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day08.part1(input)
-  end
-
-  def fun2(input) do
-    Day08.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day08.Input.parse(input) |> Enum.to_list()
 
 Benchee.run(
   %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
+    "Part 1" => fn input -> Day08.part1(input) end,
+    "Part 2" => fn input -> Day08.part2(input) end
   },
   inputs: %{
-    "Part 1" => 1
-  },
-  memory_time: 2,
-  reduction_time: 2
+    "Raw" => input,
+    "Pre-parsed" => Day08.parse(input)
+  }
 )
 
 nil
@@ -317,7 +335,44 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.1
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: Pre-parsed, Raw
+Estimated total run time: 28 s
+
+Benchmarking Part 1 with input Pre-parsed ...
+Benchmarking Part 1 with input Raw ...
+Benchmarking Part 2 with input Pre-parsed ...
+Benchmarking Part 2 with input Raw ...
+
+##### With input Pre-parsed #####
+Name             ips        average  deviation         median         99th %
+Part 1        113.18        8.84 ms     ±2.90%        8.76 ms        9.94 ms
+Part 2         94.07       10.63 ms     ±5.01%       10.41 ms       12.35 ms
+
+Comparison: 
+Part 1        113.18
+Part 2         94.07 - 1.20x slower +1.79 ms
+
+##### With input Raw #####
+Name             ips        average  deviation         median         99th %
+Part 1         87.03       11.49 ms     ±2.89%       11.35 ms       12.42 ms
+Part 2         76.14       13.13 ms     ±3.29%       12.94 ms       14.26 ms
+
+Comparison: 
+Part 1         87.03
+Part 2         76.14 - 1.14x slower +1.64 ms
 ```
 
 <!-- livebook:{"output":true} -->
