@@ -131,7 +131,7 @@ defmodule Day08 do
   @directions ~w(up dn lt rt)a
 
   def part1(input) do
-    grid = input |> parse()
+    grid = parse(input)
 
     grid
     |> Map.keys()
@@ -140,7 +140,7 @@ defmodule Day08 do
   end
 
   def part2(input) do
-    grid = input |> parse()
+    grid = parse(input)
 
     grid
     |> Map.keys()
@@ -149,46 +149,42 @@ defmodule Day08 do
     |> Enum.max()
   end
 
-  defp visible?({0, _}, _), do: true
-  defp visible?({_, 0}, _), do: true
+  def visible?({0, _}, _), do: true
+  def visible?({_, 0}, _), do: true
 
-  defp visible?(xy, grid) do
-    Enum.any?(@directions, &tallest_in_direction?(&1, xy, grid))
-  end
+  def visible?(xy, grid),
+    do: Enum.any?(@directions, &tallest_in_direction?(&1, xy, grid))
 
-  defp view_count({0, _}, _), do: [0]
-  defp view_count({_, 0}, _), do: [0]
+  def view_count({0, _}, _), do: [0]
+  def view_count({_, 0}, _), do: [0]
 
-  defp view_count(xy, grid) do
-    Enum.map(@directions, &count_in_direction(&1, xy, grid))
-  end
+  def view_count(xy, grid),
+    do: Enum.map(@directions, &count_in_direction(&1, xy, grid))
 
   defp next({x, y}, :up), do: {x, y - 1}
   defp next({x, y}, :dn), do: {x, y + 1}
   defp next({x, y}, :lt), do: {x - 1, y}
   defp next({x, y}, :rt), do: {x + 1, y}
 
-  def tallest_in_direction?(dir, xy, grid) do
-    tallest_in_direction?(dir, next(xy, dir), grid[xy], grid)
-  end
+  def tallest_in_direction?(dir, xy, grid),
+    do: do_tallest(dir, next(xy, dir), grid[xy], grid)
 
-  defp tallest_in_direction?(dir, xy, height, grid) do
+  defp do_tallest(dir, xy, height, grid) do
     case grid[xy] do
       nil -> true
       x when x >= height -> false
-      _ -> tallest_in_direction?(dir, next(xy, dir), height, grid)
+      _ -> do_tallest(dir, next(xy, dir), height, grid)
     end
   end
 
-  defp count_in_direction(dir, xy, grid) do
-    count_in_direction(dir, next(xy, dir), grid[xy], 0, grid)
-  end
+  def count_in_direction(dir, xy, grid),
+    do: do_count(dir, next(xy, dir), grid[xy], 0, grid)
 
-  defp count_in_direction(dir, xy, height, count, grid) do
+  defp do_count(dir, xy, height, count, grid) do
     case grid[xy] do
       nil -> count
       x when x >= height -> count + 1
-      _ -> count_in_direction(dir, next(xy, dir), height, count + 1, grid)
+      _ -> do_count(dir, next(xy, dir), height, count + 1, grid)
     end
   end
 
@@ -223,7 +219,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day08, <<70, 79, 82, 49, 0, 0, 18, ...>>,
+{:module, Day08, <<70, 79, 82, 49, 0, 0, 19, ...>>,
  {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
