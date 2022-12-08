@@ -103,11 +103,11 @@ defmodule Day08 do
   # - :decy (go up each column, then decrement to the prior column)
   # - :decy (go right across each row, then decrement to the prior row)
   defp next_direction(:incy, {x, y}, set, grid) do
-    # find_visible(:)
+    find_visible({})
   end
 
   defp next_row_or_column(dir, xy, set, grid) do
-    {nx, ny} = next_rc(dir, xy)
+    next = next_rc(dir, xy)
 
     if grid[next] do
       find_visible(next, set, grid, dir)
@@ -131,14 +131,22 @@ defmodule Day08 do
 
     def parse(input) when is_list(input) do
       input
-      |> Enum.map(&parse_line/1)
-      |> Nx.tensor(names: [:row, :col], type: :u8)
+      |> Stream.with_index()
+      |> Stream.flat_map(&parse_line/1)
+      |> Enum.into(%{})
     end
 
-    def parse_line(line) do
+    def parse_line({line, idx_y}) do
       line
       |> String.split("", trim: true)
-      |> Enum.map(&String.to_integer/1)
+      |> Stream.with_index()
+      |> Enum.flat_map(fn {height, idx_x} ->
+        [
+          {{idx_x, idx_y}, String.to_integer(height)},
+          max_x: idx_x,
+          max_y: idx_y
+        ]
+      end)
     end
   end
 end
@@ -171,34 +179,14 @@ warning: variable "y" is unused (if the variable is not meant to be used, prefix
  {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
-<!-- livebook:{"reevaluate_automatically":true} -->
-
 ```elixir
-tensor = Day08.parse(input)
-{x, y} = {0, -2}
-tensor[x][y]
+Day08.parse(input)[:max_y]
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-#Nx.Tensor<
-  u8
-  7
->
-```
-
-```elixir
-
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-#Nx.Tensor<
-  u8
-  3
->
+4
 ```
 
 **QUESTION ONE?**
