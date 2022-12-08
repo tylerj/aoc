@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2015 Advent of Code - Day 3: Perfectly Spherical Houses in a Vacuum
+# Day 3 - Advent of Code 2015
 
 ```elixir
 Mix.install([:kino, :benchee])

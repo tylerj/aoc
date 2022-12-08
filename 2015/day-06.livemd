@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2015 Advent of Code - Day 6: Probably a Fire Hazard
+# Day 6 - Advent of Code 2015
 
 ```elixir
 Mix.install([

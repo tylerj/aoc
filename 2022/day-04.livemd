@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2022 Advent of Code - Day 4: Camp Cleanup
+# Day 4 - Advent of Code 2022
 
 ```elixir
 Mix.install([:kino])

@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2022 Advent of Code - Day 2: Rock Paper Scissors
+# Day 2 - Advent of Code 2022
 
 ```elixir
 Mix.install([:kino])

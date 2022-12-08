@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2015 Advent of Code - Day 5: Doesn't He Have Intern-Elves For This?
+# Day 5 - Advent of Code 2015
 
 ```elixir
 Mix.install([:kino, :benchee])

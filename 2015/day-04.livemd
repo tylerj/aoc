@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2015 Advent of Code - Day 4: The Ideal Stocking Stuffer
+# Day 4 - Advent of Code 2015
 
 ```elixir
 Mix.install([:kino, :benchee])

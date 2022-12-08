@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# 2015 Advent of Code - Day 2: I Was Told There Would Be No Math
+# Day 2 - Advent of Code 2015
 
 ```elixir
 Mix.install([:kino, :benchee])
