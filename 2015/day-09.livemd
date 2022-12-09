@@ -1,0 +1,409 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 9 - Advent of Code 2015
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/9)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/9/input)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2015/day-09.livemd)
+
+## Prompt
+
+### --- Day 9: All in a Single Night ---
+
+Every year, Santa manages to deliver all of his presents in a single night.
+
+This year, however, he has some new locations to visit; his elves have provided him the distances between every pair of locations. He can start and end at any two (different) locations he wants, but he must visit each location exactly once. What is the **shortest distance** he can travel to achieve this?
+
+For example, given the following distances:
+
+```
+London to Dublin = 464
+London to Belfast = 518
+Dublin to Belfast = 141
+```
+
+The possible routes are therefore:
+
+```
+Dublin -> London -> Belfast = 982
+London -> Dublin -> Belfast = 605
+London -> Belfast -> Dublin = 659
+Dublin -> Belfast -> London = 659
+Belfast -> Dublin -> London = 605
+Belfast -> London -> Dublin = 982
+```
+
+The shortest of these is London -> Dublin -> Belfast = 605, and so the answer is 605 in this example.
+
+**What is the distance of the shortest route?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/9/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+The next year, just to show off, Santa decides to take the route with the **longest distance** instead.
+
+He can still start and end at any two (different) locations he wants, and he still must visit each location exactly once.
+
+For example, given the distances above, the longest route would be `982` via (for example) `Dublin -> London -> Belfast`.
+
+**What is the distance of the longest route?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/9/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"Faerun to Tristram = 65\nFaerun to Tambi = 129\nFaerun to Norrath = 144\nFaerun to Snowdin = 71\nFaerun to Straylight = 137\nFaerun to AlphaCentauri = 3\nFaerun to Arbre = 149\nTristram to Tambi = 63\nTristram to Norrath = 4\nTristram to Snowdin = 105\nTristram to Straylight = 125\nTristram to AlphaCentauri = 55\nTristram to Arbre = 14\nTambi to Norrath = 68\nTambi to Snowdin = 52\nTambi to Straylight = 65\nTambi to AlphaCentauri = 22\nTambi to Arbre = 143\nNorrath to Snowdin = 8\nNorrath to Straylight = 23\nNorrath to AlphaCentauri = 136\nNorrath to Arbre = 115\nSnowdin to Straylight = 101\nSnowdin to AlphaCentauri = 84\nSnowdin to Arbre = 96\nStraylight to AlphaCentauri = 107\nStraylight to Arbre = 14\nAlphaCentauri to Arbre = 46"
+```
+
+## Solution
+
+```elixir
+defmodule Day09 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    route_distances(input) |> Enum.min()
+  end
+
+  def part2(input) do
+    route_distances(input) |> Enum.max()
+  end
+
+  def route_distances(input) do
+    map = parse(input)
+    cities = Map.keys(map)
+
+    Enum.map(cities, fn city ->
+      visit_nodes(
+        city,
+        map,
+        {
+          [{city, 0}],
+          cities |> MapSet.new() |> MapSet.delete(city)
+        }
+      )
+    end)
+    |> flatten()
+    |> Enum.map(fn route -> Enum.map(route, &elem(&1, 1)) |> Enum.sum() end)
+  end
+
+  def visit_nodes(city, map, acc) do
+    map[city]
+    |> Enum.map(fn {city, distance} ->
+      visit_node({city, distance}, map, acc)
+    end)
+  end
+
+  defp visit_node({city, distance}, map, {routes, available}) do
+    cond do
+      MapSet.member?(available, city) ->
+        visit_nodes(
+          city,
+          map,
+          {
+            [{city, distance} | routes],
+            MapSet.delete(available, city)
+          }
+        )
+
+      MapSet.size(available) == 0 ->
+        routes
+
+      true ->
+        []
+    end
+  end
+
+  def flatten([[tuple | _] | _] = list) when is_tuple(tuple) do
+    list |> Stream.uniq() |> Enum.map(&Enum.reverse/1)
+  end
+
+  def flatten(list) when is_list(list) do
+    list |> Enum.flat_map(& &1) |> flatten()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      input
+      |> Stream.map(&parse_line/1)
+      |> Enum.reduce(%{}, fn [from, to, distance], map ->
+        map
+        |> update_map(from, to, distance)
+        |> update_map(to, from, distance)
+      end)
+    end
+
+    defp update_map(map, a, b, distance) do
+      distance = String.to_integer(distance)
+
+      Map.update(map, a, %{b => distance}, &Map.put(&1, b, distance))
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split([" to ", " = "])
+      |> Enum.map(&String.trim/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day09, <<70, 79, 82, 49, 0, 0, 17, ...>>,
+ {:module, Day09.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+```elixir
+map = Day09.parse(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  "AlphaCentauri" => %{
+    "Arbre" => 46,
+    "Faerun" => 3,
+    "Norrath" => 136,
+    "Snowdin" => 84,
+    "Straylight" => 107,
+    "Tambi" => 22,
+    "Tristram" => 55
+  },
+  "Arbre" => %{
+    "AlphaCentauri" => 46,
+    "Faerun" => 149,
+    "Norrath" => 115,
+    "Snowdin" => 96,
+    "Straylight" => 14,
+    "Tambi" => 143,
+    "Tristram" => 14
+  },
+  "Faerun" => %{
+    "AlphaCentauri" => 3,
+    "Arbre" => 149,
+    "Norrath" => 144,
+    "Snowdin" => 71,
+    "Straylight" => 137,
+    "Tambi" => 129,
+    "Tristram" => 65
+  },
+  "Norrath" => %{
+    "AlphaCentauri" => 136,
+    "Arbre" => 115,
+    "Faerun" => 144,
+    "Snowdin" => 8,
+    "Straylight" => 23,
+    "Tambi" => 68,
+    "Tristram" => 4
+  },
+  "Snowdin" => %{
+    "AlphaCentauri" => 84,
+    "Arbre" => 96,
+    "Faerun" => 71,
+    "Norrath" => 8,
+    "Straylight" => 101,
+    "Tambi" => 52,
+    "Tristram" => 105
+  },
+  "Straylight" => %{
+    "AlphaCentauri" => 107,
+    "Arbre" => 14,
+    "Faerun" => 137,
+    "Norrath" => 23,
+    "Snowdin" => 101,
+    "Tambi" => 65,
+    "Tristram" => 125
+  },
+  "Tambi" => %{
+    "AlphaCentauri" => 22,
+    "Arbre" => 143,
+    "Faerun" => 129,
+    "Norrath" => 68,
+    "Snowdin" => 52,
+    "Straylight" => 65,
+    "Tristram" => 63
+  },
+  "Tristram" => %{
+    "AlphaCentauri" => 55,
+    "Arbre" => 14,
+    "Faerun" => 65,
+    "Norrath" => 4,
+    "Snowdin" => 105,
+    "Straylight" => 125,
+    "Tambi" => 63
+  }
+}
+```
+
+**What is the distance of the shortest route?**
+
+Your puzzle answer was `117`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day09.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+117
+```
+
+**What is the distance of the longest route?**
+
+Your puzzle answer was `909`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day09.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+909
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/9/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day09Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day09.part1(input) == 605
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day09.part2(input) == 982
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 739165
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(%{
+  "Part 1" => fn -> Day09.part1(input) end,
+  "Part 2" => fn -> Day09.part2(input) end
+})
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.1
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1          4.84      206.78 ms     ±4.73%      208.14 ms      224.22 ms
+Part 2          4.71      212.18 ms     ±4.72%      212.25 ms      234.02 ms
+
+Comparison: 
+Part 1          4.84
+Part 2          4.71 - 1.03x slower +5.40 ms
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
