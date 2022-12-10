@@ -1,20 +1,12 @@
-defmodule Day09 do
-  defmodule Input do
-    def parse(input) when is_binary(input) do
-      input
-      |> String.split("\n")
-      |> parse()
-    end
+defmodule AdventOfCode.Y2022.Day09 do
+  alias __MODULE__
 
-    def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
-    end
+  def part1(input \\ nil) do
+    __MODULE__.Part1.part1(input)
+  end
 
-    def parse_line(line) do
-      line
-      |> String.split(" ")
-      |> then(fn [dir, num] -> [dir, String.to_integer(num)] end)
-    end
+  def part2(input \\ nil) do
+    __MODULE__.Part2.part2(input)
   end
 
   defmodule Part1 do
@@ -70,7 +62,7 @@ defmodule Day09 do
     end
 
     defp make_move(dir, {[head | tail], set}) do
-      new_head = Day09.Part1.move_head(head, dir)
+      new_head = Part1.move_head(head, dir)
       new_tails = move_tails(tail, new_head)
 
       {[new_head | new_tails], add(set, new_tails)}
@@ -105,5 +97,30 @@ defmodule Day09 do
     end
 
     defp move_tail(tail_xy, _), do: tail_xy
+  end
+
+  defmodule Input do
+    @day 9
+    @year 2022
+
+    def parse(nil) do
+      AdventOfCode.Input.get!(@day, @year) |> parse()
+    end
+
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split(" ")
+      |> then(fn [dir, num] -> [dir, String.to_integer(num)] end)
+    end
   end
 end
