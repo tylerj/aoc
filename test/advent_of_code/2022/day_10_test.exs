@@ -1,7 +1,7 @@
-defmodule AdventOfCode.Y2022.TemplateDay01Test do
+defmodule AdventOfCode.Y2022.Day10Test do
   use ExUnit.Case
 
-  import AdventOfCode.Y2022.TemplateDay01
+  import AdventOfCode.Y2022.Day10
 
   setup_all do
     [

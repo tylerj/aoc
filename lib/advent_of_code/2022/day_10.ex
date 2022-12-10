@@ -1,4 +1,4 @@
-defmodule AdventOfCode.Y2022.TemplateDay01 do
+defmodule AdventOfCode.Y2022.Day10 do
   defdelegate parse(input), to: __MODULE__.Input
 
   def part1(input \\ nil) do
@@ -14,7 +14,7 @@ defmodule AdventOfCode.Y2022.TemplateDay01 do
   end
 
   defmodule Input do
-    @day 1
+    @day 10
     @year 2022
 
     def parse(nil) do
