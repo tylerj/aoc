@@ -9,7 +9,7 @@ Mix.install([:kino])
 ## Day 7: The Treachery of Whales
 
 * [AOC Link](https://adventofcode.com/2021/day/7)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2021/day-07.livemd)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2021/day-07.livemd)
 * [José Valim GitHub](https://github.com/josevalim/aoc/blob/main/2021/day-07.livemd)
 * José Valim Twitch Stream (N/A)
 

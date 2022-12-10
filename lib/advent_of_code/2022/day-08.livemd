@@ -16,7 +16,8 @@ Mix.install([:kino, :benchee, :nx])
 
 * [Advent of Code (AoC)](https://adventofcode.com/2022/day/8)
 * [AoC Puzzle Input](https://adventofcode.com/2022/day/8/input)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-08.livemd)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_08.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-08.livemd)
 
 ## Prompt
 

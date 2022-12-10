@@ -14,8 +14,10 @@ Mix.install([:kino])
 
 ## 2022 - Day 1: Calorie Counting
 
-* [Advent of Code](https://adventofcode.com/2022/day/1)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-01.livemd)
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/1)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/1/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_01.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-01.livemd)
 
 ## Part One: Prompt
 

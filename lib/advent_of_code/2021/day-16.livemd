@@ -15,7 +15,7 @@ Mix.install([:kino])
 ## Day 16: Packet Decoder
 
 * [Advent of Code](https://adventofcode.com/2021/day/16)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2021/day-16.livemd)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2021/day-16.livemd)
 * [José Valim GitHub](https://github.com/josevalim/aoc/blob/main/2021/day-16.livemd)
 * [José Valim Twitch Stream](https://www.twitch.tv/videos/1236137267?collection=k_DLnk2tvBa-fQ)
 

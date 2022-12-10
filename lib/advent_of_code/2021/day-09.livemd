@@ -9,7 +9,7 @@ Mix.install([:kino])
 ## Day 9: Smoke Basin
 
 * [AOC Link](https://adventofcode.com/2021/day/9)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2021/day-09.livemd)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2021/day-09.livemd)
 * [José Valim GitHub](https://github.com/josevalim/aoc/blob/main/2021/day-09.livemd)
 * [José Valim Twitch Stream](https://www.twitch.tv/videos/1229612184?collection=k_DLnk2tvBa-fQ)
 

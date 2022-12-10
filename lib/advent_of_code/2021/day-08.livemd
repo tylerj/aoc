@@ -9,7 +9,7 @@ Mix.install([:kino])
 ## Day 8: Seven Segment Search
 
 * [AOC Link](https://adventofcode.com/2021/day/8)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2021/day-08.livemd)
+* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2021/day-08.livemd)
 * [José Valim GitHub](https://github.com/josevalim/aoc/blob/main/2021/day-08.livemd)
 * [José Valim Twitch Stream](https://www.twitch.tv/videos/1228693946?collection=k_DLnk2tvBa-fQ)
 

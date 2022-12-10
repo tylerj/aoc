@@ -14,8 +14,10 @@ Mix.install([:kino])
 
 ## Links
 
-* [Advent of Code](https://adventofcode.com/2022/day/2)
-* [tylerj GitHub](https://github.com/tylerj/aoc/blob/main/2022/day-02.livemd)
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/2)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/2/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_02.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-02.livemd)
 
 ## Part 1: Prompt
 
