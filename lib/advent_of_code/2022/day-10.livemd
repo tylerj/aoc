@@ -21,11 +21,204 @@ Mix.install([:kino, :benchee])
 
 ## Prompt
 
-### --- Day 10: TBD ---
+### --- Day 10: Cathode-Ray Tube ---
 
-Part One prompt
+You avoid the ropes, plunge into the river, and swim to shore.
 
-**QUESTION ONE?**
+The Elves yell something about meeting back up with them upriver, but the river is too loud to tell exactly what they're saying. They finish crossing the bridge and disappear from view.
+
+Situations like this must be why the Elves prioritized getting the communication system on your handheld device working. You pull it out of your pack, but the amount of water slowly draining from a big crack in its screen tells you it probably won't be of much immediate use.
+
+Unless, that is, you can design a replacement for the device's video system! It seems to be some kind of cathode-ray tube screen and simple CPU that are both driven by a precise clock circuit. The clock circuit ticks at a constant rate; each tick is called a cycle.
+
+Start by figuring out the signal being sent by the CPU. The CPU has a single register, X, which starts with the value 1. It supports only two instructions:
+
+* `addx V` takes two cycles to complete. After two cycles, the X register is increased by the value V. (V can be negative.)
+* `noop` takes one cycle to complete. It has no other effect.
+
+The CPU uses these instructions in a program (your puzzle input) to, somehow, tell the screen what to draw.
+
+Consider the following small program:
+
+```
+noop
+addx 3
+addx -5
+```
+
+Execution of this program proceeds as follows:
+
+* At the start of the first cycle, the `noop` instruction begins execution. During the first cycle, `X` is `1`. After the first cycle, the `noop` instruction finishes execution, doing nothing.
+* At the start of the second cycle, the `addx 3` instruction begins execution. During the second cycle, `X` is still `1`.
+* During the third cycle, `X` is still `1`. After the third cycle, the `addx 3` instruction finishes execution, setting `X` to `4`.
+* At the start of the fourth cycle, the `addx -5` instruction begins execution. During the fourth cycle, `X` is still `4`.
+* During the fifth cycle, `X` is still `4`. After the fifth cycle, the `addx -5` instruction finishes execution, setting `X` to `-1`.
+
+Maybe you can learn something by looking at the value of the X register throughout execution. For now, consider the **signal strength** (the cycle number multiplied by the value of the X register) **during** the 20th cycle and every 40 cycles after that (that is, during the 20th, 60th, 100th, 140th, 180th, and 220th cycles).
+
+For example, consider this larger program:
+
+```
+addx 15
+addx -11
+addx 6
+addx -3
+addx 5
+addx -1
+addx -8
+addx 13
+addx 4
+noop
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx -35
+addx 1
+addx 24
+addx -19
+addx 1
+addx 16
+addx -11
+noop
+noop
+addx 21
+addx -15
+noop
+noop
+addx -3
+addx 9
+addx 1
+addx -3
+addx 8
+addx 1
+addx 5
+noop
+noop
+noop
+noop
+noop
+addx -36
+noop
+addx 1
+addx 7
+noop
+noop
+noop
+addx 2
+addx 6
+noop
+noop
+noop
+noop
+noop
+addx 1
+noop
+noop
+addx 7
+addx 1
+noop
+addx -13
+addx 13
+addx 7
+noop
+addx 1
+addx -33
+noop
+noop
+noop
+addx 2
+noop
+noop
+noop
+addx 8
+noop
+addx -1
+addx 2
+addx 1
+noop
+addx 17
+addx -9
+addx 1
+addx 1
+addx -3
+addx 11
+noop
+noop
+addx 1
+noop
+addx 1
+noop
+noop
+addx -13
+addx -19
+addx 1
+addx 3
+addx 26
+addx -30
+addx 12
+addx -1
+addx 3
+addx 1
+noop
+noop
+noop
+addx -9
+addx 18
+addx 1
+addx 2
+noop
+noop
+addx 9
+noop
+noop
+noop
+addx -1
+addx 2
+addx -37
+addx 1
+addx 3
+noop
+addx 15
+addx -21
+addx 22
+addx -6
+addx 1
+noop
+addx 2
+addx 1
+noop
+addx -10
+noop
+noop
+addx 20
+addx 1
+addx 2
+addx 2
+addx -6
+addx -11
+noop
+noop
+noop
+```
+
+The interesting signal strengths can be determined as follows:
+
+* During the 20th cycle, register X has the value 21, so the signal strength is 20 * 21 = `420`. (The 20th cycle occurs in the middle of the second addx -1, so the value of register X is the starting value, 1, plus all of the other addx values up to that point: 1 + 15 - 11 + 6 - 3 + 5 - 1 - 8 + 13 + 4 = 21.)
+* During the 60th cycle, register X has the value 19, so the signal strength is 60 * 19 = `1140`.
+* During the 100th cycle, register X has the value 18, so the signal strength is 100 * 18 = `1800`.
+* During the 140th cycle, register X has the value 21, so the signal strength is 140 * 21 = `2940`.
+* During the 180th cycle, register X has the value 16, so the signal strength is 180 * 16 = `2880`.
+* During the 220th cycle, register X has the value 18, so the signal strength is 220 * 18 = `3960`.
+
+The sum of these signal strengths is `13140`.
+
+Find the signal strength during the 20th, 60th, 100th, 140th, 180th, and 220th cycles. **What is the sum of these six signal strengths?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/10/input).
 
@@ -33,9 +226,39 @@ To begin, [get your puzzle input](https://adventofcode.com/2022/day/10/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+It seems like the X register controls the horizontal position of a [sprite](https://en.wikipedia.org/wiki/Sprite_(computer_graphics)). Specifically, the sprite is 3 pixels wide, and the X register sets the horizontal position of the **middle** of that sprite. (In this system, there is no such thing as "vertical position": if the sprite's horizontal position puts its pixels where the CRT is currently drawing, then those pixels will be drawn.)
 
-**QUESTION TWO?**
+You count the pixels on the CRT: 40 wide and 6 high. This CRT screen draws the top row of pixels left-to-right, then the row below that, and so on. The left-most pixel in each row is in position `0`, and the right-most pixel in each row is in position `39`.
+
+Like the CPU, the CRT is tied closely to the clock circuit: the CRT draws **a single pixel during each cycle**. Representing each pixel of the screen as a #, here are the cycles during which the first and last pixel in each row are drawn:
+
+```
+Cycle   1 -> ######################################## <- Cycle  40
+Cycle  41 -> ######################################## <- Cycle  80
+Cycle  81 -> ######################################## <- Cycle 120
+Cycle 121 -> ######################################## <- Cycle 160
+Cycle 161 -> ######################################## <- Cycle 200
+Cycle 201 -> ######################################## <- Cycle 240
+```
+
+So, by [carefully](https://en.wikipedia.org/wiki/Racing_the_Beam) [timing](https://www.youtube.com/watch?v=sJFnWZH5FXc) the CPU instructions and the CRT drawing operations, you should be able to determine whether the sprite is visible the instant each pixel is drawn. If the sprite is positioned such that one of its three pixels is the pixel currently being drawn, the screen produces a lit pixel (#); otherwise, the screen leaves the pixel dark (.).
+
+The first few pixels from the larger example above are drawn as follows:
+
+[(See AoC website prompt for full example)](https://adventofcode.com/2022/day/10)
+
+Allowing the program to run to completion causes the CRT to produce the following image:
+
+```
+##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....
+```
+
+Render the image given by your program. **What eight capital letters appear on your CRT?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/10/input).
 
@@ -54,31 +277,88 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-""
+"addx 1\nnoop\naddx 4\nnoop\nnoop\nnoop\naddx 6\naddx -1\naddx 5\nnoop\nnoop\nnoop\naddx 5\naddx -14\nnoop\naddx 19\nnoop\naddx 1\naddx 4\naddx 1\nnoop\nnoop\naddx 2\naddx 5\naddx -27\naddx 20\naddx -30\naddx 2\naddx 5\naddx 2\naddx 4\naddx -3\naddx 2\naddx 5\naddx 2\naddx -9\naddx 1\naddx 11\nnoop\naddx -20\naddx 7\naddx 23\naddx 2\naddx 3\naddx -2\naddx -34\naddx -2\nnoop\naddx 3\nnoop\naddx 3\naddx 2\nnoop\naddx 3\naddx 2\naddx 5\naddx 2\naddx -9\naddx -7\naddx 21\nnoop\naddx 8\nnoop\naddx -1\naddx 3\naddx -2\naddx 5\naddx -37\nnoop\naddx 35\naddx -31\naddx 1\naddx 4\naddx -1\naddx 2\nnoop\naddx 3\naddx 1\naddx 5\naddx -2\naddx 7\naddx -2\naddx -2\naddx 10\nnoop\naddx 4\nnoop\nnoop\naddx -19\naddx 20\naddx -38\nnoop\nnoop\naddx 7\naddx 2\naddx 3\nnoop\naddx 4\naddx -3\naddx 2\naddx 2\nnoop\naddx 3\nnoop\nnoop\nnoop\naddx 5\nnoop\naddx 7\naddx -2\naddx 7\nnoop\nnoop\naddx -5\naddx 6\naddx -36\nnoop\naddx 1\naddx 2\naddx 5\naddx 2\naddx 3\naddx -2\naddx 2\naddx 5\naddx 2\naddx 1\nnoop\naddx 4\naddx -16\naddx 21\nnoop\nnoop\naddx 1\naddx -8\naddx 12\nnoop\nnoop\nnoop\nnoop"
 ```
 
 ## Solution
+
+As I do if I'm still awake at midnight, in order to let my brain think about the problem while I'm sleeping, I looked at this puzzle on my phone while laying in bed.
+
+I realized it would be fairly easy to solve using a spreadsheet, so I decided to give it a shot in Google Sheets on my phone.
+
+Here's that quick and dirty result: [Google Sheets link](https://docs.google.com/spreadsheets/d/1qHDjU6vyAidFf7ZmJ8H8GCHhzxVli33eZAEWQb57Wow/edit?usp=sharing)
 
 ```elixir
 defmodule Day10 do
   defdelegate parse(input), to: __MODULE__.Input
 
+  @checkpoints [20, 60, 100, 140, 180, 220]
+  @row_width 40
+
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Enum.reduce({1, 1, []}, &process_instruction(&1, &2, :part1))
+    |> elem(2)
+    |> Enum.map(fn {cycle, register} -> cycle * register end)
+    |> Enum.sum()
   end
 
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Enum.reduce({1, 1, []}, &process_instruction(&1, &2, :part2))
+    |> elem(2)
+    |> Enum.reverse()
+    |> draw_image()
+  end
+
+  def process_instruction(["noop"], acc, part), do: do_cycle(acc, part)
+  def process_instruction(["addx", v], acc, part), do: do_inc(acc, v, part)
+
+  defp do_cycle(acc, part) do
+    acc
+    |> capture(part)
+    |> increment_cycle()
+  end
+
+  defp do_inc(acc, v, part) do
+    acc
+    |> do_cycle(part)
+    |> do_cycle(part)
+    |> increment_register(v)
+  end
+
+  defp increment_cycle({cycle, register, list}),
+    do: {cycle + 1, register, list}
+
+  defp increment_register({count, register, list}, v),
+    do: {count, register + v, list}
+
+  defp capture({cycle, register, list}, :part1) when cycle in @checkpoints,
+    do: {cycle, register, [{cycle, register} | list]}
+
+  defp capture({cycle, register, list}, :part2) do
+    char = if sprite_visible?(cycle, register), do: "#", else: "."
+
+    {cycle, register, [char | list]}
+  end
+
+  defp capture(acc, _), do: acc
+
+  defp sprite_visible?(cycle, register) do
+    cycle_index = rem(cycle - 1, @row_width)
+    cycle_index in (register - 1)..(register + 1)
+  end
+
+  defp draw_image(list) do
+    list |> Enum.chunk_every(@row_width) |> Enum.each(&IO.puts/1)
   end
 
   defmodule Input do
     def parse(input) when is_binary(input) do
       input
-      |> String.split("\n")
+      |> String.split("\n", trim: true)
       |> parse()
     end
 
@@ -88,9 +368,14 @@ defmodule Day10 do
 
     def parse_line(line) do
       line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+      |> String.split(" ", trim: true)
+      |> Enum.map(&to_int/1)
     end
+
+    defp to_int(x), do: Integer.parse(x) |> return_int(x)
+
+    defp return_int({int, ""}, _), do: int
+    defp return_int(:error, input), do: input
   end
 end
 ```
@@ -98,13 +383,23 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day10, <<70, 79, 82, 49, 0, 0, 8, ...>>,
- {:module, Day10.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day10, <<70, 79, 82, 49, 0, 0, 18, ...>>,
+ {:module, Day10.Input, <<70, 79, 82, ...>>, {:return_int, 2}}}
 ```
 
-**QUESTION ONE?**
+```elixir
+Day10.parse(input) |> Enum.to_list() |> Enum.take(5)
+```
 
-Your puzzle answer was `answer one`.
+<!-- livebook:{"output":true} -->
+
+```
+[["addx", 1], ["noop"], ["addx", 4], ["noop"], ["noop"]]
+```
+
+Find the signal strength during the 20th, 60th, 100th, 140th, 180th, and 220th cycles. **What is the sum of these six signal strengths?**
+
+Your puzzle answer was `14220`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -115,12 +410,12 @@ Day10.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+14220
 ```
 
-**QUESTION TWO?**
+Render the image given by your program. **What eight capital letters appear on your CRT?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `ZRARLFZU`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -131,7 +426,18 @@ Day10.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+####.###...##..###..#....####.####.#..#.
+...#.#..#.#..#.#..#.#....#.......#.#..#.
+..#..#..#.#..#.#..#.#....###....#..#..#.
+.#...###..####.###..#....#.....#...#..#.
+#....#.#..#..#.#.#..#....#....#....#..#.
+####.#..#.#..#.#..#.####.#....####..##..
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -152,19 +458,14 @@ defmodule Day10Test do
 
   setup_all do
     [
-      input: ""
+      input:
+        "addx 15\naddx -11\naddx 6\naddx -3\naddx 5\naddx -1\naddx -8\naddx 13\naddx 4\nnoop\naddx -1\naddx 5\naddx -1\naddx 5\naddx -1\naddx 5\naddx -1\naddx 5\naddx -1\naddx -35\naddx 1\naddx 24\naddx -19\naddx 1\naddx 16\naddx -11\nnoop\nnoop\naddx 21\naddx -15\nnoop\nnoop\naddx -3\naddx 9\naddx 1\naddx -3\naddx 8\naddx 1\naddx 5\nnoop\nnoop\nnoop\nnoop\nnoop\naddx -36\nnoop\naddx 1\naddx 7\nnoop\nnoop\nnoop\naddx 2\naddx 6\nnoop\nnoop\nnoop\nnoop\nnoop\naddx 1\nnoop\nnoop\naddx 7\naddx 1\nnoop\naddx -13\naddx 13\naddx 7\nnoop\naddx 1\naddx -33\nnoop\nnoop\nnoop\naddx 2\nnoop\nnoop\nnoop\naddx 8\nnoop\naddx -1\naddx 2\naddx 1\nnoop\naddx 17\naddx -9\naddx 1\naddx 1\naddx -3\naddx 11\nnoop\nnoop\naddx 1\nnoop\naddx 1\nnoop\nnoop\naddx -13\naddx -19\naddx 1\naddx 3\naddx 26\naddx -30\naddx 12\naddx -1\naddx 3\naddx 1\nnoop\nnoop\nnoop\naddx -9\naddx 18\naddx 1\naddx 2\nnoop\nnoop\naddx 9\nnoop\nnoop\nnoop\naddx -1\naddx 2\naddx -37\naddx 1\naddx 3\nnoop\naddx 15\naddx -21\naddx 22\naddx -6\naddx 1\nnoop\naddx 2\naddx 1\nnoop\naddx -10\nnoop\nnoop\naddx 20\naddx 1\naddx 2\naddx 2\naddx -6\naddx -11\nnoop\nnoop\nnoop"
     ]
   end
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day10.part1(input) == [""]
-    end
-  end
-
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day10.part2(input) == [""]
+      assert Day10.part1(input) == 13140
     end
   end
 end
@@ -175,54 +476,28 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-..
+.
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
+1 test, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 774524
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
+%{excluded: 0, failures: 0, skipped: 0, total: 1}
 ```
 
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day10.part1(input)
-  end
-
-  def fun2(input) do
-    Day10.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day10.Input.parse(input) |> Enum.to_list()
 
-Benchee.run(
-  %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+Benchee.run(%{
+  "Part 1" => fn -> Day10.part1(input) end,
+  "Part 2" => fn -> Day10.part2(input) end
+})
 
 nil
 ```
@@ -230,7 +505,32 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1       15.90 K       62.89 μs    ±77.24%       52.89 μs      305.35 μs
+Part 2       13.68 K       73.12 μs     ±6.35%       72.78 μs       80.16 μs
+
+Comparison: 
+Part 1       15.90 K
+Part 2       13.68 K - 1.16x slower +10.24 μs
 ```
 
 <!-- livebook:{"output":true} -->
