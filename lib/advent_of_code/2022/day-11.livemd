@@ -179,8 +179,9 @@ defmodule Day11 do
   def part2(input) do
     map = parse(input)
     count = Map.new(Map.keys(map), &{&1, 0})
+    mod_amt = mod_trick(map)
 
-    Enum.reduce(map, {0, 10000, count, map, &rem(&1, mod_trick(map))}, fn {idx, monkey}, acc ->
+    Enum.reduce(map, {0, 10000, count, map, &rem(&1, mod_amt)}, fn {idx, monkey}, acc ->
       Enum.reduce(monkey[:items], acc, &process_item(idx, &1, &2))
     end)
     |> parse_answer()
@@ -278,7 +279,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day11, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+{:module, Day11, <<70, 79, 82, 49, 0, 0, 21, ...>>,
  {:module, Day11.Input, <<70, 79, 82, ...>>, {:parse_op, 1}}}
 ```
 
@@ -378,10 +379,10 @@ ExUnit.run()
 
 ```
 ..
-Finished in 0.02 seconds (0.00s async, 0.02s sync)
+Finished in 0.01 seconds (0.00s async, 0.01s sync)
 2 tests, 0 failures
 
-Randomized with seed 534386
+Randomized with seed 680989
 ```
 
 <!-- livebook:{"output":true} -->
@@ -430,26 +431,26 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1       30.64 K      0.0326 ms     ±8.16%      0.0315 ms      0.0397 ms
-Part 2      0.0761 K       13.14 ms     ±8.03%       12.86 ms       18.09 ms
+Part 1        5.42 K       0.185 ms     ±8.35%       0.182 ms        0.22 ms
+Part 2      0.0144 K       69.59 ms     ±1.52%       69.19 ms       72.62 ms
 
 Comparison: 
-Part 1       30.64 K
-Part 2      0.0761 K - 402.58x slower +13.10 ms
+Part 1        5.42 K
+Part 2      0.0144 K - 376.94x slower +69.41 ms
 
 Memory usage statistics:
 
 Name      Memory usage
-Part 1       0.0520 MB
-Part 2        22.32 MB - 429.16x memory usage +22.27 MB
+Part 1         0.36 MB
+Part 2       139.34 MB - 391.85x memory usage +138.98 MB
 
 **All measurements for memory usage were the same**
 
 Reduction count statistics:
 
 Name   Reduction count
-Part 1       0.00916 M
-Part 2          2.48 M - 270.41x reduction count +2.47 M
+Part 1        0.0420 M
+Part 2         15.08 M - 359.12x reduction count +15.03 M
 
 **All measurements for reduction count were the same**
 ```
