@@ -1,0 +1,462 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 11 - Advent of Code 2022
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/11)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/11/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_11.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-11.livemd)
+
+## Prompt
+
+### --- Day 11: Monkey in the Middle ---
+
+As you finally start making your way upriver, you realize your pack is much lighter than you remember. Just then, one of the items from your pack goes flying overhead. Monkeys are playing [Keep Away](https://en.wikipedia.org/wiki/Keep_away) with your missing things!
+
+To get your stuff back, you need to be able to predict where the monkeys will throw your items. After some careful observation, you realize the monkeys operate based on **how worried you are about each item.**
+
+You take some notes (your puzzle input) on the items each monkey currently has, how worried you are about those items, and how the monkey makes decisions based on your worry level. For example:
+
+```
+Monkey 0:
+  Starting items: 79, 98
+  Operation: new = old * 19
+  Test: divisible by 23
+    If true: throw to monkey 2
+    If false: throw to monkey 3
+
+Monkey 1:
+  Starting items: 54, 65, 75, 74
+  Operation: new = old + 6
+  Test: divisible by 19
+    If true: throw to monkey 2
+    If false: throw to monkey 0
+
+Monkey 2:
+  Starting items: 79, 60, 97
+  Operation: new = old * old
+  Test: divisible by 13
+    If true: throw to monkey 1
+    If false: throw to monkey 3
+
+Monkey 3:
+  Starting items: 74
+  Operation: new = old + 3
+  Test: divisible by 17
+    If true: throw to monkey 0
+    If false: throw to monkey 1
+```
+
+Each monkey has several attributes:
+
+* `Starting items` lists your **worry level** for each item the monkey is currently holding in the order they will be inspected.
+* `Operation` shows how your worry level changes as that monkey inspects an item. (An operation like `new = old * 5` means that your worry level after the monkey inspected the item is five times whatever your worry level was before inspection.)
+* `Test` shows how the monkey uses your worry level to decide where to throw an item next.
+* `If true` shows what happens with an item if the `Test` was `true`.
+* `If false` shows what happens with an item if the `Test` was `false`.
+
+After each monkey inspects an item but before it tests your worry level, your relief that the monkey's inspection didn't damage the item causes your worry level to be **divided by three** and rounded down to the nearest integer.
+
+The monkeys take turns inspecting and throwing items. On a single monkey's **turn**, it inspects and throws all of the items it is holding one at a time and in the order listed. Monkey 0 goes first, then monkey 1, and so on until each monkey has had one turn. The process of each monkey taking a single turn is called a **round**.
+
+When a monkey throws an item to another monkey, the item goes on the **end** of the recipient monkey's list. A monkey that starts a round with no items could end up inspecting and throwing many items by the time its turn comes around. If a monkey is holding no items at the start of its turn, its turn ends.
+
+In the above example, the first round proceeds as follows:
+
+```
+Monkey 0:
+  Monkey inspects an item with a worry level of 79.
+    Worry level is multiplied by 19 to 1501.
+    Monkey gets bored with item. Worry level is divided by 3 to 500.
+    Current worry level is not divisible by 23.
+    Item with worry level 500 is thrown to monkey 3.
+  Monkey inspects an item with a worry level of 98.
+    Worry level is multiplied by 19 to 1862.
+    Monkey gets bored with item. Worry level is divided by 3 to 620.
+    Current worry level is not divisible by 23.
+    Item with worry level 620 is thrown to monkey 3.
+# etc ...
+```
+
+([SEE WEBSITE FOR FULL EXAMPLE](https://adventofcode.com/2022/day/11))
+
+After round 1, the monkeys are holding items with these worry levels:
+
+```
+Monkey 0: 20, 23, 27, 26
+Monkey 1: 2080, 25, 167, 207, 401, 1046
+Monkey 2: 
+Monkey 3: 
+```
+
+Monkeys 2 and 3 aren't holding any items at the end of the round; they both inspected items during the round and threw them all before the round ended.
+
+This process continues for a few more rounds:
+
+([SEE WEBSITE FOR FULL EXAMPLE](https://adventofcode.com/2022/day/11))
+
+Chasing all of the monkeys at once is impossible; you're going to have to focus on the **two most active monkeys** if you want any hope of getting your stuff back. Count the **total number of times each monkey inspects items** over 20 rounds:
+
+```
+Monkey 0 inspected items 101 times.
+Monkey 1 inspected items 95 times.
+Monkey 2 inspected items 7 times.
+Monkey 3 inspected items 105 times.
+```
+
+In this example, the two most active monkeys inspected items `101` and `105` times. The level of **monkey business** in this situation can be found by multiplying these together: `10605`.
+
+Figure out which monkeys to chase by counting how many items they inspect over 20 rounds. **What is the level of monkey business after 20 rounds of stuff-slinging simian shenanigans?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/11/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+You're worried you might not ever get your items back. So worried, in fact, that your relief that a monkey's inspection didn't damage an item **no longer causes your worry level to be divided by three.**
+
+Unfortunately, that relief was all that was keeping your worry levels from **reaching ridiculous** levels. You'll need to **find another way to keep your worry levels manageable.**
+
+At this rate, you might be putting up with these monkeys for a **very long time** - possibly **10000 rounds**!
+
+With these new rules, you can still figure out the monkey business after 10000 rounds. Using the same example above:
+
+([SEE WEBSITE FOR FULL EXAMPLE](https://adventofcode.com/2022/day/11))
+
+After 10000 rounds, the two most active monkeys inspected items 52166 and 52013 times. Multiplying these together, the level of **monkey business** in this situation is now `2713310158`.
+
+Worry levels are no longer divided by three after each item is inspected; you'll need to find another way to keep your worry levels manageable. Starting again from the initial state in your puzzle input, **what is the level of monkey business after 10000 rounds?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/11/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"Monkey 0:\n  Starting items: 89, 74\n  Operation: new = old * 5\n  Test: divisible by 17\n    If true: throw to monkey 4\n    If false: throw to monkey 7\n\nMonkey 1:\n  Starting items: 75, 69, 87, 57, 84, 90, 66, 50\n  Operation: new = old + 3\n  Test: divisible by 7\n    If true: throw to monkey 3\n    If false: throw to monkey 2\n\nMonkey 2:\n  Starting items: 55\n  Operation: new = old + 7\n  Test: divisible by 13\n    If true: throw to monkey 0\n    If false: throw to monkey 7\n\nMonkey 3:\n  Starting items: 69, 82, 69, 56, 68\n  Operation: new = old + 5\n  Test: divisible by 2\n    If true: throw to monkey 0\n    If false: throw to monkey 2\n\nMonkey 4:\n  Starting items: 72, 97, 50\n  Operation: new = old + 2\n  Test: divisible by 19\n    If true: throw to monkey 6\n    If false: throw to monkey 5\n\nMonkey 5:\n  Starting items: 90, 84, 56, 92, 91, 91\n  Operation: new = old * 19\n  Test: divisible by 3\n    If true: throw to monkey 6\n    If false: throw to monkey 1\n\nMonkey 6:\n  Starting items: 63, 93, 55, 53\n  Operation: new = old * old\n  Test: divisible by 5\n    If true: throw to monkey 3\n    If false: throw to monkey 1\n\nMonkey 7:\n  Starting items: 50, 61, 52, 58, 86, 68, 97\n  Operation: new = old + 4\n  Test: divisible by 11\n    If true: throw to monkey 5\n    If false: throw to monkey 4"
+```
+
+## Solution
+
+```elixir
+defmodule Day11 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    map = parse(input)
+    count = Map.new(Map.keys(map), &{&1, 0})
+
+    Enum.reduce(map, {0, 20, 3, false, count, map}, fn {idx, monkey}, acc ->
+      Enum.reduce(monkey[:items], acc, &process_item(idx, &1, &2))
+    end)
+    |> parse_answer()
+  end
+
+  def part2(input) do
+    map = parse(input)
+    count = Map.new(Map.keys(map), &{&1, 0})
+
+    Enum.reduce(map, {0, 10000, 1, mod_trick(map), count, map}, fn {idx, monkey}, acc ->
+      Enum.reduce(monkey[:items], acc, &process_item(idx, &1, &2))
+    end)
+    |> parse_answer()
+  end
+
+  defp mod_trick(map) do
+    map |> Map.values() |> Enum.map(& &1.test) |> Enum.product()
+  end
+
+  defp process_item(_, _, {round, round, div_by, mod_by, count, map}) do
+    {0, round, div_by, mod_by, count, map}
+  end
+
+  defp process_item(idx, item, {round, total_rounds, div_by, mod_by, count, map}) do
+    %{op: {op, opx}} = monkey = map[idx]
+
+    count = Map.update!(count, idx, &(&1 + 1))
+    item = if mod_by, do: rem(item, mod_by), else: item
+    item = apply(Kernel, op, [item, opx]) |> div(div_by)
+    next = if rem(item, monkey[:test]) == 0, do: monkey[:ift], else: monkey[:iff]
+    round = if next > idx, do: round, else: round + 1
+
+    process_item(next, item, {round, total_rounds, div_by, mod_by, count, map})
+  end
+
+  def parse_answer(acc) do
+    acc
+    |> elem(4)
+    |> Map.values()
+    |> Enum.sort(:desc)
+    |> Enum.take(2)
+    |> Enum.product()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      input
+      |> Stream.map(&parse_line/1)
+      |> Enum.into(%{})
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split("\n", trim: true)
+      |> parse_line_item()
+      |> Enum.into(%{})
+      |> then(fn %{monkey: index} = map ->
+        {index, map}
+      end)
+    end
+
+    def parse_line_item([monkey, items, op, test, ift, iff]) do
+      %{
+        monkey: parse_monkey(monkey),
+        items: parse_items(items),
+        op: parse_op(op),
+        test: parse_test(test),
+        ift: parse_ift(ift),
+        iff: parse_iff(iff)
+      }
+    end
+
+    import String, only: [to_integer: 1]
+
+    defp parse_monkey(<<"Monkey ", idx::binary-size(1), _::binary>>),
+      do: to_integer(idx)
+
+    defp parse_test(<<"  Test: divisible by ", rest::binary>>),
+      do: to_integer(rest)
+
+    defp parse_ift(<<"    If true: throw to monkey ", idx::binary-size(1)>>),
+      do: to_integer(idx)
+
+    defp parse_iff(<<"    If false: throw to monkey ", idx::binary-size(1)>>),
+      do: to_integer(idx)
+
+    defp parse_items("  Starting items: " <> items),
+      do: String.split(items, ", ") |> Enum.map(&to_integer/1)
+
+    defp parse_op(<<"  Operation: new = old ", rest::binary>>) do
+      case String.split(rest, " ") do
+        [_op, "old"] -> {:**, 2}
+        [op, val] -> {String.to_atom(op), to_integer(val)}
+      end
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day11, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+ {:module, Day11.Input, <<70, 79, 82, ...>>, {:parse_op, 1}}}
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day11.parse(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  0 => %{iff: 7, ift: 4, items: 'YJ', monkey: 0, op: {:*, 5}, test: 17},
+  1 => %{iff: 2, ift: 3, items: 'KEW9TZB2', monkey: 1, op: {:+, 3}, test: 7},
+  2 => %{iff: 7, ift: 0, items: '7', monkey: 2, op: {:+, 7}, test: 13},
+  3 => %{iff: 2, ift: 0, items: 'ERE8D', monkey: 3, op: {:+, 5}, test: 2},
+  4 => %{iff: 5, ift: 6, items: 'Ha2', monkey: 4, op: {:+, 2}, test: 19},
+  5 => %{iff: 1, ift: 6, items: 'ZT8\\[[', monkey: 5, op: {:*, 19}, test: 3},
+  6 => %{iff: 1, ift: 3, items: '?]75', monkey: 6, op: {:**, 2}, test: 5},
+  7 => %{iff: 4, ift: 5, items: '2=4:VDa', monkey: 7, op: {:+, 4}, test: 11}
+}
+```
+
+Figure out which monkeys to chase by counting how many items they inspect over 20 rounds. **What is the level of monkey business after 20 rounds of stuff-slinging simian shenanigans?**
+
+Your puzzle answer was `120056`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day11.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+120056
+```
+
+Worry levels are no longer divided by three after each item is inspected; you'll need to find another way to keep your worry levels manageable. Starting again from the initial state in your puzzle input, **what is the level of monkey business after 10000 rounds?**
+
+Your puzzle answer was `21816744824`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day11.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+21816744824
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/11/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day11Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "Monkey 0:\n  Starting items: 79, 98\n  Operation: new = old * 19\n  Test: divisible by 23\n    If true: throw to monkey 2\n    If false: throw to monkey 3\n\nMonkey 1:\n  Starting items: 54, 65, 75, 74\n  Operation: new = old + 6\n  Test: divisible by 19\n    If true: throw to monkey 2\n    If false: throw to monkey 0\n\nMonkey 2:\n  Starting items: 79, 60, 97\n  Operation: new = old * old\n  Test: divisible by 13\n    If true: throw to monkey 1\n    If false: throw to monkey 3\n\nMonkey 3:\n  Starting items: 74\n  Operation: new = old + 3\n  Test: divisible by 17\n    If true: throw to monkey 0\n    If false: throw to monkey 1"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day11.part1(input) == 10605
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day11.part2(input) == 2_713_310_158
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.02 seconds (0.00s async, 0.02s sync)
+2 tests, 0 failures
+
+Randomized with seed 534386
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day11.part1(input) end,
+    "Part 2" => fn -> Day11.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1       30.64 K      0.0326 ms     ±8.16%      0.0315 ms      0.0397 ms
+Part 2      0.0761 K       13.14 ms     ±8.03%       12.86 ms       18.09 ms
+
+Comparison: 
+Part 1       30.64 K
+Part 2      0.0761 K - 402.58x slower +13.10 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1       0.0520 MB
+Part 2        22.32 MB - 429.16x memory usage +22.27 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1       0.00916 M
+Part 2          2.48 M - 270.41x reduction count +2.47 M
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
