@@ -3,7 +3,7 @@
 # Day 12 - Advent of Code 2022
 
 ```elixir
-Mix.install([:kino, :benchee])
+Mix.install([:kino, :benchee, :nx])
 ```
 
 <!-- livebook:{"output":true} -->
@@ -14,30 +14,84 @@ Mix.install([:kino, :benchee])
 
 ## Links
 
-* [Advent of Code (AoC)](https://adventofcode.com/2022/day/1)
-* [AoC Puzzle Input](https://adventofcode.com/2022/day/1/input)
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/12)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/12/input)
 * [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_12.ex)
 * [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-12.livemd)
 
 ## Prompt
 
-### --- Day 12: TBD ---
+### --- Day 12: Hill Climbing Algorithm ---
 
-Part One prompt
+You try contacting the Elves using your handheld device, but the river you're following must be too low to get a decent signal.
 
-**QUESTION ONE?**
+You ask the device for a heightmap of the surrounding area (your puzzle input). The heightmap shows the local area from above broken into a grid; the elevation of each square of the grid is given by a single lowercase letter, where `a` is the lowest elevation, `b` is the next-lowest, and so on up to the highest elevation, `z`.
 
-To begin, [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+Also included on the heightmap are marks for your current position (`S`) and the location that should get the best signal (`E`). Your current position (`S`) has elevation `a`, and the location that should get the best signal (`E`) has elevation `z`.
+
+You'd like to reach `E`, but to save energy, you should do it in **as few steps as possible**. During each step, you can move exactly one square up, down, left, or right. To avoid needing to get out your climbing gear, the elevation of the destination square can be **at most one higher** than the elevation of your current square; that is, if your current elevation is `m`, you could step to elevation `n`, but not to elevation `o`. (This also means that the elevation of the destination square can be much lower than the elevation of your current square.)
+
+For example:
+
+```
+Sabqponm
+abcryxxl
+accszExk
+acctuvwj
+abdefghi
+```
+
+Here, you start in the top-left corner; your goal is near the middle. You could start by moving down or right, but eventually you'll need to head toward the `e` at the bottom. From there, you can spiral around to the goal:
+
+```
+v..v<<<<
+>v.vv<<^
+.>vv>E^^
+..v>>>^^
+..>>>>>^
+```
+
+In the above diagram, the symbols indicate whether the path exits each square moving up (`^`), down (`v`), left (`<`), or right (`>`). The location that should get the best signal is still `E`, and `.` marks unvisited squares.
+
+This path reaches the goal in `31` steps, the fewest possible.
+
+**What is the fewest steps required to move from your current position to the location that should get the best signal?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/12/input).
 
 <!-- livebook:{"break_markdown":true} -->
 
 ### --- Part Two ---
 
-Part Two prompt
+As you walk up the hill, you suspect that the Elves will want to turn this into a hiking trail. The beginning isn't very scenic, though; perhaps you can find a better starting point.
 
-**QUESTION TWO?**
+To maximize exercise while hiking, the trail should start as low as possible: elevation `a`. The goal is still the square marked `E`. However, the trail should still be direct, taking the fewest steps to reach its goal. So, you'll need to find the shortest path from **any square at elevation `a`** to the square marked `E`.
 
-Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+Again consider the example from above:
+
+```
+Sabqponm
+abcryxxl
+accszExk
+acctuvwj
+abdefghi
+```
+
+Now, there are six choices for starting position (five marked `a`, plus the square marked `S` that counts as being at elevation `a`). If you start at the bottom-left square, you can reach the goal most quickly:
+
+```
+...v<<<<
+...vv<<^
+...v>E^^
+.>v>>>^^
+>^>>>>>^
+```
+
+This path reaches the goal in only `29` steps, the fewest possible.
+
+**What is the fewest steps required to move starting from any square with elevation a to the location that should get the best signal?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/12/input).
 
 ## Input
 
@@ -54,7 +108,7 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-""
+"abaaaaacccccccccccccccccccccccccccccccccccccccaaaaaaaccccaaaaaaaaaaaaaaaaacccccaaaaaacccccccccccccccccccccccaaaaaaaaccccccccccccccccccccccccccccccccaaaaaa\nabaaaaaacccaaaacccccccccccccccccccccccaccccccccaaaaaaaaccaaaaaaaaaaaaaaaaccccccaaaaaacccccccccccccccccccccccccaaaaccccccccccccccccccccccccccccccccccaaaaaa\nabaaaaaacccaaaacccccccccccccccccaaaaaaaacccccccaaaaaaaaacaaaaaaaaaaaaacccccccccaaaaacccccccccccccccccccccccccaaaaacccccccccccccccccccaaaccccccccccccaaaaaa\nabaaacaccccaaaaccccccccccccccccccaaaaaacccccccccaaaaaaaccccaaaaaaaaaaacccccccccaaaaacccccccccccccccccccccccccaacaaaccccccccccccccccccaaacccccccccccccccaaa\nabaaacccccccaaacccccccccccaacccccaaaaaaccccccccaaaaaaccccccaacaaaaaaaacccccccccccccccccccccccaaccccccccccccccacccaaaaacccccccccaaccccaaacccccccccccccccaaa\nabccccccccccccccccccccccccaaaaccaaaaaaaacccccccaaaaaaaccccccccaaaaaaaaaccccccccccaacccccccccaaaccccccccccccccccccacaaacccccccccaaaaccaaacccccccccccccccaac\nabccccccccccccccccccccccaaaaaacaaaaaaaaaaccccccaaccaaaaacccccaaaaccaaaaccccccccccaaacaacccccaaacaaacccaaccccccccaaaaaaaacccccccaaaaakkkkkkcccccccccccccccc\nabccccccccccccccccccccccaaaaaccaaaaaaaaaacccccccccccaaaaaaccccacccaaaaaccccccccccaaaaaaccaaaaaaaaaaaaaaaccccccccaaaaaaaaccccccccaaajkkkkkkkaccccccaacccccc\nabcccccccccccccccccccccccaaaaacacacaaaccccccccccccccaaaaaaccccccccaaaacccccccccaaaaaaacccaaaaaaaaaaaaaaaaaccccccccaaaaaccccccccccjjjkkkkkkkkccaaaaaacccccc\nabcccccccccccccccccccccccaacaacccccaaacccaccccccccccaaaaaaccccccccaaaacccccccccaaaaaaacccccaaaaaacaaaaaaaacccccccaaaaacccccccjjjjjjjooopppkkkcaaaaaaaccccc\nabcccccccccccccccccaacaacccccccccccaaaaaaacccccccccccaaaaacccccccccccccccccccccccaaaaaaccccaaaaaaccaaaaaaacccccccaaaaaacciijjjjjjjjoooopppkkkcaaaaaaaacccc\nabccccccccccaaaccccaaaaacccccccccccccaaaaacccccccccccaaaaccccccccccccccccccccccccaacaaaccccaaaaaaacaaaaacccccccccaccaaaciiiijjjjjjoooopppppkllcaaaaaaacccc\nabccaaccccccaaaaacaaaaacccccccccccccaaaaaacccccccccccccccccccccccccccccccccccccccaacccccccaaaacaaaaaaaaacccaaccccaaaaaciiiiinoooooooouuuupplllaaaaaacccccc\nabcaaacccccaaaaaacaaaaaacccccccccccaaaaaaaaccccccccaacaccccccccccccccccccccccccccccccccccccaccccccccccaaccaaaccccaaaaaciiinnnooooooouuuuuppplllaaacacccccc\nabaaaaaacccaaaaaacccaaaacccccccccccaaaaaaaaccccccccaaaaccccccccccccccccccccccccccccccccccccccccccccccccaaaaacaacaaaaaaiiinnnnntttoouuuuuupppllllcccccccccc\nabaaaaaaccccaaaaacccaaccccccccccacccccaaccccccccccaaaaaccccccccccccccccccccccccccccccccccccccccccccccccaaaaaaaacaaaaaaiiinnnnttttuuuuxxuuupppllllccccccccc\nabaaaaacccccaacaaccccccccccccccaaaccccaacccccaacccaaaaaacccccccccccccccccccccccccccccccccccccccccccccccccaaaaaccaaaaaaiiinnnttttxxuuxxyyuuppppllllcccccccc\nabaaaacccccccccccccccccccccaaacaaaccccccaaacaaaaccacaaaacccccccccccccccccccccccccccccccccccaacccccccccccaaaaaccccaaaccciinnntttxxxxxxxyyvvvqqqqqlllccccccc\nabaaaaaccccccccccccccccccccaaaaaaaaaacccaaaaaaacccccaaccccccccccccccccccccccccccccccccccccaaacccccccccccaacaaaccccccccciiinntttxxxxxxxyyvvvvvqqqqljjcccccc\nabccaaaccaccccccccaaacccccccaaaaaaaaaccccaaaaaacccccccccccccccccccccccccccccccaacccccccaaaaacaaccccccccccccaacccccccccchhinnnttxxxxxxyyyyyvvvvqqqjjjcccccc\nSbccccaaaacccccccaaaaaacccccccaaaaaccccccaaaaaaaaccccccccccccccccccccaaccccccaaaaccccccaaaaaaaacccccccccccccccccccccccchhhnnntttxxxxEzyyyyyvvvqqqjjjcccccc\nabccccaaaacccccccaaaaaaccccccaaaaaacccccaaaaaaaaaacccccccccccccccccccaaccccccaaaaccccccccaaaaacccccccccccccccccccccccccchhhnntttxxxyyyyyyyvvvvqqqjjjcccccc\nabcccaaaaaaccccccaaaaaacccccaaaaaaaccccaaaaaaaaaacccccccccccccccccaaaaaaaacccaaaacccccccaaaaaccccccccccccccccccccccccccchhmmmttxxxyyyyyyvvvvvqqqjjjdcccccc\nabcccaaaaaacccccccaaaaacccccaaacaaacaaaaaaaaaaccccccccccccaaacccccaaaaaaaaccccccccccccccaacaaacccccccaacaaacccccccccccchhhmmmtswwwyyyyyyvvvqqqqjjjjdddcccc\nabcccccaacccccccccaacaacccccccccccacaaaaaccaaaccccccccccaaaaacccccccaaaacccccccccccccccccccaaccccccccaaaaaacccccccccccchhhmmssswwwwwwyyywvrqqqjjjjdddccccc\nabcccccccccccccccccccccccccccccccccaaaaaccccaaccccccccacaaaaaacccccaaaaacccccccccccccccccccccccccccccaaaaaacccccccccccchhhmmssswwwwwwywywwrrqjjjjddddccccc\nabcccccccccccccccccccccccccccccccccaaaaaccccccccaaacaaacaaaaaacccc" <> ...
 ```
 
 ## Solution
@@ -63,33 +117,131 @@ input = input |> Kino.Input.read()
 defmodule Day12 do
   defdelegate parse(input), to: __MODULE__.Input
 
+  alias __MODULE__.{Mover, Queue}
+
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> find_end()
+    |> elem(1)
   end
 
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> find_start()
+    |> elem(1)
+  end
+
+  defp find_end(%{?S => start_xy, ?E => end_xy} = grid) do
+    Mover.navigate(
+      {
+        %{start_xy => 0},
+        Queue.add([], start_xy, 0)
+      },
+      grid,
+      end_xy,
+      :forward
+    )
+  end
+
+  defp find_start(%{?E => end_xy} = grid) do
+    Mover.navigate(
+      {
+        %{end_xy => 0},
+        Queue.add([], end_xy, 0)
+      },
+      grid,
+      ?a,
+      :backward
+    )
+  end
+
+  defmodule Mover do
+    # Endpoint found. EXIT.
+    def navigate({%{end: endpoint}, _}, _, _, _), do: endpoint
+
+    def navigate({seen, [{weight, xy} | queue]}, grid, the_end, dir) do
+      new_xys(xy)
+      |> Enum.reduce({seen, queue}, fn new_xy, acc ->
+        move(acc, new_xy, grid[xy], grid[new_xy], the_end, weight, dir)
+      end)
+      |> navigate(grid, the_end, dir)
+    end
+
+    def move(acc, _, _, nil, _, _, _), do: acc
+    def move(acc, _, me, next, _, _, :forward) when next - me > 1, do: acc
+    def move(acc, _, me, next, _, _, :backward) when me - next > 1, do: acc
+
+    # EXIT: found the end
+    def move({seen, queue}, next_xy, _, next_value, the_end, weight, _)
+        when the_end in [next_xy, next_value],
+        do: {Map.put(seen, :end, {next_xy, weight + 1}), queue}
+
+    def move({seen, queue}, next_xy, _, _, _, weight, _) do
+      if seen[next_xy] do
+        {seen, queue}
+      else
+        {
+          Map.put(seen, next_xy, weight + 1),
+          Queue.add(queue, next_xy, weight + 1)
+        }
+      end
+    end
+
+    def new_xys({x, y}),
+      do: [{x, y - 1}, {x, y + 1}, {x - 1, y}, {x + 1, y}]
+  end
+
+  defmodule Queue do
+    def add([{lowest_weight, _} | _] = queue, xy, weight) when weight <= lowest_weight do
+      [{weight, xy} | queue]
+    end
+
+    def add([head | tail], xy, weight) do
+      [head | add(tail, xy, weight)]
+    end
+
+    def add([], xy, weight) do
+      [{weight, xy}]
+    end
   end
 
   defmodule Input do
     def parse(input) when is_binary(input) do
       input
-      |> String.split("\n")
+      |> String.split("\n", trim: true)
       |> parse()
+      |> put_start()
+      |> put_end()
     end
 
     def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
+      input
+      |> Enum.with_index()
+      |> Enum.reduce(%{}, fn {row, y}, acc ->
+        row
+        |> String.to_charlist()
+        |> Enum.with_index()
+        |> Enum.into(acc, fn {col, x} -> {{x, y}, col} end)
+      end)
     end
 
-    def parse_line(line) do
-      line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+    def put_start(grid) do
+      start_xy = find_value(grid, ?S)
+      grid |> Map.put(?S, start_xy) |> Map.put(start_xy, ?a)
+    end
+
+    def put_end(grid) do
+      end_xy = find_value(grid, ?E)
+      grid |> Map.put(?E, end_xy) |> Map.put(end_xy, ?z)
+    end
+
+    defp find_value(grid, value) do
+      Enum.find_value(grid, fn
+        {k, ^value} -> k
+        _ -> nil
+      end)
     end
   end
 end
@@ -98,13 +250,13 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day12, <<70, 79, 82, 49, 0, 0, 8, ...>>,
- {:module, Day12.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day12, <<70, 79, 82, 49, 0, 0, 10, ...>>,
+ {:module, Day12.Input, <<70, 79, 82, ...>>, {:find_value, 2}}}
 ```
 
-**QUESTION ONE?**
+**What is the fewest steps required to move from your current position to the location that should get the best signal?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `472`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -115,12 +267,12 @@ Day12.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+472
 ```
 
-**QUESTION TWO?**
+**What is the fewest steps required to move starting from any square with elevation a to the location that should get the best signal?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `465`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -131,14 +283,14 @@ Day12.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+465
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
 
 At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
 
-If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/1/input).
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/12/input).
 
 ## Tests
 
@@ -152,19 +304,19 @@ defmodule Day12Test do
 
   setup_all do
     [
-      input: ""
+      input: "Sabqponm\nabcryxxl\naccszExk\nacctuvwj\nabdefghi"
     ]
   end
 
-  describe "part1/1" do
+  describe "part1" do
     test "returns expected value", %{input: input} do
-      assert Day12.part1(input) == [""]
+      assert Day12.part1(input) == 31
     end
   end
 
-  describe "part2/1" do
+  describe "part2" do
     test "returns expected value", %{input: input} do
-      assert Day12.part2(input) == [""]
+      assert Day12.part2(input) == 29
     end
   end
 end
@@ -179,7 +331,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 486415
 ```
 
 <!-- livebook:{"output":true} -->
@@ -191,38 +343,12 @@ Randomized with seed 162351
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day12.part1(input)
-  end
-
-  def fun2(input) do
-    Day12.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day12.Input.parse(input) |> Enum.to_list()
 
-Benchee.run(
-  %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+Benchee.run(%{
+  "Part 1" => fn -> Day12.part1(input) end,
+  "Part 2" => fn -> Day12.part2(input) end
+})
 
 nil
 ```
@@ -230,7 +356,32 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 2        166.71        6.00 ms     ±4.71%        6.00 ms        6.53 ms
+Part 1        123.46        8.10 ms     ±2.58%        7.98 ms        8.55 ms
+
+Comparison: 
+Part 2        166.71
+Part 1        123.46 - 1.35x slower +2.10 ms
 ```
 
 <!-- livebook:{"output":true} -->
