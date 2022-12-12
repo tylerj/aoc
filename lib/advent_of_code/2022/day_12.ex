@@ -7,6 +7,7 @@ defmodule AdventOfCode.Y2022.Day12 do
     input
     |> parse()
     |> find_end()
+    |> Map.get(:endpoint)
     |> elem(1)
   end
 
@@ -14,13 +15,42 @@ defmodule AdventOfCode.Y2022.Day12 do
     input
     |> parse()
     |> find_start()
+    |> Map.get(:endpoint)
     |> elem(1)
+  end
+
+  def draw_part1(input \\ nil) do
+    grid = parse(input)
+    %{endpoint: {xy, _}} = coords = find_end(grid)
+
+    draw_path(grid, MapSet.new(coords[xy]))
+  end
+
+  def draw_part2(input \\ nil) do
+    grid = parse(input)
+    %{endpoint: {xy, _}} = coords = find_start(grid)
+
+    draw_path(grid, MapSet.new(coords[xy]))
+  end
+
+  def draw_path(grid, path, char \\ " ") do
+    xs = for {{x, _}, _} <- grid, do: x
+    ys = for {{_, y}, _} <- grid, do: y
+
+    Enum.min(ys)..Enum.max(ys)
+    |> Enum.each(fn y ->
+      Enum.min(xs)..Enum.max(xs)
+      |> Enum.map(fn x ->
+        if MapSet.member?(path, {x, y}), do: char, else: grid[{x, y}]
+      end)
+      |> IO.puts()
+    end)
   end
 
   defp find_end(%{?S => start_xy, ?E => end_xy} = grid) do
     Mover.navigate(
       {
-        %{start_xy => 0},
+        %{start_xy => []},
         Queue.add([], start_xy, 0)
       },
       grid,
@@ -32,7 +62,7 @@ defmodule AdventOfCode.Y2022.Day12 do
   defp find_start(%{?E => end_xy} = grid) do
     Mover.navigate(
       {
-        %{end_xy => 0},
+        %{end_xy => []},
         Queue.add([], end_xy, 0)
       },
       grid,
@@ -43,7 +73,7 @@ defmodule AdventOfCode.Y2022.Day12 do
 
   defmodule Mover do
     # Endpoint found. EXIT.
-    def navigate({%{endpoint: endpoint}, _}, _, _, _), do: endpoint
+    def navigate({%{endpoint: _} = seen, _}, _, _, _), do: seen
 
     def navigate({seen, [{weight, xy} | queue]}, grid, the_end, dir) do
       new_xys(xy)
@@ -51,6 +81,7 @@ defmodule AdventOfCode.Y2022.Day12 do
         move(
           acc,
           %{
+            xy: xy,
             next_xy: next_xy,
             this: grid[xy],
             next: grid[next_xy],
@@ -72,20 +103,25 @@ defmodule AdventOfCode.Y2022.Day12 do
       do: acc
 
     # EXIT: found the end
-    def move({seen, queue}, %{end: the_end, next_xy: next_xy, next: next, weight: wt})
+    def move({seen, queue}, %{end: the_end, xy: xy, next_xy: next_xy, next: next, weight: wt})
         when the_end in [next_xy, next],
-        do: {Map.put(seen, :endpoint, {next_xy, wt + 1}), queue}
+        do: {
+          seen |> update_seen(xy, next_xy) |> Map.put(:endpoint, {next_xy, wt + 1}),
+          queue
+        }
 
-    def move({seen, queue}, %{next_xy: next_xy, weight: weight}) do
+    def move({seen, queue}, %{xy: xy, next_xy: next_xy, weight: weight}) do
       if seen[next_xy] do
         {seen, queue}
       else
         {
-          Map.put(seen, next_xy, weight + 1),
+          update_seen(seen, xy, next_xy),
           Queue.add(queue, next_xy, weight + 1)
         }
       end
     end
+
+    defp update_seen(seen, xy, next_xy), do: Map.put(seen, next_xy, [next_xy | seen[xy]])
 
     def new_xys({x, y}),
       do: [{x, y - 1}, {x, y + 1}, {x - 1, y}, {x + 1, y}]
