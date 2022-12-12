@@ -159,26 +159,40 @@ defmodule Day12 do
 
   defmodule Mover do
     # Endpoint found. EXIT.
-    def navigate({%{end: endpoint}, _}, _, _, _), do: endpoint
+    def navigate({%{endpoint: endpoint}, _}, _, _, _), do: endpoint
 
     def navigate({seen, [{weight, xy} | queue]}, grid, the_end, dir) do
       new_xys(xy)
-      |> Enum.reduce({seen, queue}, fn new_xy, acc ->
-        move(acc, new_xy, grid[xy], grid[new_xy], the_end, weight, dir)
+      |> Enum.reduce({seen, queue}, fn next_xy, acc ->
+        move(
+          acc,
+          %{
+            next_xy: next_xy,
+            this: grid[xy],
+            next: grid[next_xy],
+            end: the_end,
+            weight: weight,
+            dir: dir
+          }
+        )
       end)
       |> navigate(grid, the_end, dir)
     end
 
-    def move(acc, _, _, nil, _, _, _), do: acc
-    def move(acc, _, me, next, _, _, :forward) when next - me > 1, do: acc
-    def move(acc, _, me, next, _, _, :backward) when me - next > 1, do: acc
+    def move(acc, %{next: nil}), do: acc
+
+    def move(acc, %{this: this, next: next, dir: :forward}) when next - this > 1,
+      do: acc
+
+    def move(acc, %{this: this, next: next, dir: :backward}) when this - next > 1,
+      do: acc
 
     # EXIT: found the end
-    def move({seen, queue}, next_xy, _, next_value, the_end, weight, _)
-        when the_end in [next_xy, next_value],
-        do: {Map.put(seen, :end, {next_xy, weight + 1}), queue}
+    def move({seen, queue}, %{end: the_end, next_xy: next_xy, next: next, weight: wt})
+        when the_end in [next_xy, next],
+        do: {Map.put(seen, :endpoint, {next_xy, wt + 1}), queue}
 
-    def move({seen, queue}, next_xy, _, _, _, weight, _) do
+    def move({seen, queue}, %{next_xy: next_xy, weight: weight}) do
       if seen[next_xy] do
         {seen, queue}
       else
@@ -331,7 +345,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 486415
+Randomized with seed 665270
 ```
 
 <!-- livebook:{"output":true} -->
@@ -376,12 +390,12 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 2        166.71        6.00 ms     ±4.71%        6.00 ms        6.53 ms
-Part 1        123.46        8.10 ms     ±2.58%        7.98 ms        8.55 ms
+Part 2        157.00        6.37 ms    ±10.59%        6.26 ms        7.57 ms
+Part 1        112.74        8.87 ms     ±3.53%        8.81 ms        9.89 ms
 
 Comparison: 
-Part 2        166.71
-Part 1        123.46 - 1.35x slower +2.10 ms
+Part 2        157.00
+Part 1        112.74 - 1.39x slower +2.50 ms
 ```
 
 <!-- livebook:{"output":true} -->
