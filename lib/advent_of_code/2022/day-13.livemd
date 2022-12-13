@@ -157,9 +157,8 @@ defmodule Day13 do
     input
     |> Input.parse()
     |> Stream.with_index(1)
-    |> Stream.map(fn {[a, b], index} ->
-      if correct?(a, b), do: index, else: 0
-    end)
+    |> Stream.filter(fn {[a, b], _} -> correct?(a, b) end)
+    |> Stream.map(fn {_, index} -> index end)
     |> Enum.sum()
   end
 
@@ -167,9 +166,8 @@ defmodule Day13 do
     (@keys ++ Input.parse_lines(input))
     |> Enum.sort(fn a, b -> correct?(a, b) end)
     |> Stream.with_index(1)
-    |> Stream.map(fn {v, index} ->
-      if v in @keys, do: index, else: 1
-    end)
+    |> Stream.filter(fn {v, _} -> v in @keys end)
+    |> Stream.map(fn {_, index} -> index end)
     |> Enum.product()
   end
 
@@ -333,12 +331,12 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        1.50 K      666.86 μs     ±4.15%      660.98 μs      788.98 μs
-Part 2        1.09 K      921.22 μs     ±7.86%      919.05 μs     1062.15 μs
+Part 1        1.52 K      657.16 μs     ±3.26%      654.76 μs      778.92 μs
+Part 2        1.11 K      899.86 μs     ±7.02%      878.10 μs     1029.28 μs
 
 Comparison: 
-Part 1        1.50 K
-Part 2        1.09 K - 1.38x slower +254.36 μs
+Part 1        1.52 K
+Part 2        1.11 K - 1.37x slower +242.70 μs
 ```
 
 <!-- livebook:{"output":true} -->
