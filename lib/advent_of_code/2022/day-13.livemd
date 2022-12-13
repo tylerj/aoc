@@ -3,7 +3,7 @@
 # Day 13 - Advent of Code 2022
 
 ```elixir
-Mix.install([:kino, :benchee])
+Mix.install([:kino, :benchee, :jason])
 ```
 
 <!-- livebook:{"output":true} -->
@@ -197,7 +197,7 @@ defmodule Day13 do
     def parse_lines(lines) do
       lines
       |> String.split("\n", trim: true)
-      |> Enum.map(&(Code.eval_string(&1) |> elem(0)))
+      |> Enum.map(&Jason.decode!/1)
     end
   end
 end
@@ -288,7 +288,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 473249
+Randomized with seed 673949
 ```
 
 <!-- livebook:{"output":true} -->
@@ -333,12 +333,12 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        230.99        4.33 ms     ±2.27%        4.32 ms        4.59 ms
-Part 2        213.74        4.68 ms     ±4.73%        4.71 ms        5.03 ms
+Part 1        1.50 K      666.86 μs     ±4.15%      660.98 μs      788.98 μs
+Part 2        1.09 K      921.22 μs     ±7.86%      919.05 μs     1062.15 μs
 
 Comparison: 
-Part 1        230.99
-Part 2        213.74 - 1.08x slower +0.35 ms
+Part 1        1.50 K
+Part 2        1.09 K - 1.38x slower +254.36 μs
 ```
 
 <!-- livebook:{"output":true} -->

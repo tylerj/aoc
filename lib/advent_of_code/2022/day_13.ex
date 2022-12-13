@@ -54,7 +54,7 @@ defmodule AdventOfCode.Y2022.Day13 do
     def parse_lines(lines) do
       lines
       |> String.split("\n", trim: true)
-      |> Enum.map(&(Code.eval_string(&1) |> elem(0)))
+      |> Enum.map(&Jason.decode!/1)
     end
 
     def remote_input(), do: AdventOfCode.Input.get!(@day, @year)
