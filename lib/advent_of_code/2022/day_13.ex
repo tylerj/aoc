@@ -23,7 +23,6 @@ defmodule AdventOfCode.Y2022.Day13 do
     |> Enum.product()
   end
 
-  def correct?([], []), do: nil
   def correct?([], _), do: true
   def correct?(_, []), do: false
   def correct?([a | t1], [a | t2]), do: correct?(t1, t2)
@@ -36,12 +35,7 @@ defmodule AdventOfCode.Y2022.Day13 do
   def correct?([a | t1], [b | t2]) when not is_list(a) and is_list(b),
     do: correct?([[a] | t1], [b | t2])
 
-  def correct?([a | t1], [b | t2]) when is_list(a) and is_list(b) do
-    case correct?(a, b) do
-      nil -> correct?(t1, t2)
-      result -> result
-    end
-  end
+  def correct?([a | _], [b | _]), do: correct?(a, b)
 
   defmodule Input do
     @day 13

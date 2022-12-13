@@ -173,7 +173,6 @@ defmodule Day13 do
     |> Enum.product()
   end
 
-  def correct?([], []), do: nil
   def correct?([], _), do: true
   def correct?(_, []), do: false
   def correct?([a | t1], [a | t2]), do: correct?(t1, t2)
@@ -186,12 +185,7 @@ defmodule Day13 do
   def correct?([a | t1], [b | t2]) when not is_list(a) and is_list(b),
     do: correct?([[a] | t1], [b | t2])
 
-  def correct?([a | t1], [b | t2]) when is_list(a) and is_list(b) do
-    case correct?(a, b) do
-      nil -> correct?(t1, t2)
-      result -> result
-    end
-  end
+  def correct?([a | _], [b | _]), do: correct?(a, b)
 
   defmodule Input do
     def parse(input) do
@@ -339,12 +333,12 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        230.65        4.34 ms     ±2.32%        4.33 ms        4.61 ms
-Part 2        213.61        4.68 ms     ±4.70%        4.71 ms        5.10 ms
+Part 1        230.99        4.33 ms     ±2.27%        4.32 ms        4.59 ms
+Part 2        213.74        4.68 ms     ±4.73%        4.71 ms        5.03 ms
 
 Comparison: 
-Part 1        230.65
-Part 2        213.61 - 1.08x slower +0.35 ms
+Part 1        230.99
+Part 2        213.74 - 1.08x slower +0.35 ms
 ```
 
 <!-- livebook:{"output":true} -->
