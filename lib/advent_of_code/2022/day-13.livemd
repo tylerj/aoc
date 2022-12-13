@@ -21,11 +21,65 @@ Mix.install([:kino, :benchee])
 
 ## Prompt
 
-### --- Day 13: TBD ---
+### --- Day 13: Distress Signal ---
 
-Part One prompt
+You climb the hill and again try contacting the Elves. However, you instead receive a signal you weren't expecting: a **distress signal**.
 
-**QUESTION ONE?**
+Your handheld device must still not be working properly; the packets from the distress signal got decoded **out of order**. You'll need to re-order the list of received packets (your puzzle input) to decode the message.
+
+Your list consists of pairs of packets; pairs are separated by a blank line. You need to identify **how many pairs of packets are in the right order**.
+
+For example:
+
+```
+[1,1,3,1,1]
+[1,1,5,1,1]
+
+[[1],[2,3,4]]
+[[1],4]
+
+[9]
+[[8,7,6]]
+
+[[4,4],4,4]
+[[4,4],4,4,4]
+
+[7,7,7,7]
+[7,7,7]
+
+[]
+[3]
+
+[[[]]]
+[[]]
+
+[1,[2,[3,[4,[5,6,7]]]],8,9]
+[1,[2,[3,[4,[5,6,0]]]],8,9]
+```
+
+Packet data consists of lists and integers. Each list starts with `[`, ends with `]`, and contains zero or more comma-separated values (either integers or other lists). Each packet is always a list and appears on its own line.
+
+When comparing two values, the first value is called `left` and the second value is called `right`. Then:
+
+* If **both values are integers**, the **lower integer** should come first. If the left integer is lower than the right integer, the inputs are in the right order. If the left integer is higher than the right integer, the inputs are not in the right order. Otherwise, the inputs are the same integer; continue checking the next part of the input.
+* If **both values are lists**, compare the first value of each list, then the second value, and so on. If the left list runs out of items first, the inputs are in the right order. If the right list runs out of items first, the inputs are not in the right order. If the lists are the same length and no comparison makes a decision about the order, continue checking the next part of the input.
+* If **exactly one value is an integer**, convert the integer to a list which contains that integer as its only value, then retry the comparison. For example, if comparing `[0,0,0]` and `2`, convert the right value to `[2]` (a list containing `2`); the result is then found by instead comparing `[0,0,0]` and `[2]`.
+  Using these rules, you can determine which of the pairs in the example are in the right order:
+
+```
+== Pair 1 ==
+- Compare [1,1,3,1,1] vs [1,1,5,1,1]
+  - Compare 1 vs 1
+  - Compare 1 vs 1
+  - Compare 3 vs 5
+    - Left side is smaller, so inputs are in the right order
+```
+
+([SEE WEBSITE FOR FULL EXAMPLE](https://adventofcode.com/2022/day/13))
+
+What are the indices of the pairs that are already **in the right order**? (The first pair has index 1, the second pair has index 2, and so on.) In the above example, the pairs in the right order are `1, 2, 4, and 6`; the sum of these indices is `13`.
+
+Determine which pairs of packets are already in the right order. **What is the sum of the indices of those pairs?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/13/input).
 
@@ -33,9 +87,43 @@ To begin, [get your puzzle input](https://adventofcode.com/2022/day/13/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+Now, you just need to put **all** of the packets in the right order. Disregard the blank lines in your list of received packets.
 
-**QUESTION TWO?**
+The distress signal protocol also requires that you include two additional **divider packets**:
+
+```
+[[2]]
+[[6]]
+```
+
+Using the same rules as before, organize all packets - the ones in your list of received packets as well as the two divider packets - into the correct order.
+
+For the example above, the result of putting the packets in the correct order is:
+
+```
+[]
+[[]]
+[[[]]]
+[1,1,3,1,1]
+[1,1,5,1,1]
+[[1],[2,3,4]]
+[1,[2,[3,[4,[5,6,0]]]],8,9]
+[1,[2,[3,[4,[5,6,7]]]],8,9]
+[[1],4]
+[[2]] ***
+[3]
+[[4,4],4,4]
+[[4,4],4,4,4]
+[[6]] ***
+[7,7,7]
+[7,7,7,7]
+[[8,7,6]]
+[9]
+```
+
+Afterward, locate the divider packets. To find the **decoder key** for this distress signal, you need to determine the indices of the two divider packets and multiply them together. (The first packet is at index 1, the second packet is at index 2, and so on.) In this example, the divider packets are `10th` and `14th`, and so the decoder key is `140`.
+
+Organize all of the packets into the correct order. **What is the decoder key for the distress signal?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/13/input).
 
@@ -54,42 +142,68 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-""
+"[[5,[[3,0]],[0,[8,6,9],2,9],[5,6,[2,8,3],[0]],[6,2,[2,6,8],10]]]\n[[6,4,[2,[2,2],8,[3,7,0,6,2]]],[4,10]]\n\n[[[6,[10,9,7]],9,[9,[9,0,8,3],[0],3],[8,1]],[2,10,9],[[0,6,[4]],2,[2,3,[6,7,0],[1,4,2]],[[3,7,2],[],0],9],[],[[]]]\n[[1,[1,10]]]\n\n[[2,3,[]],[7,[[6,9,9,1,6],[0,3],10,3,[5]],[[]],[9,[],[1,0,0,1,1]]],[7,[1,[3,0],[7,10,8,5,0],2,1],4,7,3],[[5],6,4],[9,3,[4,[0,7,9,9],5,[2,0],[]],[6,[],[4,9]]]]\n[[2,[[3,4,7],[7,2,2,6],[8,9,7,7,6],[7,8,1,6,1],[]],[],8]]\n\n[[4,[[9,8,1],2],10,6,[[],[],7]]]\n[[9,4,10],[0,[1,[10,4,6],[1],8],[[6,2,7,2,4],[9,3,5,6],[0,3,7],10],3],[[[5,4],2,10],2,9,4,[[6,7,2,3],[6]]],[],[]]\n\n[[0,1],[[7,[10,0,8,1],1,4]],[]]\n[[1,3,2,3],[1,[[],7,[6,5,8,7,9],[0,2]],[8],5,[]],[[7,8,[],[8,9,4]],[2]]]\n\n[[7,[[6]],[4,9]]]\n[[10],[],[[10,[10,10,5,2,1],[10],5],[4,4],[[2,1],[9]],6],[6,8]]\n\n[[[[],[2,3,7],4],0],[[[6,5,10,2,6],10,[2,7],5,5],7,8,[0]],[[10,1,3,3,[7]],0],[]]\n[[[[6,2,2,8],[7,4,9,4],3,[0]],7,10]]\n\n[[6,5,5,1],[8],[]]\n[[1,[]],[10],[10,[8,[4]],6,1],[5]]\n\n[[[[1,1,2,4],[7,8,8,7],5,[9,1,7,0,8],[2,10,10,4]],10,[7,[6,10],[6,10,6,9],[0,8,10],7]],[8,[[],[],[1,3,0,5,10],[7,0,7]],1],[]]\n[[6,3,[],5],[]]\n\n[[[3],[2,[],[1,10,5,5],[1,0,3,3,1]]]]\n[[[6,5,[4]]],[5,10,5,3],[6],[10]]\n\n[[[[],[5,0,8,5,4],[2],0,[]],7,6,10,[7,1,10,9]],[]]\n[[[8,[1,2,3]]],[8],[6,9,[3,1,1,[10,10,3,10,0]],3,0],[[[8,7]]]]\n\n[[0,[[0],5,[6,3,3],[10,3,10,9]],4]]\n[[],[5],[8],[[[10,8,10,5,3],[3,7,10,9,8],0],[[],[]]]]\n\n[[],[10,[7,3,[6],7],[9,[3],[8],7,[1]],10],[6,9,[9,3],[[4,8,1],[10,1,4,7],7],10],[[],[3]]]\n[[[6],5,6,10,6],[[]],[1,[6,10],8,3],[1]]\n\n[[1,3],[10,[2],8,1,[6,6,[5],5,[2]]],[[4]],[],[]]\n[[[],[1,0,[8],8,[0,3,6]],1],[[[6,1],8,3,1],1,[6,[6,9,3,8,7]],10,[5,[4]]]]\n\n[[9,[6,2,[],[3,0,2,7]],0],[[[5,4,0],0,[2],[7,3,2,5,1]],9,3]]\n[[2,[7,[5,2,4],8,5,[3,0,4,5,4]],0,8]]\n\n[[8,6,3,[[10,1,1,7]],8]]\n[[[9,2,5],10,5]]\n\n[[],[6],[[[3,6,3,9]],[[2,0],7,1,[10,10,4,4,10]]]]\n[[4,[[6,8,4,9,2],[],5,[10,1]],1,6],[[[4,2,5],4]],[[3,6]],[7,8,[[5,8,9,10],1,[6,8],1,7]]]\n\n[[[[],10,7],[],[1,[]],8,[9,0]],[0,[[6],3,1,[0,7,5]],[[7,6,3,9,3],4,4],[],0],[],[9,2,[9,1,[0,9,4,6],[9,2],10],9]]\n[[],[2,5,6,5,8]]\n\n[[[[4,4],5,[7],3,[8,8,4]],2],[]]\n[[[[6,5,4,7,1],[0,9,9]],[[7,3,7,6,10],3,[6,4,9,4]],[1,[],[]]],[[7,5,[2,4,1,1]],2,4],[],[[[4,7],[1,7,9],5,[]],4,[[7,5,1,9,10],2,5,[1,2,0,9,9]]],[9,[]]]\n\n[[7,[[8,10,9,4,5],[1,3]],1],[[[1,1],2],[[3]],[[7,9,6,6,8],4,[5]],7],[3],[[9,[3,9],[3,1,0,9,2]],4,5,9,[[1]]]]\n[[[4,[9],5],[[2],8,[5,7,0,0],0,9],[[2,1],[],7,[7,1],2],4,7],[[[4,7,0,10,2],[5,5,0,3,6],[10,6,3,3],4,8],2,[[1]],9,9]]\n\n[[[[6,2,4,0]],[],[[8,3,1,5,5],1,7,4,2],5,1]]\n[[[],0],[],[4,[[1,6],2,[8,4,1,3,10]],[5,0,[10,1,0]],8,[2,[10,8,4],[6,2,7,10,10],[8,2,4,4],[]]],[[],6],[[4,5,[2],[10,2,2,1],[4,6,5,10]],[5,[],9,[1]],[]]]\n\n[[9]]\n[[[],8],[7,[6,4]],[5]]\n\n[[],[[3,5,[1],3,[3]],[5],6,[[7,2,6,9],[1,0,0,1]]],[[[5,5,2,0,10],10,7,8,7],5,7,7,[[],1,[6]]],[[]]]\n[[[5,8,10,[9,1,3,2,4],[6,7,0,7,6]],3,[[7],3,9,4,[9]]]]\n\n[[3,1,4,[[6]],[[4,6],1,[4]]],[0],[3,[],7]]\n[[7]]\n\n[[4,[[5]],[10,8,5,0]],[4]]\n[[7,6,10,[[1],8,0,[10,5,1]]],[[[2,1,6],9,9,[4],9]],[]]\n\n[[7,0,5,3,1],[],[[0,9,[8,4,9]],[7,[10,9,4,1,7],2,6],10,[],10],[]]\n[[1,[],[],6,[[],10,3]]]\n\n[[[[1,6]]],[[[5,3,7],[],[10,9,7,3,3],0,[]],3,10,5],[],[10,[2]]]\n[[[[1,5],5],[[6],[3,2],9,[2,0,8]],[9,[6,9,4],8,0,6]],[[[8],8,10],0,[],6,[[2,7,8],0,9]],[7,1],[[[0],[9,5,9]],[[2,10]],[]]]\n\n[[1,7,[[9],8,[1,1,8]]],[[[9,10,2,0,1],10],0,[7,[10,10],10],5],[7,1],[9,[[],[7,10]]],[[2,9,8,[0,0],[10,9,4,1]],[5],[[8,6]]]]\n[[[[4,7,4],[],6,[5,4]],[],[7,[],[],3],[[9,3,5,1,10],[],[7,2]]],[[6,1],3,[[],[3,2],[],[3],[8,7,3,9]]]]\n\n[[[2],0],[2,[6,1],6,5],[0,[],[[9],[],[],[10,8,6]],[[9,6,8,2,3],8,1,5,1],[[4],2,[]]],[[10,1,0,6,1],6],[4]]\n[[1,[[4,10,2],10],[4],6,[[1,0,7],[8,1,9,5,2],6]]]\n\n[[],[9],[[],[[4,4,1,8],3,5]]]\n[[[[10,7],6,[]],[[1,3],[8,9,4],8,[],[2,9]],[8,3],10],[7],[8,9,10]]\n\n[[3,[10,[],4],[[8,3],4,6,[0,6,9,3,6],[8,9,5,9]],[10,[7,1,0,1],[7,1,2,1],[],[]]]]\n[[7,2]]\n\n[[8,[],2,0],[[1,[10,7],[0],2,0]],[4,0,[10,[0,5,1],[1],[]],6,[9]]]\n[[],[6,[[5,1,6,0,5],4],[7,7,[6],8,[2,1]],1,[[3,0]]],[4,10,[[5,10],[4,9,2,1,5],[7,1,5,6]]],[],[1,9,[]]]\n\n[[[[5,7,1,2],[8],[7,0,9,7,3],[4,2,1],1],8,[4,1,[8,6,1,10],[6,8,3,2,0]],[[3],1,[2]]],[[8,[7,1" <> ...
 ```
 
 ## Solution
 
 ```elixir
 defmodule Day13 do
-  defdelegate parse(input), to: __MODULE__.Input
+  alias __MODULE__.Input
+
+  @keys [[[2]], [[6]]]
 
   def part1(input) do
     input
-    |> parse()
-    |> Enum.map(& &1)
+    |> Input.parse()
+    |> Stream.with_index(1)
+    |> Stream.map(fn {[a, b], index} ->
+      if correct?(a, b), do: index, else: 0
+    end)
+    |> Enum.sum()
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    (@keys ++ Input.parse_lines(input))
+    |> Enum.sort(fn a, b -> correct?(a, b) end)
+    |> Stream.with_index(1)
+    |> Stream.map(fn {v, index} ->
+      if v in @keys, do: index, else: 1
+    end)
+    |> Enum.product()
+  end
+
+  def correct?([], []), do: nil
+  def correct?([], _), do: true
+  def correct?(_, []), do: false
+  def correct?([a | t1], [a | t2]), do: correct?(t1, t2)
+  def correct?([a | _], [b | _]) when is_integer(a) and is_integer(b) and a < b, do: true
+  def correct?([a | _], [b | _]) when is_integer(a) and is_integer(b) and a > b, do: false
+
+  def correct?([a | t1], [b | t2]) when is_list(a) and not is_list(b),
+    do: correct?([a | t1], [[b] | t2])
+
+  def correct?([a | t1], [b | t2]) when not is_list(a) and is_list(b),
+    do: correct?([[a] | t1], [b | t2])
+
+  def correct?([a | t1], [b | t2]) when is_list(a) and is_list(b) do
+    case correct?(a, b) do
+      nil -> correct?(t1, t2)
+      result -> result
+    end
   end
 
   defmodule Input do
-    def parse(input) when is_binary(input) do
+    def parse(input) do
       input
-      |> String.split("\n")
-      |> parse()
+      |> String.split("\n\n", trim: true)
+      |> Stream.map(&parse_lines/1)
     end
 
-    def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
-    end
-
-    def parse_line(line) do
-      line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+    def parse_lines(lines) do
+      lines
+      |> String.split("\n", trim: true)
+      |> Enum.map(&(Code.eval_string(&1) |> elem(0)))
     end
   end
 end
@@ -98,13 +212,13 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day13, <<70, 79, 82, 49, 0, 0, 8, ...>>,
- {:module, Day13.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day13, <<70, 79, 82, 49, 0, 0, 14, ...>>,
+ {:module, Day13.Input, <<70, 79, 82, ...>>, {:parse_lines, 1}}}
 ```
 
-**QUESTION ONE?**
+Determine which pairs of packets are already in the right order. **What is the sum of the indices of those pairs?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `5623`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -115,12 +229,12 @@ Day13.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+5623
 ```
 
-**QUESTION TWO?**
+Organize all of the packets into the correct order. **What is the decoder key for the distress signal?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `20570`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -131,7 +245,7 @@ Day13.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+20570
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -152,19 +266,20 @@ defmodule Day13Test do
 
   setup_all do
     [
-      input: ""
+      input:
+        "[1,1,3,1,1]\n[1,1,5,1,1]\n\n[[1],[2,3,4]]\n[[1],4]\n\n[9]\n[[8,7,6]]\n\n[[4,4],4,4]\n[[4,4],4,4,4]\n\n[7,7,7,7]\n[7,7,7]\n\n[]\n[3]\n\n[[[]]]\n[[]]\n\n[1,[2,[3,[4,[5,6,7]]]],8,9]\n[1,[2,[3,[4,[5,6,0]]]],8,9]"
     ]
   end
 
-  describe "part1/1" do
+  describe "part1" do
     test "returns expected value", %{input: input} do
-      assert Day13.part1(input) == [""]
+      assert Day13.part1(input) == 13
     end
   end
 
-  describe "part2/1" do
+  describe "part2" do
     test "returns expected value", %{input: input} do
-      assert Day13.part2(input) == [""]
+      assert Day13.part2(input) == 140
     end
   end
 end
@@ -179,7 +294,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 473249
 ```
 
 <!-- livebook:{"output":true} -->
@@ -191,38 +306,12 @@ Randomized with seed 162351
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day13.part1(input)
-  end
-
-  def fun2(input) do
-    Day13.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day13.Input.parse(input) |> Enum.to_list()
 
-Benchee.run(
-  %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+Benchee.run(%{
+  "Part 1" => fn -> Day13.part1(input) end,
+  "Part 2" => fn -> Day13.part2(input) end
+})
 
 nil
 ```
@@ -230,7 +319,32 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        230.65        4.34 ms     ±2.32%        4.33 ms        4.61 ms
+Part 2        213.61        4.68 ms     ±4.70%        4.71 ms        5.10 ms
+
+Comparison: 
+Part 1        230.65
+Part 2        213.61 - 1.08x slower +0.35 ms
 ```
 
 <!-- livebook:{"output":true} -->
