@@ -1,0 +1,557 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 14 - Advent of Code 2022
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/14)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/14/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_14.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-14.livemd)
+
+## Prompt
+
+### --- Day 14: Regolith Reservoir ---
+
+The distress signal leads you to a giant waterfall! Actually, hang on - the signal seems like it's coming from the waterfall itself, and that doesn't make any sense. However, you do notice a little path that leads **behind** the waterfall.
+
+Correction: the distress signal leads you behind a giant waterfall! There seems to be a large cave system here, and the signal definitely leads further inside.
+
+As you begin to make your way deeper underground, you feel the ground rumble for a moment. Sand begins pouring into the cave! If you don't quickly figure out where the sand is going, you could quickly become trapped!
+
+Fortunately, your [familiarity](https://adventofcode.com/2018/day/17) with analyzing the path of falling material will come in handy here. You scan a two-dimensional vertical slice of the cave above you (your puzzle input) and discover that it is mostly **air** with structures made of **rock**.
+
+Your scan traces the path of each solid rock structure and reports the x,y coordinates that form the shape of the path, where x represents distance to the right and y represents distance down. Each path appears as a single line of text in your scan. After the first point of each path, each point indicates the end of a straight horizontal or vertical line to be drawn from the previous point. For example:
+
+```
+498,4 -> 498,6 -> 496,6
+503,4 -> 502,4 -> 502,9 -> 494,9
+```
+
+This scan means that there are two paths of rock; the first path consists of two straight lines, and the second path consists of three straight lines. (Specifically, the first path consists of a line of rock from `498,4` through `498,6` and another line of rock from `498,6` through `496,6`.)
+
+The sand is pouring into the cave from point 500,0.
+
+Drawing rock as `#`, air as `.`, and the source of the sand as `+`, this becomes:
+
+```
+  4     5  5
+  9     0  0
+  4     0  3
+0 ......+...
+1 ..........
+2 ..........
+3 ..........
+4 ....#...##
+5 ....#...#.
+6 ..###...#.
+7 ........#.
+8 ........#.
+9 #########.
+```
+
+Sand is produced **one unit at a time**, and the next unit of sand is not produced until the previous unit of sand **comes to rest**. A unit of sand is large enough to fill one tile of air in your scan.
+
+A unit of sand always falls **down one step** if possible. If the tile immediately below is blocked (by rock or sand), the unit of sand attempts to instead move diagonally **one step down and to the left**. If that tile is blocked, the unit of sand attempts to instead move diagonally **one step down and to the right**. Sand keeps moving as long as it is able to do so, at each step trying to move down, then down-left, then down-right. If all three possible destinations are blocked, the unit of sand **comes to rest** and no longer moves, at which point the next unit of sand is created back at the source.
+
+So, drawing sand that has come to rest as o, the first unit of sand simply falls straight down and then stops:
+
+```
+......+...
+..........
+..........
+..........
+....#...##
+....#...#.
+..###...#.
+........#.
+......o.#.
+#########.
+```
+
+The second unit of sand then falls straight down, lands on the first one, and then comes to rest to its left:
+
+```
+......+...
+..........
+..........
+..........
+....#...##
+....#...#.
+..###...#.
+........#.
+.....oo.#.
+#########.
+```
+
+After a total of five units of sand have come to rest, they form this pattern:
+
+```
+......+...
+..........
+..........
+..........
+....#...##
+....#...#.
+..###...#.
+......o.#.
+....oooo#.
+#########.
+```
+
+After a total of 22 units of sand:
+
+```
+......+...
+..........
+......o...
+.....ooo..
+....#ooo##
+....#ooo#.
+..###ooo#.
+....oooo#.
+...ooooo#.
+#########.
+```
+
+Finally, only two more units of sand can possibly come to rest:
+
+```
+......+...
+..........
+......o...
+.....ooo..
+....#ooo##
+...o#ooo#.
+..###ooo#.
+....oooo#.
+.o.ooooo#.
+#########.
+```
+
+Once all `24` units of sand shown above have come to rest, all further sand flows out the bottom, falling into the endless void. Just for fun, the path any new sand takes before falling forever is shown here with ~:
+
+```
+.......+...
+.......~...
+......~o...
+.....~ooo..
+....~#ooo##
+...~o#ooo#.
+..~###ooo#.
+..~..oooo#.
+.~o.ooooo#.
+~#########.
+~..........
+~..........
+~..........
+```
+
+Using your scan, simulate the falling sand. **How many units of sand come to rest before sand starts flowing into the abyss below?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/14/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+You realize you misread the scan. There isn't an endless void at the bottom of the scan - there's floor, and you're standing on it!
+
+You don't have time to scan the floor, so assume the floor is an infinite horizontal line with a y coordinate equal to **two plus the highest y coordinate** of any point in your scan.
+
+In the example above, the highest y coordinate of any point is `9`, and so the floor is at `y=11`. (This is as if your scan contained one extra rock path like `-infinity,11 -> infinity,11`.) With the added floor, the example above now looks like this:
+
+```
+        ...........+........
+        ....................
+        ....................
+        ....................
+        .........#...##.....
+        .........#...#......
+        .......###...#......
+        .............#......
+        .............#......
+        .....#########......
+        ....................
+<-- etc #################### etc -->
+```
+
+To find somewhere safe to stand, you'll need to simulate falling sand until a unit of sand comes to rest at 500,0, blocking the source entirely and stopping the flow of sand into the cave. In the example above, the situation finally looks like this after `93` units of sand come to rest:
+
+```
+............o............
+...........ooo...........
+..........ooooo..........
+.........ooooooo.........
+........oo#ooo##o........
+.......ooo#ooo#ooo.......
+......oo###ooo#oooo......
+.....oooo.oooo#ooooo.....
+....oooooooooo#oooooo....
+...ooo#########ooooooo...
+..ooooo.......ooooooooo..
+#########################
+```
+
+Using your scan, simulate the falling sand until the source of the sand becomes blocked. **How many units of sand come to rest?**
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/14/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 -> 505,53 -> 505,60 -> 507,60 -> 507,52 -> 507,60 -> 509,60 -> 509,53 -> 509,60 -> 511,60 -> 511,58 -> 511,60\n497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 -> 505,53 -> 505,60 -> 507,60 -> 507,52 -> 507,60 -> 509,60 -> 509,53 -> 509,60 -> 511,60 -> 511,58 -> 511,60\n497,76 -> 497,80 -> 494,80 -> 494,86 -> 508,86 -> 508,80 -> 503,80 -> 503,76\n498,13 -> 502,13\n525,120 -> 525,122 -> 522,122 -> 522,130 -> 535,130 -> 535,122 -> 531,122 -> 531,120\n504,21 -> 508,21\n492,17 -> 496,17\n534,137 -> 538,137\n497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 -> 505,53 -> 505,60 -> 507,60 -> 507,52 -> 507,60 -> 509,60 -> 509,53 -> 509,60 -> 511,60 -> 511,58 -> 511,60\n479,34 -> 479,32 -> 479,34 -> 481,34 -> 481,30 -> 481,34 -> 483,34 -> 483,26 -> 483,34 -> 485,34 -> 485,25 -> 485,34 -> 487,34 -> 487,26 -> 487,34 -> 489,34 -> 489,32 -> 489,34\n469,37 -> 469,38 -> 487,38 -> 487,37\n548,160 -> 548,161 -> 561,161 -> 561,160\n497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 -> 505,53 -> 505,60 -> 507,60 -> 507,52 -> 507,60 -> 509,60 -> 509,53 -> 509,60 -> 511,60 -> 511,58 -> 511,60\n497,76 -> 497,80 -> 494,80 -> 494,86 -> 508,86 -> 508,80 -> 503,80 -> 503,76\n497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 -> 505,53 -> 505,60 -> 507,60 -> 507,52 -> 507,60 -> 509,60 -> 509,53 -> 509,60 -> 511,60 -> 511,58 -> 511,60\n479,34 -> 479,32 -> 479,34 -> 481,34 -> 481,30 -> 481,34 -> 483,34 -> 483,26 -> 483,34 -> 485,34 -> 485,25 -> 485,34 -> 487,34 -> 487,26 -> 487,34 -> 489,34 -> 489,32 -> 489,34\n525,120 -> 525,122 -> 522,122 -> 522,130 -> 535,130 -> 535,122 -> 531,122 -> 531,120\n497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 -> 505,53 -> 505,60 -> 507,60 -> 507,52 -> 507,60 -> 509,60 -> 509,53 -> 509,60 -> 511,60 -> 511,58 -> 511,60\n514,110 -> 514,103 -> 514,110 -> 516,110 -> 516,101 -> 516,110 -> 518,110 -> 518,105 -> 518,110\n479,34 -> 479,32 -> 479,34 -> 481,34 -> 481,30 -> 481,34 -> 483,34 -> 483,26 -> 483,34 -> 485,34 -> 485,25 -> 485,34 -> 487,34 -> 487,26 -> 487,34 -> 489,34 -> 489,32 -> 489,34\n469,37 -> 469,38 -> 487,38 -> 487,37\n537,139 -> 537,140 -> 548,140 -> 548,139\n523,117 -> 527,117\n501,15 -> 505,15\n514,110 -> 514,103 -> 514,110 -> 516,110 -> 516,101 -> 516,110 -> 518,110 -> 518,105 -> 518,110\n497,76 -> 497,80 -> 494,80 -> 494,86 -> 508,86 -> 508,80 -> 503,80 -> 503,76\n514,110 -> 514,103 -> 514,110 -> 516,110 -> 516,101 -> 516,110 -> 518,110 -> 518,105 -> 518,110\n545,146 -> 545,150 -> 537,150 -> 537,156 -> 551,156 -> 551,150 -> 548,150 -> 548,146\n479,34 -> 479,32 -> 479,34 -> 481,34 -> 481,30 -> 481,34 -> 483,34 -> 483,26 -> 483,34 -> 485,34 -> 485,25 -> 485,34 -> 487,34 -> 487,26 -> 487,34 -> 489,34 -> 489,32 -> 489,34\n492,21 -> 496,21\n548,160 -> 548,161 -> 561,161 -> 561,160\n491,73 -> 491,63 -> 491,73 -> 493,73 -> 493,65 -> 493,73 -> 495,73 -> 495,68 -> 495,73 -> 497,73 -> 497,67 -> 497,73 -> 499,73 -> 499,68 -> 499,73\n497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 -> 505,53 -> 505,60 -> 507,60 -> 507,52 -> 507,60 -> 509,60 -> 509,53 -> 509,60 -> 511,60 -> 511,58 -> 511,60\n497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 -> 505,53 -> 505,60 -> 507,60 -> 507,52 -> 507,60 -> 509,60 -> 509,53 -> 509,60 -> 511,60 -> 511,58 -> 511,60\n525,120 -> 525,122 -> 522,122 -> 522,130 -> 535,130 -> 535,122 -> 531,122 -> 531,120\n469,37 -> 469,38 -> 487,38 -> 487,37\n497,60 -> 497,59 -> 497,60 -> 499,60 -> 499,55 -> 499,60 -> 501,60 -> 501,54 -> 501,60 -> 503,60 -> 503,53 -> 503,60 -> 505,60 ->" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day14 do
+  alias __MODULE__.{Grid, Input}
+  defdelegate parse(input), to: Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Grid.build()
+    |> add_sand_p1({500, 0})
+    |> elem(1)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Grid.build()
+    |> add_sand_p2({500, 0})
+    |> elem(1)
+  end
+
+  def add_sand_p1(grid, {x, y}, count \\ 0) do
+    d = {x, y + 1}
+    dl = {x - 1, y + 1}
+    dr = {x + 1, y + 1}
+
+    put_sand = fn xy ->
+      add_sand_p1(Map.put(grid, xy, "o"), {500, 0}, count + 1)
+    end
+
+    case grid do
+      %{^d => _, ^dl => _, ^dr => _} ->
+        put_sand.({x, y})
+
+      %{^d => _, ^dl => _, max_x: ^x} ->
+        {:void, count}
+
+      %{^d => _, ^dl => _} ->
+        add_sand_p1(grid, dr, count)
+
+      %{^d => _, min_x: ^x} ->
+        {:void, count}
+
+      %{^d => _} ->
+        add_sand_p1(grid, dl, count)
+
+      _ ->
+        add_sand_p1(grid, d, count)
+    end
+  end
+
+  def add_sand_p2(grid, {x, y}, count \\ 0) do
+    next_y = y + 1
+    d = {x, next_y}
+    dl = {x - 1, next_y}
+    dr = {x + 1, next_y}
+
+    put_sand = fn xy ->
+      add_sand_p2(Map.put(grid, xy, "o"), {500, 0}, count + 1)
+    end
+
+    case grid do
+      %{{500, 0} => _} ->
+        {:blocked, count}
+
+      %{floor_y: ^next_y} ->
+        put_sand.({x, y})
+
+      %{^d => _, ^dl => _, ^dr => _} ->
+        put_sand.({x, y})
+
+      %{^d => _, ^dl => _} ->
+        add_sand_p2(grid, dr, count)
+
+      %{^d => _} ->
+        add_sand_p2(grid, dl, count)
+
+      _ ->
+        add_sand_p2(grid, d, count)
+    end
+  end
+
+  defmodule Grid do
+    def build(input) do
+      input
+      |> Enum.reduce(%{}, &add_path/2)
+      |> add_min_max()
+    end
+
+    def add_path([xy | tail], grid) do
+      add_path_segment(xy, tail, grid)
+    end
+
+    def add_path_segment(xy, [next_xy | tail], grid) do
+      add_path_segment(
+        next_xy,
+        tail,
+        add_to_grid(xy, next_xy, grid)
+      )
+    end
+
+    def add_path_segment(_, [], grid), do: grid
+
+    def add_to_grid({x1, y1}, {x2, y2}, grid) when x1 > x2 or y1 > y2,
+      do: add_to_grid({x2, y2}, {x1, y1}, grid)
+
+    def add_to_grid({x1, y1}, {x2, y2}, grid) do
+      for x <- x1..x2, y <- y1..y2, reduce: grid do
+        acc -> Map.put(acc, {x, y}, "#")
+      end
+    end
+
+    def add_min_max(grid) do
+      {min_x, max_x} = grid |> Stream.map(fn {{x, _}, _} -> x end) |> Enum.min_max()
+      max_y = grid |> Stream.map(fn {{_, y}, _} -> y end) |> Enum.max()
+
+      Map.merge(grid, %{min_x: min_x, max_x: max_x, floor_y: max_y + 2})
+    end
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split([" -> ", ","], trim: true)
+      |> Stream.map(&String.to_integer/1)
+      |> Stream.chunk_every(2)
+      |> Enum.map(&List.to_tuple/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day14, <<70, 79, 82, 49, 0, 0, 17, ...>>,
+ {:module, Day14.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Using your scan, simulate the falling sand. **How many units of sand come to rest before sand starts flowing into the abyss below?**
+
+Your puzzle answer was `873`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day14.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+873
+```
+
+Using your scan, simulate the falling sand until the source of the sand becomes blocked. **How many units of sand come to rest?**
+
+Your puzzle answer was `24813`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day14.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+24813
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/14/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day14Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "498,4 -> 498,6 -> 496,6\n503,4 -> 502,4 -> 502,9 -> 494,9"
+    ]
+  end
+
+  describe "part1" do
+    test "returns expected value", %{input: input} do
+      assert Day14.part1(input) == 24
+    end
+  end
+
+  describe "part2" do
+    test "returns expected value", %{input: input} do
+      assert Day14.part2(input) == 93
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 863781
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmark do
+  def fun1(input) do
+    Day14.part1(input)
+  end
+
+  def fun2(input) do
+    Day14.part2(input)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
+```
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day14.part1(input) end,
+    "Part 2" => fn -> Day14.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1         82.04       12.19 ms     ±1.60%       12.15 ms       13.06 ms
+Part 2          1.75      572.60 ms     ±0.27%      571.92 ms      574.96 ms
+
+Comparison: 
+Part 1         82.04
+Part 2          1.75 - 46.97x slower +560.41 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         7.45 MB     ±0.00%        7.45 MB        7.45 MB
+Part 2       202.16 MB     ±0.00%      202.16 MB      202.16 MB
+
+Comparison: 
+Part 1         7.45 MB
+Part 2       202.16 MB - 27.13x memory usage +194.70 MB
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1          0.20 M     ±0.00%         0.20 M         0.20 M
+Part 2          3.04 M     ±0.01%         3.03 M         3.04 M
+
+Comparison: 
+Part 1          0.20 M
+Part 2          3.04 M - 14.98x reduction count +2.83 M
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
