@@ -238,7 +238,7 @@ defmodule Day14 do
     input
     |> parse()
     |> Grid.build()
-    |> add_sand_p1({500, 0})
+    |> add_sand_p1({500, 0}, [{500, 0}])
     |> elem(1)
   end
 
@@ -246,48 +246,48 @@ defmodule Day14 do
     input
     |> parse()
     |> Grid.build()
-    |> add_sand_p2({500, 0})
+    |> add_sand_p2({500, 0}, [{500, 0}])
     |> elem(1)
   end
 
-  def add_sand_p1(grid, {x, y}, count \\ 0) do
+  def add_sand_p1(grid, {x, y} = xy, path, count \\ 0) do
     d = {x, y + 1}
     dl = {x - 1, y + 1}
     dr = {x + 1, y + 1}
 
-    put_sand = fn xy ->
-      add_sand_p1(Map.put(grid, xy, "o"), {500, 0}, count + 1)
+    put_sand = fn xy, [h | t] ->
+      add_sand_p1(Map.put(grid, xy, "o"), h, t, count + 1)
     end
 
     case grid do
       %{^d => _, ^dl => _, ^dr => _} ->
-        put_sand.({x, y})
+        put_sand.(xy, path)
 
       %{^d => _, ^dl => _, max_x: ^x} ->
         {:void, count}
 
       %{^d => _, ^dl => _} ->
-        add_sand_p1(grid, dr, count)
+        add_sand_p1(grid, dr, [xy | path], count)
 
       %{^d => _, min_x: ^x} ->
         {:void, count}
 
       %{^d => _} ->
-        add_sand_p1(grid, dl, count)
+        add_sand_p1(grid, dl, [xy | path], count)
 
       _ ->
-        add_sand_p1(grid, d, count)
+        add_sand_p1(grid, d, [xy | path], count)
     end
   end
 
-  def add_sand_p2(grid, {x, y}, count \\ 0) do
+  def add_sand_p2(grid, {x, y} = xy, path, count \\ 0) do
     next_y = y + 1
     d = {x, next_y}
     dl = {x - 1, next_y}
     dr = {x + 1, next_y}
 
-    put_sand = fn xy ->
-      add_sand_p2(Map.put(grid, xy, "o"), {500, 0}, count + 1)
+    put_sand = fn xy, [h | t] ->
+      add_sand_p2(Map.put(grid, xy, "o"), h, t, count + 1)
     end
 
     case grid do
@@ -295,19 +295,19 @@ defmodule Day14 do
         {:blocked, count}
 
       %{floor_y: ^next_y} ->
-        put_sand.({x, y})
+        put_sand.(xy, path)
 
       %{^d => _, ^dl => _, ^dr => _} ->
-        put_sand.({x, y})
+        put_sand.(xy, path)
 
       %{^d => _, ^dl => _} ->
-        add_sand_p2(grid, dr, count)
+        add_sand_p2(grid, dr, [xy | path], count)
 
       %{^d => _} ->
-        add_sand_p2(grid, dl, count)
+        add_sand_p2(grid, dl, [xy | path], count)
 
       _ ->
-        add_sand_p2(grid, d, count)
+        add_sand_p2(grid, d, [xy | path], count)
     end
   end
 
@@ -374,7 +374,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day14, <<70, 79, 82, 49, 0, 0, 17, ...>>,
+{:module, Day14, <<70, 79, 82, 49, 0, 0, 18, ...>>,
  {:module, Day14.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -455,7 +455,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 863781
+Randomized with seed 304564
 ```
 
 <!-- livebook:{"output":true} -->
@@ -485,9 +485,9 @@ nil
 
 ```
 Operating System: macOS
-CPU Information: Apple M1
-Number of Available Cores: 8
-Available memory: 8 GB
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
 Elixir 1.14.2
 Erlang 25.1.2
 
@@ -504,32 +504,30 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1         82.04       12.19 ms     ±1.60%       12.15 ms       13.06 ms
-Part 2          1.75      572.60 ms     ±0.27%      571.92 ms      574.96 ms
+Part 1        579.65        1.73 ms    ±17.72%        1.69 ms        1.97 ms
+Part 2         56.73       17.63 ms     ±2.86%       17.55 ms       19.44 ms
 
 Comparison: 
-Part 1         82.04
-Part 2          1.75 - 46.97x slower +560.41 ms
+Part 1        579.65
+Part 2         56.73 - 10.22x slower +15.90 ms
 
 Memory usage statistics:
 
 Name           average  deviation         median         99th %
-Part 1         7.45 MB     ±0.00%        7.45 MB        7.45 MB
-Part 2       202.16 MB     ±0.00%      202.16 MB      202.16 MB
+Part 1         2.37 MB     ±0.00%        2.37 MB        2.37 MB
+Part 2        16.39 MB     ±0.00%       16.39 MB       16.39 MB
 
 Comparison: 
-Part 1         7.45 MB
-Part 2       202.16 MB - 27.13x memory usage +194.70 MB
+Part 1         2.37 MB
+Part 2        16.39 MB - 6.92x memory usage +14.02 MB
 
 Reduction count statistics:
 
-Name           average  deviation         median         99th %
-Part 1          0.20 M     ±0.00%         0.20 M         0.20 M
-Part 2          3.04 M     ±0.01%         3.03 M         3.04 M
+Name   Reduction count
+Part 1        126.72 K
+Part 2        267.29 K - 2.11x reduction count +140.57 K
 
-Comparison: 
-Part 1          0.20 M
-Part 2          3.04 M - 14.98x reduction count +2.83 M
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->

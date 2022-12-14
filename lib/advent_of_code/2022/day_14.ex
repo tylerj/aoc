@@ -6,7 +6,7 @@ defmodule AdventOfCode.Y2022.Day14 do
     input
     |> parse()
     |> Grid.build()
-    |> add_sand_p1({500, 0})
+    |> add_sand_p1({500, 0}, [{500, 0}])
     |> elem(1)
   end
 
@@ -14,54 +14,52 @@ defmodule AdventOfCode.Y2022.Day14 do
     input
     |> parse()
     |> Grid.build()
-    |> add_sand_p2({500, 0})
+    |> add_sand_p2({500, 0}, [{500, 0}])
     |> elem(1)
   end
 
-  def add_sand_p1(grid, {x, y}, count \\ 0) do
+  def add_sand_p1(grid, {x, y} = xy, path, count \\ 0) do
     d = {x, y + 1}
     dl = {x - 1, y + 1}
     dr = {x + 1, y + 1}
 
-    put_sand = fn xy ->
+    put_sand = fn xy, [h | t] ->
       grid
       |> Map.put(xy, "o")
-      |> Map.delete({x, y + 2})
-      |> add_sand_p1({500, 0}, count + 1)
+      |> add_sand_p1(h, t, count + 1)
     end
 
     case grid do
       %{^d => _, ^dl => _, ^dr => _} ->
-        put_sand.({x, y})
+        put_sand.(xy, path)
 
       %{^d => _, ^dl => _, max_x: ^x} ->
         {:void, count, grid}
 
       %{^d => _, ^dl => _} ->
-        add_sand_p1(grid, dr, count)
+        add_sand_p1(grid, dr, [xy | path], count)
 
       %{^d => _, min_x: ^x} ->
         {:void, count, grid}
 
       %{^d => _} ->
-        add_sand_p1(grid, dl, count)
+        add_sand_p1(grid, dl, [xy | path], count)
 
       _ ->
-        add_sand_p1(grid, d, count)
+        add_sand_p1(grid, d, [xy | path], count)
     end
   end
 
-  def add_sand_p2(grid, {x, y}, count \\ 0) do
+  def add_sand_p2(grid, {x, y} = xy, path, count \\ 0) do
     next_y = y + 1
     d = {x, next_y}
     dl = {x - 1, next_y}
     dr = {x + 1, next_y}
 
-    put_sand = fn xy ->
+    put_sand = fn xy, [h | t] ->
       grid
       |> Map.put(xy, "o")
-      |> Map.delete({x, y + 2})
-      |> add_sand_p2({500, 0}, count + 1)
+      |> add_sand_p2(h, t, count + 1)
     end
 
     case grid do
@@ -69,19 +67,19 @@ defmodule AdventOfCode.Y2022.Day14 do
         {:blocked, count, grid}
 
       %{floor_y: ^next_y} ->
-        put_sand.({x, y})
+        put_sand.(xy, path)
 
       %{^d => _, ^dl => _, ^dr => _} ->
-        put_sand.({x, y})
+        put_sand.(xy, path)
 
       %{^d => _, ^dl => _} ->
-        add_sand_p2(grid, dr, count)
+        add_sand_p2(grid, dr, [xy | path], count)
 
       %{^d => _} ->
-        add_sand_p2(grid, dl, count)
+        add_sand_p2(grid, dl, [xy | path], count)
 
       _ ->
-        add_sand_p2(grid, d, count)
+        add_sand_p2(grid, d, [xy | path], count)
     end
   end
 
