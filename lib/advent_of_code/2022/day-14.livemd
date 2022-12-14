@@ -467,24 +467,6 @@ Randomized with seed 863781
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day14.part1(input)
-  end
-
-  def fun2(input) do
-    Day14.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
 
 Benchee.run(

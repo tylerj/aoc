@@ -24,7 +24,10 @@ defmodule AdventOfCode.Y2022.Day14 do
     dr = {x + 1, y + 1}
 
     put_sand = fn xy ->
-      add_sand_p1(Map.put(grid, xy, "o"), {500, 0}, count + 1)
+      grid
+      |> Map.put(xy, "o")
+      |> Map.delete({x, y + 2})
+      |> add_sand_p1({500, 0}, count + 1)
     end
 
     case grid do
@@ -32,13 +35,13 @@ defmodule AdventOfCode.Y2022.Day14 do
         put_sand.({x, y})
 
       %{^d => _, ^dl => _, max_x: ^x} ->
-        {:void, count}
+        {:void, count, grid}
 
       %{^d => _, ^dl => _} ->
         add_sand_p1(grid, dr, count)
 
       %{^d => _, min_x: ^x} ->
-        {:void, count}
+        {:void, count, grid}
 
       %{^d => _} ->
         add_sand_p1(grid, dl, count)
@@ -55,12 +58,15 @@ defmodule AdventOfCode.Y2022.Day14 do
     dr = {x + 1, next_y}
 
     put_sand = fn xy ->
-      add_sand_p2(Map.put(grid, xy, "o"), {500, 0}, count + 1)
+      grid
+      |> Map.put(xy, "o")
+      |> Map.delete({x, y + 2})
+      |> add_sand_p2({500, 0}, count + 1)
     end
 
     case grid do
       %{{500, 0} => _} ->
-        {:blocked, count}
+        {:blocked, count, grid}
 
       %{floor_y: ^next_y} ->
         put_sand.({x, y})
@@ -110,10 +116,22 @@ defmodule AdventOfCode.Y2022.Day14 do
     end
 
     def add_min_max(grid) do
-      {min_x, max_x} = grid |> Stream.map(fn {{x, _}, _} -> x end) |> Enum.min_max()
-      max_y = grid |> Stream.map(fn {{_, y}, _} -> y end) |> Enum.max()
+      {min_x, max_x} = Enum.min_max(for {{x, _}, _} <- grid, do: x)
+      max_y = Enum.max(for {{_, y}, _} <- grid, do: y)
 
-      Map.merge(grid, %{min_x: min_x, max_x: max_x, floor_y: max_y + 2})
+      Map.merge(grid, %{min_x: min_x, max_x: max_x, max_y: max_y, floor_y: max_y + 2})
+    end
+
+    def draw(grid) do
+      grid = add_min_max(grid)
+
+      0..grid.max_y
+      |> Enum.each(fn y ->
+        grid.min_x..grid.max_x
+        |> Enum.map(fn x -> grid[{x, y}] || "." end)
+        |> Enum.join("")
+        |> IO.puts()
+      end)
     end
   end
 
