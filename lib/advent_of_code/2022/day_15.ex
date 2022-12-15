@@ -64,14 +64,14 @@ defmodule AdventOfCode.Y2022.Day15 do
     [r1 | ranges] = Stream.reject(ranges, &is_nil/1) |> Enum.sort()
 
     Enum.reduce(ranges, [r1], fn
-      _..l2, [_..l1 | _] = ranges when l2 < l1 ->
-        ranges
+      _..l2, [_..l1 | _] = acc when l2 < l1 ->
+        acc
 
       f2..l2, [f1..l1 | tail] when f2 <= l1 ->
         [f1..l2 | tail]
 
-      r2, ranges ->
-        [r2 | ranges]
+      r2, acc ->
+        [r2 | acc]
     end)
     |> Enum.sort()
   end
