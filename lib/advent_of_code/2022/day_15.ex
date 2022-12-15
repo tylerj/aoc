@@ -22,22 +22,14 @@ defmodule AdventOfCode.Y2022.Day15 do
           false
 
         ranges ->
-          return_unless_sensor(y_axis, ranges, input)
+          if x = missing_point_in_ranges(ranges) do
+            {x, y_axis}
+          else
+            nil
+          end
       end
     end)
     |> then(fn {x, y} -> x * @max_part2 + y end)
-  end
-
-  def return_unless_sensor(y_axis, ranges, _input) do
-    ranges
-    |> Enum.sort()
-    |> Enum.find_value(fn
-      _f..l when l < 0 or l > @max_part2 ->
-        false
-
-      _f..l ->
-        {l + 1, y_axis}
-    end)
   end
 
   def x_ranges_for_y_axis(input, y_axis) do
@@ -81,7 +73,10 @@ defmodule AdventOfCode.Y2022.Day15 do
       r2, ranges ->
         [r2 | ranges]
     end)
+    |> Enum.sort()
   end
+
+  def missing_point_in_ranges([_f..l, f.._l]) when l + 2 == f, do: l + 1
 
   def beacon_count(input, {nil, y}) do
     uniq_beacons(input)
