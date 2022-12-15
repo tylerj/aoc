@@ -35,8 +35,6 @@ defmodule AdventOfCode.Y2022.Day15 do
   def x_ranges_for_y_axis(input, y_axis) do
     input
     |> Enum.map(fn {{sx, sy} = sensor_xy, beacon_xy} ->
-      manh_distance(sensor_xy, beacon_xy)
-
       y_distance = abs(sy - y_axis)
       x_distance = manh_distance(sensor_xy, beacon_xy) - y_distance
 
@@ -82,14 +80,6 @@ defmodule AdventOfCode.Y2022.Day15 do
     uniq_beacons(input)
     |> Enum.count(fn
       {_, ^y} -> true
-      _ -> false
-    end)
-  end
-
-  def beacon_count(input, {x, nil}) do
-    uniq_beacons(input)
-    |> Enum.count(fn
-      {^x, _} -> true
       _ -> false
     end)
   end
