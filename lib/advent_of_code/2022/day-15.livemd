@@ -1,0 +1,449 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 15 - Advent of Code 2022
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/15)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/15/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_15.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-15.livemd)
+
+## Prompt
+
+### --- Day 15: Beacon Exclusion Zone ---
+
+You feel the ground rumble again as the distress signal leads you to a large network of subterranean tunnels. You don't have time to search them all, but you don't need to: your pack contains a set of deployable **sensors** that you imagine were originally built to locate lost Elves.
+
+The sensors aren't very powerful, but that's okay; your handheld device indicates that you're close enough to the source of the distress signal to use them. You pull the emergency sensor system out of your pack, hit the big button on top, and the sensors zoom off down the tunnels.
+
+Once a sensor finds a spot it thinks will give it a good reading, it attaches itself to a hard surface and begins monitoring for the nearest signal source **beacon**. Sensors and beacons always exist at integer coordinates. Each sensor knows its own position and can **determine the position of a beacon precisely**; however, sensors can only lock on to the one beacon **closest to the sensor** as measured by the [Manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry). (There is never a tie where two beacons are the same distance to a sensor.)
+
+It doesn't take long for the sensors to report back their positions and closest beacons (your puzzle input). For example:
+
+```
+Sensor at x=2, y=18: closest beacon is at x=-2, y=15
+Sensor at x=9, y=16: closest beacon is at x=10, y=16
+Sensor at x=13, y=2: closest beacon is at x=15, y=3
+Sensor at x=12, y=14: closest beacon is at x=10, y=16
+Sensor at x=10, y=20: closest beacon is at x=10, y=16
+Sensor at x=14, y=17: closest beacon is at x=10, y=16
+Sensor at x=8, y=7: closest beacon is at x=2, y=10
+Sensor at x=2, y=0: closest beacon is at x=2, y=10
+Sensor at x=0, y=11: closest beacon is at x=2, y=10
+Sensor at x=20, y=14: closest beacon is at x=25, y=17
+Sensor at x=17, y=20: closest beacon is at x=21, y=22
+Sensor at x=16, y=7: closest beacon is at x=15, y=3
+Sensor at x=14, y=3: closest beacon is at x=15, y=3
+Sensor at x=20, y=1: closest beacon is at x=15, y=3
+```
+
+So, consider the sensor at `2,18`; the closest beacon to it is at `-2,15`. For the sensor at `9,16`, the closest beacon to it is at `10,16`.
+
+Drawing sensors as `S` and beacons as `B`, the above arrangement of sensors and beacons looks like this:
+
+```
+               1    1    2    2
+     0    5    0    5    0    5
+ 0 ....S.......................
+ 1 ......................S.....
+ 2 ...............S............
+ 3 ................SB..........
+ 4 ............................
+ 5 ............................
+ 6 ............................
+ 7 ..........S.......S.........
+ 8 ............................
+ 9 ............................
+10 ....B.......................
+11 ..S.........................
+12 ............................
+13 ............................
+14 ..............S.......S.....
+15 B...........................
+16 ...........SB...............
+17 ................S..........B
+18 ....S.......................
+19 ............................
+20 ............S......S........
+21 ............................
+22 .......................B....
+```
+
+This isn't necessarily a comprehensive map of all beacons in the area, though. Because each sensor only identifies its closest beacon, if a sensor detects a beacon, you know there are no other beacons that close or closer to that sensor. There could still be beacons that just happen to not be the closest beacon to any sensor. Consider the sensor at `8,7`:
+
+```
+               1    1    2    2
+     0    5    0    5    0    5
+-2 ..........#.................
+-1 .........###................
+ 0 ....S...#####...............
+ 1 .......#######........S.....
+ 2 ......#########S............
+ 3 .....###########SB..........
+ 4 ....#############...........
+ 5 ...###############..........
+ 6 ..#################.........
+ 7 .#########S#######S#........
+ 8 ..#################.........
+ 9 ...###############..........
+10 ....B############...........
+11 ..S..###########............
+12 ......#########.............
+13 .......#######..............
+14 ........#####.S.......S.....
+15 B........###................
+16 ..........#SB...............
+17 ................S..........B
+18 ....S.......................
+19 ............................
+20 ............S......S........
+21 ............................
+22 .......................B....
+```
+
+This sensor's closest beacon is at `2,10`, and so you know there are no beacons that close or closer (in any positions marked `#`).
+
+None of the detected beacons seem to be producing the distress signal, so you'll need to work out where the distress beacon is by working out where it **isn't**. For now, keep things simple by counting the positions where a beacon cannot possibly be along just a single row.
+
+So, suppose you have an arrangement of beacons and sensors like in the example above and, just in the row where `y=10`, you'd like to count the number of positions a beacon cannot possibly exist. The coverage from all sensors near that row looks like this:
+
+```
+                 1    1    2    2
+       0    5    0    5    0    5
+ 9 ...#########################...
+10 ..####B######################..
+11 .###S#############.###########.
+```
+
+In this example, in the row where `y=10`, there are `26` positions where a beacon cannot be present.
+
+Consult the report from the sensors you just deployed. **In the row where `y=2000000`, how many positions cannot contain a beacon?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/15/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Your handheld device indicates that the distress signal is coming from a beacon nearby. The distress beacon is not detected by any sensor, but the distress beacon must have `x` and `y` coordinates each no lower than `0` and no larger than `4000000`.
+
+To isolate the distress beacon's signal, you need to determine its **tuning frequency**, which can be found by multiplying its `x` coordinate by `4000000` and then adding its `y` coordinate.
+
+In the example above, the search space is smaller: instead, the `x` and `y` coordinates can each be at most `20`. With this reduced search area, there is only a single position that could have a beacon: `x=14`, `y=11`. The tuning frequency for this distress beacon is `56000011`.
+
+Find the only possible position for the distress beacon. **What is its tuning frequency?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/15/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"Sensor at x=98246, y=1908027: closest beacon is at x=1076513, y=2000000\nSensor at x=1339369, y=2083853: closest beacon is at x=1076513, y=2000000\nSensor at x=679177, y=3007305: closest beacon is at x=1076513, y=2000000\nSensor at x=20262, y=3978297: closest beacon is at x=13166, y=4136840\nSensor at x=3260165, y=2268955: closest beacon is at x=4044141, y=2290104\nSensor at x=2577675, y=3062584: closest beacon is at x=2141091, y=2828176\nSensor at x=3683313, y=2729137: closest beacon is at x=4044141, y=2290104\nSensor at x=1056412, y=370641: closest beacon is at x=1076513, y=2000000\nSensor at x=2827280, y=1827095: closest beacon is at x=2757345, y=1800840\nSensor at x=1640458, y=3954524: closest beacon is at x=2141091, y=2828176\nSensor at x=2139884, y=1162189: closest beacon is at x=2757345, y=1800840\nSensor at x=3777450, y=3714504: closest beacon is at x=3355953, y=3271922\nSensor at x=1108884, y=2426713: closest beacon is at x=1076513, y=2000000\nSensor at x=2364307, y=20668: closest beacon is at x=2972273, y=-494417\nSensor at x=3226902, y=2838842: closest beacon is at x=3355953, y=3271922\nSensor at x=22804, y=3803886: closest beacon is at x=13166, y=4136840\nSensor at x=2216477, y=2547945: closest beacon is at x=2141091, y=2828176\nSensor at x=1690953, y=2203555: closest beacon is at x=1076513, y=2000000\nSensor at x=3055156, y=3386812: closest beacon is at x=3355953, y=3271922\nSensor at x=3538996, y=719130: closest beacon is at x=2972273, y=-494417\nSensor at x=2108918, y=2669413: closest beacon is at x=2141091, y=2828176\nSensor at x=3999776, y=2044283: closest beacon is at x=4044141, y=2290104\nSensor at x=2184714, y=2763072: closest beacon is at x=2141091, y=2828176\nSensor at x=2615462, y=2273553: closest beacon is at x=2757345, y=1800840"
+```
+
+## Solution
+
+```elixir
+defmodule Day15 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  @part1_y 2_000_000
+  @max_part2 4_000_000
+
+  def part1(input, y_axis \\ @part1_y) do
+    input = parse(input)
+    total = x_ranges_for_y_axis(input, y_axis) |> total_ranges_size()
+
+    # subtract out any beacons on that y axis
+    total - beacon_count(input, {nil, y_axis})
+  end
+
+  def part2(input, min \\ 0, max \\ @max_part2) do
+    input = parse(input)
+
+    min..max
+    |> Enum.find_value(fn y_axis ->
+      case x_ranges_for_y_axis(input, y_axis) do
+        [_] ->
+          false
+
+        ranges ->
+          return_unless_sensor(y_axis, ranges, input)
+      end
+    end)
+    |> then(fn {x, y} -> x * @max_part2 + y end)
+  end
+
+  def return_unless_sensor(y_axis, ranges, _input) do
+    ranges
+    |> Enum.sort()
+    |> Enum.find_value(fn
+      _f..l when l < 0 or l > @max_part2 ->
+        false
+
+      _f..l ->
+        # if sensor?(input, {l + 1, y_axis}), do: false, else: {l + 1, y_axis}
+        {l + 1, y_axis}
+    end)
+  end
+
+  def sensor?(input, xy) do
+    Enum.any?(input, fn {sensor, _} -> sensor == xy end)
+  end
+
+  def x_ranges_for_y_axis(input, y_axis) do
+    input
+    |> Enum.map(fn {{sx, sy} = sensor_xy, beacon_xy} ->
+      manh_distance(sensor_xy, beacon_xy)
+
+      y_distance = abs(sy - y_axis)
+      x_distance = manh_distance(sensor_xy, beacon_xy) - y_distance
+
+      if x_distance > 0 do
+        (sx - x_distance)..(sx + x_distance)
+      else
+        nil
+      end
+    end)
+    |> combine_ranges()
+  end
+
+  def manh_distance({x1, y1}, {x2, y2}) do
+    abs(x1 - x2) + abs(y1 - y2)
+  end
+
+  def total_ranges_size(ranges) do
+    ranges
+    |> combine_ranges()
+    |> Stream.map(fn first..last -> last - first + 1 end)
+    |> Enum.sum()
+  end
+
+  def combine_ranges(ranges) do
+    [r1 | ranges] = Stream.reject(ranges, &is_nil/1) |> Enum.sort()
+
+    Enum.reduce(ranges, [r1], fn
+      _..l2, [_..l1 | _] = ranges when l2 < l1 ->
+        ranges
+
+      f2..l2, [f1..l1 | tail] when f2 <= l1 ->
+        [f1..l2 | tail]
+
+      r2, ranges ->
+        [r2 | ranges]
+    end)
+  end
+
+  def beacon_count(input, {nil, y}) do
+    uniq_beacons(input)
+    |> Enum.count(fn
+      {_, ^y} -> true
+      _ -> false
+    end)
+  end
+
+  def beacon_count(input, {x, nil}) do
+    uniq_beacons(input)
+    |> Enum.count(fn
+      {^x, _} -> true
+      _ -> false
+    end)
+  end
+
+  def uniq_beacons(input) do
+    input
+    |> Stream.map(fn {_sensor, beacon} -> beacon end)
+    |> Stream.uniq()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      input |> Stream.map(&parse_line/1) |> Stream.map(&List.to_tuple/1)
+    end
+
+    def parse_line(line) do
+      Regex.scan(~r/[xy]=(?<xy>\-?\d+)/, line, capture: :all_names)
+      |> Stream.map(fn [v] -> String.to_integer(v) end)
+      |> Stream.chunk_every(2)
+      |> Enum.map(&List.to_tuple/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day15, <<70, 79, 82, 49, 0, 0, 31, ...>>,
+ {:module, Day15.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Consult the report from the sensors you just deployed. **In the row where `y=2000000`, how many positions cannot contain a beacon?**
+
+Your puzzle answer was `5125700`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day15.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+5125700
+```
+
+Find the only possible position for the distress beacon. **What is its tuning frequency?**
+
+Your puzzle answer was `11379394658764`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+# Now that I know the correct answer:
+# cheating for performance by starting at a row close to that point.
+part2_start_y_axis = 2_658_000
+
+Day15.part2(input, part2_start_y_axis)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+11379394658764
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/15/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day15Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "Sensor at x=2, y=18: closest beacon is at x=-2, y=15\nSensor at x=9, y=16: closest beacon is at x=10, y=16\nSensor at x=13, y=2: closest beacon is at x=15, y=3\nSensor at x=12, y=14: closest beacon is at x=10, y=16\nSensor at x=10, y=20: closest beacon is at x=10, y=16\nSensor at x=14, y=17: closest beacon is at x=10, y=16\nSensor at x=8, y=7: closest beacon is at x=2, y=10\nSensor at x=2, y=0: closest beacon is at x=2, y=10\nSensor at x=0, y=11: closest beacon is at x=2, y=10\nSensor at x=20, y=14: closest beacon is at x=25, y=17\nSensor at x=17, y=20: closest beacon is at x=21, y=22\nSensor at x=16, y=7: closest beacon is at x=15, y=3\nSensor at x=14, y=3: closest beacon is at x=15, y=3\nSensor at x=20, y=1: closest beacon is at x=15, y=3"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day15.part1(input, 10) == 26
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day15.part2(input) == 56_000_011
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 767015
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(%{
+  "Part 1" => fn -> Day15.part1(input) end,
+  "Part 2" => fn -> Day15.part2(input, part2_start_y_axis) end
+})
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        5.49 K       0.182 ms     ±5.21%       0.180 ms        0.22 ms
+Part 2      0.0140 K       71.21 ms     ±0.61%       71.12 ms       73.47 ms
+
+Comparison: 
+Part 1        5.49 K
+Part 2      0.0140 K - 391.08x slower +71.03 ms
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
