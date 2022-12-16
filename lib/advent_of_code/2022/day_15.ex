@@ -16,19 +16,30 @@ defmodule AdventOfCode.Y2022.Day15 do
     input = parse(input)
 
     min..max
-    |> Enum.find_value(fn y_axis ->
-      case x_ranges_for_y_axis(input, y_axis) do
-        [_] ->
-          false
+    |> Stream.chunk_every(25_000)
+    |> Task.async_stream(
+      fn chunk ->
+        Enum.find_value(chunk, fn y_axis ->
+          if rem(y_axis, 100_000) == 0, do: IO.puts("Y-AXIS: #{y_axis}")
 
-        ranges ->
-          if x = missing_point_in_ranges(ranges) do
-            {x, y_axis}
-          else
-            nil
+          case x_ranges_for_y_axis(input, y_axis) do
+            [_] ->
+              false
+
+            ranges ->
+              case missing_point_in_ranges(ranges) do
+                nil -> nil
+                x -> {x, y_axis}
+              end
           end
-      end
-    end)
+        end)
+      end,
+      timeout: :infinity,
+      ordered: false
+    )
+    |> Stream.map(fn {:ok, x} -> x end)
+    |> Stream.reject(&is_nil/1)
+    |> Enum.at(0)
     |> then(fn {x, y} -> x * @max_part2 + y end)
   end
 
@@ -75,6 +86,7 @@ defmodule AdventOfCode.Y2022.Day15 do
   end
 
   def missing_point_in_ranges([_f..l, f.._l]) when l + 2 == f, do: l + 1
+  def missing_point_in_ranges(_), do: nil
 
   def beacon_count(input, {nil, y}) do
     uniq_beacons(input)

@@ -3,7 +3,7 @@
 # Day 15 - Advent of Code 2022
 
 ```elixir
-Mix.install([:kino, :benchee])
+Mix.install([:kino, :benchee, :nx])
 ```
 
 <!-- livebook:{"output":true} -->
@@ -185,19 +185,28 @@ defmodule Day15 do
     input = parse(input)
 
     min..max
-    |> Enum.find_value(fn y_axis ->
-      case x_ranges_for_y_axis(input, y_axis) do
-        [_] ->
-          false
+    |> Stream.chunk_every(25_000)
+    |> Task.async_stream(
+      fn chunk ->
+        Enum.find_value(chunk, fn y_axis ->
+          case x_ranges_for_y_axis(input, y_axis) do
+            [_] ->
+              false
 
-        ranges ->
-          if x = missing_point_in_ranges(ranges) do
-            {x, y_axis}
-          else
-            nil
+            ranges ->
+              case missing_point_in_ranges(ranges) do
+                nil -> nil
+                x -> {x, y_axis}
+              end
           end
-      end
-    end)
+        end)
+      end,
+      timeout: :infinity,
+      ordered: false
+    )
+    |> Stream.map(fn {:ok, x} -> x end)
+    |> Stream.reject(&is_nil/1)
+    |> Enum.at(0)
     |> then(fn {x, y} -> x * @max_part2 + y end)
   end
 
@@ -283,7 +292,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day15, <<70, 79, 82, 49, 0, 0, 28, ...>>,
+{:module, Day15, <<70, 79, 82, 49, 0, 0, 30, ...>>,
  {:module, Day15.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -312,9 +321,9 @@ Your puzzle answer was `11379394658764`.
 ```elixir
 # Now that I know the correct answer:
 # cheating for performance by starting at a row close to that point.
-part2_start_y_axis = 2_658_000
+start_y_axis = 2_500_000
 
-Day15.part2(input, part2_start_y_axis)
+Day15.part2(input, start_y_axis)
 ```
 
 <!-- livebook:{"output":true} -->
@@ -354,7 +363,7 @@ defmodule Day15Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day15.part2(input) == 56_000_011
+      assert Day15.part2(input, 0, 20) == 56_000_011
     end
   end
 end
@@ -369,7 +378,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 519033
+Randomized with seed 490200
 ```
 
 <!-- livebook:{"output":true} -->
@@ -385,7 +394,7 @@ Randomized with seed 519033
 
 Benchee.run(%{
   "Part 1" => fn -> Day15.part1(input) end,
-  "Part 2" => fn -> Day15.part2(input, part2_start_y_axis) end
+  "Part 2" => fn -> Day15.part2(input) end
 })
 
 nil
@@ -414,12 +423,12 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        5.49 K       0.182 ms     ±5.21%       0.180 ms        0.22 ms
-Part 2      0.0140 K       71.21 ms     ±0.61%       71.12 ms       73.47 ms
+Part 1        5.56 K      0.00018 s     ±4.01%      0.00018 s      0.00020 s
+Part 2     0.00002 K        50.70 s     ±0.00%        50.70 s        50.70 s
 
 Comparison: 
-Part 1        5.49 K
-Part 2      0.0140 K - 391.08x slower +71.03 ms
+Part 1        5.56 K
+Part 2     0.00002 K - 281929.64x slower +50.70 s
 ```
 
 <!-- livebook:{"output":true} -->
