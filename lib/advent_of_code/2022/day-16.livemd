@@ -649,24 +649,145 @@ If you still want to see it, you can [get your puzzle input](https://adventofcod
 ## Playground
 
 ```elixir
+get_rates = fn grid ->
+  grid |> Enum.map(fn {k, v} -> {k, v.rate} end) |> Enum.into(%{})
+end
+
+grid["AA"]
+
+get_rates.(grid)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  "AA" => 0,
+  "AU" => 20,
+  "CX" => 13,
+  "GY" => 9,
+  "HS" => 8,
+  "KR" => 17,
+  "LI" => 25,
+  "MF" => 15,
+  "MV" => 14,
+  "NG" => 21,
+  "OI" => 5,
+  "WW" => 6,
+  "WX" => 16,
+  "XS" => 4,
+  "XU" => 3,
+  "ZY" => 10
+}
+```
+
+```elixir
+results =
+  Day16.next_step(grid, "AA", 0, 0, [], 1, 30)
+  |> Day16.Input.flatten()
+  |> Enum.sort(:desc)
+  |> Enum.take(5)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {1647, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+  {1602, ["HS", "MV", "LI", "AU", "KR", "GY", "CX"]},
+  {1596, ["HS", "MV", "AU", "LI", "KR", "NG"]},
+  {1582, ["HS", "MV", "LI", "AU", "KR", "GY", "XS", "XU"]},
+  {1579, ["HS", "MV", "LI", "AU", "KR", "GY", "XS"]}
+]
+```
+
+```elixir
 results =
   Day16.next_step(grid, "AA", 0, 0, [], 1, 26)
   |> Day16.Input.flatten()
   |> Enum.sort(:desc)
 
-{
-  Enum.at(results, 0),
-  Enum.at(results, -2)
-}
+indexed_results = Enum.with_index(results, 1)
+```
 
-result =
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {{1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, 1},
+  {{1191, ["HS", "MV", "LI", "AU", "KR", "GY"]}, 2},
+  {{1176, ["HS", "MV", "LI", "AU", "KR", "XS"]}, 3},
+  {{1176, ["HS", "MV", "AU", "LI", "KR", "NG"]}, 4},
+  {{1167, ["HS", "MV", "LI", "AU", "KR", "XU"]}, 5},
+  {{1164, ["HS", "MV", "LI", "AU", "KR"]}, 6},
+  {{1164, ["HS", "MV", "AU", "LI", "KR", "GY"]}, 7},
+  {{1159, ["HS", "MV", "AU", "LI", "KR", "XS"]}, 8},
+  {{1158, ["OI", "MV", "LI", "AU", "KR", "NG"]}, 9},
+  {{1155, ["HS", "MV", "AU", "LI", "KR"]}, 10},
+  {{1151, ["HS", "MV", "AU", "KR", "NG", "GY"]}, 11},
+  {{1146, ["HS", "MV", "AU", "KR", "NG", "XS"]}, 12},
+  {{1142, ["HS", "MV", "AU", "KR", "NG"]}, 13},
+  {{1140, ["MV", "LI", "AU", "KR", "NG"]}, 14},
+  {{1134, ["GY", "KR", "AU", "LI", "MV", "HS"]}, 15},
+  {{1129, ["HS", "MV", "LI", "AU", "NG"]}, 16},
+  {{1128, ["GY", "KR", "AU", "LI", "MV", "OI"]}, 17},
+  {{1122, ["OI", "MV", "LI", "AU", "KR", "GY"]}, 18},
+  {{1118, ["GY", "KR", "AU", "LI", "MV"]}, 19},
+  {{1114, ["HS", "MV", "AU", "KR", "GY", "CX", "WX"]}, 20},
+  {{1113, ["GY", "KR", "AU", "MV", "LI"]}, 21},
+  {{1112, ["XS", "KR", "AU", "LI", "MV", "HS"]}, 22},
+  {{1112, ["HS", "MV", "AU", "LI", "NG"]}, 23},
+  {{1108, ["HS", "MV", "AU", "KR", "GY", "CX", "ZY"]}, 24},
+  {{1107, ["OI", "MV", "LI", "AU", "KR", "XS"]}, 25},
+  {{1107, ["OI", "MV", "AU", "LI", "KR", "NG"]}, 26},
+  {{1104, ["KR", "AU", "LI", "MV", "HS"]}, 27},
+  {{1103, ["XS", "KR", "AU", "LI", "MV", "OI"]}, 28},
+  {{1101, ["HS", "MV", "AU", "LI", "OI", "XU"]}, 29},
+  {{1099, ["HS", "MV", "AU", "LI", "OI", "XS"]}, 30},
+  {{1099, ["HS", "MV", "AU", "KR", "LI"]}, 31},
+  {{1098, ["OI", "MV", "LI", "AU", "KR", "XU"]}, 32},
+  {{1098, ["HS", "MV", "AU", "KR", "GY", "CX"]}, 33},
+  {{1096, ["MV", "LI", "AU", "KR", "GY", "XS"]}, 34},
+  {{1095, ["OI", "MV", "LI", "AU", "KR"]}, 35},
+  {{1095, ["OI", "MV", "AU", "LI", "KR", "GY"]}, 36},
+  {{1095, ["KR", "AU", "LI", "MV", "OI", "XU"]}, 37},
+  {{1095, ["HS", "MV", "AU", "LI", "OI"]}, 38},
+  {{1092, ["MV", "LI", "AU", "KR", "GY"]}, 39},
+  {{1092, ["KR", "AU", "LI", "MV", "OI"]}, 40},
+  {{1091, ["XS", "KR", "AU", "MV", "LI", "HS"]}, 41},
+  {{1091, ["XS", "KR", "AU", "LI", "MV", ...]}, 42},
+  {{1090, ["OI", "MV", "AU", "LI", ...]}, 43},
+  {{1089, ["MV", "AU", "LI", ...]}, 44},
+  {{1088, ["XS", "KR", ...]}, 45},
+  {{1088, ["XS", ...]}, 46},
+  {{1088, [...]}, 47},
+  {{1086, ...}, 48},
+  {{...}, ...},
+  {...},
+  ...
+]
+```
+
+```elixir
+indexed_results
+|> Enum.filter(fn {{x, _}, _} -> x == 1227 end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[{{1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, 1}]
+```
+
+```elixir
+results =
   results
   |> Stream.map(fn {_, a_list} = a ->
     [
       a,
       Enum.find(results, fn {_, b_list} ->
         a_list -- b_list == a_list
-      end)
+      end) || {0, []}
     ]
   end)
   |> Enum.sort_by(fn [{a, _}, {b, _}] -> -(a + b) end)
@@ -679,7 +800,178 @@ result =
   end)
   |> Enum.uniq()
   |> Stream.with_index(1)
-  |> Enum.max_by(fn {[_total, {a_score, _}, _], _} -> a_score end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+#Stream<[
+  enum: [
+    [
+      2169,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}
+    ],
+    [2139, {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, {912, ["GY", "CX", "WX", "ZY", "MF"]}],
+    [
+      2123,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {896, ["XS", "GY", "CX", "WX", "ZY", "MF", "WW"]}
+    ],
+    [
+      2118,
+      {1176, ["HS", "MV", "LI", "AU", "KR", "XS"]},
+      {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}
+    ],
+    [
+      2118,
+      {1176, ["HS", "MV", "AU", "LI", "KR", "NG"]},
+      {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}
+    ],
+    [
+      2109,
+      {1167, ["HS", "MV", "LI", "AU", "KR", "XU"]},
+      {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}
+    ],
+    [
+      2109,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {882, ["GY", "CX", "ZY", "WX", "MF", "WW"]}
+    ],
+    [
+      2108,
+      {1158, ["OI", "MV", "LI", "AU", "KR", "NG"]},
+      {950, ["GY", "CX", "WX", "ZY", "MF", "WW", "HS"]}
+    ],
+    [2106, {1164, ["HS", "MV", "LI", "AU", "KR"]}, {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}],
+    [
+      2105,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {878, ["XS", "GY", "CX", "WX", "ZY", "MF"]}
+    ],
+    [
+      2101,
+      {1159, ["HS", "MV", "AU", "LI", "KR", "XS"]},
+      {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}
+    ],
+    [
+      2100,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {873, ["GY", "CX", "WX", "ZY", "WW", "MF"]}
+    ],
+    [2097, {1155, ["HS", "MV", "AU", "LI", "KR"]}, {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}],
+    [2091, {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, {864, ["GY", "CX", "ZY", "WX", "MF"]}],
+    [
+      2090,
+      {1140, ["MV", "LI", "AU", "KR", "NG"]},
+      {950, ["GY", "CX", "WX", "ZY", "MF", "WW", "HS"]}
+    ],
+    [
+      2088,
+      {1146, ["HS", "MV", "AU", "KR", "NG", "XS"]},
+      {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}
+    ],
+    [
+      2086,
+      {1158, ["OI", "MV", "LI", "AU", "KR", "NG"]},
+      {928, ["GY", "CX", "WX", "ZY", "MF", "HS"]}
+    ],
+    [2084, {1142, ["HS", "MV", "AU", "KR", "NG"]}, {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}],
+    [2084, {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, {857, ["GY", "CX", "WX", "MF", "ZY"]}],
+    [2071, {1129, ["HS", "MV", "LI", "AU", "NG"]}, {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}],
+    [2070, {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, {843, ["GY", "CX", "WX", "MF", "WW"]}],
+    [
+      2063,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {836, ["XS", "GY", "CX", "ZY", "WX", "MF", "WW"]}
+    ],
+    [
+      2058,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {831, ["GY", "WX", "CX", "ZY", "MF", "WW"]}
+    ],
+    [
+      2057,
+      {1107, ["OI", "MV", "LI", "AU", "KR", "XS"]},
+      {950, ["GY", "CX", "WX", "ZY", "MF", "WW", "HS"]}
+    ],
+    [
+      2057,
+      {1107, ["OI", "MV", "AU", "LI", "KR", "NG"]},
+      {950, ["GY", "CX", "WX", "ZY", "MF", "WW", "HS"]}
+    ],
+    [
+      2057,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {830, ["XS", "GY", "CX", "ZY", "WX", "MF"]}
+    ],
+    [
+      2056,
+      {1158, ["OI", "MV", "LI", "AU", "KR", "NG"]},
+      {898, ["HS", "WW", "MF", "ZY", "WX", "CX", "GY"]}
+    ],
+    [2055, {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, {828, ["GY", "CX", "WX", "ZY", "WW"]}],
+    [
+      2054,
+      {1112, ["XS", "KR", "AU", "LI", "MV", "HS"]},
+      {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}
+    ],
+    [2054, {1112, ["HS", "MV", "AU", "LI", "NG"]}, {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}],
+    [
+      2054,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {827, ["XS", "GY", "CX", "WX", "ZY", "WW", "MF"]}
+    ],
+    [2054, {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, {827, ["GY", "CX", "ZY", "MF", "WX"]}],
+    [
+      2053,
+      {1103, ["XS", "KR", "AU", "LI", "MV", "OI"]},
+      {950, ["GY", "CX", "WX", "ZY", "MF", "WW", "HS"]}
+    ],
+    [
+      2050,
+      {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]},
+      {823, ["XS", "GY", "CX", "WX", "MF", "ZY"]}
+    ],
+    [
+      2048,
+      {1098, ["OI", "MV", "LI", "AU", "KR", "XU"]},
+      {950, ["GY", "CX", "WX", "ZY", "MF", "WW", "HS"]}
+    ],
+    [2046, {1104, ["KR", "AU", "LI", "MV", "HS"]}, {942, ["GY", "CX", "WX", "ZY", "MF", "WW"]}],
+    [
+      2045,
+      {1095, ["OI", "MV", "LI", "AU", "KR"]},
+      {950, ["GY", "CX", "WX", "ZY", "MF", "WW", "HS"]}
+    ],
+    [
+      2045,
+      {1095, ["KR", "AU", "LI", "MV", "OI", "XU"]},
+      {950, ["GY", "CX", "WX", "ZY", "MF", "WW", ...]}
+    ],
+    [2044, {1227, ["HS", "MV", "LI", "AU", "KR", "NG"]}, {817, ["XS", "GY", "CX", "WX", "MF", ...]}],
+    [2043, {1101, ["HS", "MV", "AU", "LI", "OI", ...]}, {942, ["GY", "CX", "WX", "ZY", ...]}],
+    [2042, {1092, ["KR", "AU", "LI", "MV", ...]}, {950, ["GY", "CX", "WX", ...]}],
+    [2041, {1099, ["HS", "MV", "AU", ...]}, {942, ["GY", "CX", ...]}],
+    [2041, {1099, ["HS", "MV", ...]}, {942, ["GY", ...]}],
+    [2041, {1091, ["XS", ...]}, {950, [...]}],
+    [2040, {1090, [...]}, {950, ...}],
+    [2040, {1227, ...}, {...}],
+    [2040, {...}, ...],
+    [2039, ...],
+    [...],
+    ...
+  ],
+  funs: [#Function<66.124013645/1 in Stream.with_index/2>]
+]>
+```
+
+```elixir
+result =
+  results
+  |> Enum.at(0)
+
+# |> Enum.filter(fn {[total, {_a_score, _}, _], _} -> total == 2392 end)
 ```
 
 <!-- livebook:{"output":true} -->
@@ -702,7 +994,7 @@ Map.drop(grid, a_list ++ b_list ++ ["AA"]) |> get_rates.()
 <!-- livebook:{"output":true} -->
 
 ```
-%{"OI" => 5, "XS" => 4, "XU" => 3}
+%{"FK" => 4, "TM" => 3, "WC" => 15, "XX" => 5}
 ```
 
 ## Tests
