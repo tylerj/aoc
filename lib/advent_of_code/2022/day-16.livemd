@@ -21,11 +21,73 @@ Mix.install([:kino, :benchee])
 
 ## Prompt
 
-### --- Day 16: TBD ---
+### --- Day 16: Proboscidea Volcanium ---
 
-Part One prompt
+The sensors have led you to the origin of the distress signal: yet another handheld device, just like the one the Elves gave you. However, you don't see any Elves around; instead, the device is surrounded by elephants! They must have gotten lost in these tunnels, and one of the elephants apparently figured out how to turn on the distress signal.
 
-**QUESTION ONE?**
+The ground rumbles again, much stronger this time. What kind of cave is this, exactly? You scan the cave with your handheld device; it reports mostly igneous rock, some ash, pockets of pressurized gas, magma... this isn't just a cave, it's a volcano!
+
+You need to get the elephants out of here, quickly. Your device estimates that you have **30 minutes** before the volcano erupts, so you don't have time to go back out the way you came in.
+
+You scan the cave for other options and discover a network of pipes and pressure-release **valves**. You aren't sure how such a system got into a volcano, but you don't have time to complain; your device produces a report (your puzzle input) of each valve's **flow rate** if it were opened (in pressure per minute) and the tunnels you could use to move between the valves.
+
+There's even a valve in the room you and the elephants are currently standing in labeled AA. You estimate it will take you one minute to open a single valve and one minute to follow any tunnel from one valve to another. What is the most pressure you could release?
+
+For example, suppose you had the following scan output:
+
+```
+Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
+Valve BB has flow rate=13; tunnels lead to valves CC, AA
+Valve CC has flow rate=2; tunnels lead to valves DD, BB
+Valve DD has flow rate=20; tunnels lead to valves CC, AA, EE
+Valve EE has flow rate=3; tunnels lead to valves FF, DD
+Valve FF has flow rate=0; tunnels lead to valves EE, GG
+Valve GG has flow rate=0; tunnels lead to valves FF, HH
+Valve HH has flow rate=22; tunnel leads to valve GG
+Valve II has flow rate=0; tunnels lead to valves AA, JJ
+Valve JJ has flow rate=21; tunnel leads to valve II
+```
+
+All of the valves begin **closed**. You start at valve `AA`, but it must be damaged or jammed or something: its flow rate is `0`, so there's no point in opening it. However, you could spend one minute moving to valve `BB` and another minute opening it; doing so would release pressure during the remaining **28 minutes** at a flow rate of `13`, a total eventual pressure release of `28 * 13 = 364`. Then, you could spend your third minute moving to valve CC and your fourth minute opening it, providing an additional **26 minutes** of eventual pressure release at a flow rate of 2, or `52` total pressure released by valve CC.
+
+Making your way through the tunnels like this, you could probably open many or all of the valves by the time 30 minutes have elapsed. However, you need to release as much pressure as possible, so you'll need to be methodical. Instead, consider this approach:
+
+```
+== Minute 1 ==
+No valves are open.
+You move to valve DD.
+
+== Minute 2 ==
+No valves are open.
+You open valve DD.
+
+== Minute 3 ==
+Valve DD is open, releasing 20 pressure.
+You move to valve CC.
+
+== Minute 4 ==
+Valve DD is open, releasing 20 pressure.
+You move to valve BB.
+
+== Minute 5 ==
+Valve DD is open, releasing 20 pressure.
+You open valve BB.
+
+== Minute 6 ==
+Valves BB and DD are open, releasing 33 pressure.
+You move to valve AA.
+
+...
+
+== Minute 30 ==
+Valves BB, CC, DD, EE, HH, and JJ are open, releasing 81 pressure.
+```
+
+([SEE WEBSITE FOR FULL EXAMPLE](https://adventofcode.com/2022/day/16))
+
+This approach lets you release the most pressure possible in 30 minutes with this valve layout, `1651`.
+
+Work out the steps to release the most pressure in 30 minutes. **What is the most pressure you can release?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/16/input).
 
@@ -54,42 +116,165 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-""
+"Valve KR has flow rate=17; tunnels lead to valves WA, JQ, JY, KI\nValve JN has flow rate=0; tunnels lead to valves XS, JQ\nValve JY has flow rate=0; tunnels lead to valves KR, AP\nValve WE has flow rate=0; tunnels lead to valves GY, XS\nValve HW has flow rate=0; tunnels lead to valves GP, AA\nValve QS has flow rate=0; tunnels lead to valves WW, MF\nValve MF has flow rate=15; tunnels lead to valves RJ, QS\nValve IM has flow rate=0; tunnels lead to valves WH, HS\nValve RJ has flow rate=0; tunnels lead to valves MF, PM\nValve IG has flow rate=0; tunnels lead to valves WX, ZY\nValve YL has flow rate=0; tunnels lead to valves GY, EB\nValve LI has flow rate=25; tunnels lead to valves YS, SI\nValve WW has flow rate=6; tunnels lead to valves PJ, QS\nValve QK has flow rate=0; tunnels lead to valves MV, AU\nValve AU has flow rate=20; tunnels lead to valves QK, BT, VK\nValve WH has flow rate=0; tunnels lead to valves MV, IM\nValve YS has flow rate=0; tunnels lead to valves ZL, LI\nValve FR has flow rate=0; tunnels lead to valves XS, AA\nValve NX has flow rate=0; tunnels lead to valves KI, NG\nValve OI has flow rate=5; tunnels lead to valves SU, OX, LW, JH, DK\nValve YJ has flow rate=0; tunnels lead to valves XK, XU\nValve DK has flow rate=0; tunnels lead to valves OI, IZ\nValve SU has flow rate=0; tunnels lead to valves OI, XU\nValve OH has flow rate=0; tunnels lead to valves CX, WX\nValve HS has flow rate=8; tunnels lead to valves UY, IM, WJ, XK, UC\nValve UY has flow rate=0; tunnels lead to valves HS, OX\nValve AP has flow rate=0; tunnels lead to valves JY, GY\nValve JQ has flow rate=0; tunnels lead to valves KR, JN\nValve XK has flow rate=0; tunnels lead to valves YJ, HS\nValve PM has flow rate=0; tunnels lead to valves RJ, ZY\nValve WJ has flow rate=0; tunnels lead to valves AA, HS\nValve VK has flow rate=0; tunnels lead to valves AU, SI\nValve OX has flow rate=0; tunnels lead to valves UY, OI\nValve ZL has flow rate=0; tunnels lead to valves YS, MV\nValve LW has flow rate=0; tunnels lead to valves TT, OI\nValve TT has flow rate=0; tunnels lead to valves LW, MV\nValve PJ has flow rate=0; tunnels lead to valves UC, WW\nValve UC has flow rate=0; tunnels lead to valves PJ, HS\nValve XU has flow rate=3; tunnels lead to valves EB, CW, SU, TL, YJ\nValve XS has flow rate=4; tunnels lead to valves IZ, CW, WE, JN, FR\nValve CW has flow rate=0; tunnels lead to valves XU, XS\nValve TF has flow rate=0; tunnels lead to valves AA, TL\nValve EB has flow rate=0; tunnels lead to valves XU, YL\nValve WA has flow rate=0; tunnels lead to valves KR, BT\nValve GY has flow rate=9; tunnels lead to valves GP, AP, YL, ZO, WE\nValve IZ has flow rate=0; tunnels lead to valves DK, XS\nValve KI has flow rate=0; tunnels lead to valves NX, KR\nValve AA has flow rate=0; tunnels lead to valves HW, TF, FR, JH, WJ\nValve ZO has flow rate=0; tunnels lead to valves GY, QM\nValve QM has flow rate=0; tunnels lead to valves ZO, CX\nValve SI has flow rate=0; tunnels lead to valves LI, VK\nValve BT has flow rate=0; tunnels lead to valves AU, WA\nValve BC has flow rate=0; tunnels lead to valves CX, ZY\nValve NG has flow rate=21; tunnel leads to valve NX\nValve WX has flow rate=16; tunnels lead to valves IG, OH\nValve GP has flow rate=0; tunnels lead to valves HW, GY\nValve JH has flow rate=0; tunnels lead to valves AA, OI\nValve CX has flow rate=13; tunnels lead to valves OH, BC, QM\nValve TL has flow rate=0; tunnels lead to valves TF, XU\nValve MV has flow rate=14; tunnels lead to valves QK, ZL, WH, TT\nValve ZY has flow rate=10; tunnels lead to valves PM, BC, IG"
 ```
 
 ## Solution
 
 ```elixir
 defmodule Day16 do
-  defdelegate parse(input), to: __MODULE__.Input
+  alias __MODULE__.Input
 
-  def part1(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+  @start_valve "AA"
+  @part1_rounds 30
+  @part2_rounds 26
+
+  def part1(input \\ nil)
+
+  def part1(input) when is_nil(input) or is_binary(input) do
+    input |> Input.parse() |> part1()
   end
 
-  def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+  def part1(%{} = grid) do
+    next_step(grid, @start_valve, 0, 0, [], 1, @part1_rounds)
+    |> Input.flatten()
+    |> Enum.sort(:desc)
+    |> List.first()
+    |> elem(0)
+  end
+
+  def part2(input \\ nil)
+
+  def part2(input) when is_binary(input) or is_nil(input) do
+    input |> Input.parse() |> part2()
+  end
+
+  def part2(%{} = grid) do
+    results =
+      next_step(grid, @start_valve, 0, 0, [], 1, @part2_rounds)
+      |> Input.flatten()
+      |> Enum.sort(:desc)
+
+    results
+    |> Stream.map(fn {a, [_ | a_list]} ->
+      a +
+        Enum.find_value(results, fn {b, [_ | b_list]} ->
+          a_list -- b_list == a_list && b
+        end)
+    end)
+    |> Enum.max()
+  end
+
+  def next_step(_, _, _, total_pressure, open, round, num_rounds) when round > num_rounds do
+    {total_pressure, open}
+  end
+
+  def next_step(grid, current_valve, current_rate, total_pressure, open, round, num_rounds) do
+    grid
+    |> Map.get(current_valve)
+    |> Enum.filter(fn
+      {:rate, _} ->
+        false
+
+      {v, d} ->
+        v not in open && d < num_rounds - round
+    end)
+    |> then(fn
+      l -> [{@start_valve, num_rounds - round} | l]
+    end)
+    |> Enum.map(fn {valve, distance} ->
+      rate = grid |> Map.get(valve) |> Map.get(:rate, 0)
+
+      num_rounds_to_open = distance + 1
+
+      next_step(
+        grid,
+        valve,
+        current_rate + rate,
+        total_pressure + num_rounds_to_open * current_rate,
+        [valve | open],
+        round + num_rounds_to_open,
+        num_rounds
+      )
+    end)
   end
 
   defmodule Input do
     def parse(input) when is_binary(input) do
       input
-      |> String.split("\n")
+      |> String.split("\n", trim: true)
       |> parse()
     end
 
     def parse(input) when is_list(input) do
       Stream.map(input, &parse_line/1)
+      |> Enum.into(%{})
+      |> add_distances()
+      |> Stream.reject(fn
+        {"AA", _} -> false
+        {_, %{rate: rate}} -> rate <= 0
+      end)
+      |> Stream.map(fn {k, map} -> {k, Map.delete(map, :edges)} end)
+      |> Enum.into(%{})
     end
 
     def parse_line(line) do
-      line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+      ~r/Valve ([A-Z]+) has flow rate=(\d+); tunnels? leads? to valves? (.+)/
+      |> Regex.run(line, capture: :all_but_first)
+      |> then(fn [valve, rate, leads_to] ->
+        {valve, %{rate: String.to_integer(rate), edges: String.split(leads_to, ", ")}}
+      end)
+    end
+
+    def add_distances(grid) do
+      Enum.reduce(grid, grid, fn {valve, _}, acc ->
+        Map.update!(acc, valve, fn map ->
+          valve_distances(grid, valve)
+          |> Enum.reduce(map, fn {k, d, _}, acc ->
+            Map.put(acc, k, d)
+          end)
+        end)
+      end)
+    end
+
+    def shortest_paths(grid, from, to) do
+      paths = paths_to(grid, from, to) |> flatten() |> Enum.sort_by(&length/1)
+      l = List.first(paths) |> length()
+
+      Enum.take_while(paths, fn p -> length(p) == l end)
+    end
+
+    def paths_to(grid, from, to) do
+      paths_to(grid, from, to, from, [from])
+    end
+
+    def paths_to(_, _, to, current, path) when to == current, do: path
+
+    def paths_to(grid, from, to, current, path) do
+      Map.get(grid, current)
+      |> Map.get(:edges)
+      |> Enum.map(fn
+        node -> if node in path, do: nil, else: paths_to(grid, from, to, node, [node | path])
+      end)
+    end
+
+    def flatten([]), do: []
+    def flatten(nil), do: []
+    def flatten([[a | _] = path | b]) when is_binary(a), do: [Enum.reverse(path) | flatten(b)]
+    def flatten([a | b]), do: flatten(a) ++ flatten(b)
+    def flatten(v), do: [v]
+
+    def valve_distances(grid, valve, open \\ []) do
+      grid
+      |> Stream.filter(fn {k, %{rate: r}} ->
+        k != valve && k not in open && r > 0
+      end)
+      |> Stream.map(fn {k, %{rate: r}} ->
+        d = (shortest_paths(grid, valve, k) |> List.first() |> length()) - 1
+        {k, d, r}
+      end)
+      |> Enum.to_list()
+      |> Enum.sort_by(fn {_, _, d} -> -d end)
     end
   end
 end
@@ -98,40 +283,320 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day16, <<70, 79, 82, 49, 0, 0, 8, ...>>,
- {:module, Day16.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day16, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+ {:module, Day16.Input, <<70, 79, 82, ...>>, {:valve_distances, 3}}}
 ```
 
-**QUESTION ONE?**
-
-Your puzzle answer was `answer one`.
-
-<!-- livebook:{"reevaluate_automatically":true} -->
-
 ```elixir
-Day16.part1(input)
+grid = Day16.Input.parse(input)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+%{
+  "AA" => %{
+    :rate => 0,
+    "AU" => 7,
+    "CX" => 6,
+    "GY" => 3,
+    "HS" => 2,
+    "KR" => 5,
+    "LI" => 8,
+    "MF" => 7,
+    "MV" => 5,
+    "NG" => 8,
+    "OI" => 2,
+    "WW" => 5,
+    "WX" => 8,
+    "XS" => 2,
+    "XU" => 3,
+    "ZY" => 8
+  },
+  "AU" => %{
+    :rate => 20,
+    "CX" => 9,
+    "GY" => 6,
+    "HS" => 5,
+    "KR" => 3,
+    "LI" => 3,
+    "MF" => 10,
+    "MV" => 2,
+    "NG" => 6,
+    "OI" => 5,
+    "WW" => 8,
+    "WX" => 11,
+    "XS" => 6,
+    "XU" => 7,
+    "ZY" => 11
+  },
+  "CX" => %{
+    :rate => 13,
+    "AU" => 9,
+    "GY" => 3,
+    "HS" => 8,
+    "KR" => 6,
+    "LI" => 12,
+    "MF" => 5,
+    "MV" => 11,
+    "NG" => 9,
+    "OI" => 8,
+    "WW" => 7,
+    "WX" => 2,
+    "XS" => 5,
+    "XU" => 6,
+    "ZY" => 2
+  },
+  "GY" => %{
+    :rate => 9,
+    "AU" => 6,
+    "CX" => 3,
+    "HS" => 5,
+    "KR" => 3,
+    "LI" => 9,
+    "MF" => 8,
+    "MV" => 8,
+    "NG" => 6,
+    "OI" => 5,
+    "WW" => 8,
+    "WX" => 5,
+    "XS" => 2,
+    "XU" => 3,
+    "ZY" => 5
+  },
+  "HS" => %{
+    :rate => 8,
+    "AU" => 5,
+    "CX" => 8,
+    "GY" => 5,
+    "KR" => 7,
+    "LI" => 6,
+    "MF" => 5,
+    "MV" => 3,
+    "NG" => 10,
+    "OI" => 3,
+    "WW" => 3,
+    "WX" => 10,
+    "XS" => 4,
+    "XU" => 3,
+    "ZY" => 8
+  },
+  "KR" => %{
+    :rate => 17,
+    "AU" => 3,
+    "CX" => 6,
+    "GY" => 3,
+    "HS" => 7,
+    "LI" => 6,
+    "MF" => 11,
+    "MV" => 5,
+    "NG" => 3,
+    "OI" => 6,
+    "WW" => 10,
+    "WX" => 8,
+    "XS" => 3,
+    "XU" => 5,
+    "ZY" => 8
+  },
+  "LI" => %{
+    :rate => 25,
+    "AU" => 3,
+    "CX" => 12,
+    "GY" => 9,
+    "HS" => 6,
+    "KR" => 6,
+    "MF" => 11,
+    "MV" => 3,
+    "NG" => 9,
+    "OI" => 6,
+    "WW" => 9,
+    "WX" => 14,
+    "XS" => 9,
+    "XU" => 8,
+    "ZY" => 14
+  },
+  "MF" => %{
+    :rate => 15,
+    "AU" => 10,
+    "CX" => 5,
+    "GY" => 8,
+    "HS" => 5,
+    "KR" => 11,
+    "LI" => 11,
+    "MV" => 8,
+    "NG" => 14,
+    "OI" => 8,
+    "WW" => 2,
+    "WX" => 5,
+    "XS" => 9,
+    "XU" => 8,
+    "ZY" => 3
+  },
+  "MV" => %{
+    :rate => 14,
+    "AU" => 2,
+    "CX" => 11,
+    "GY" => 8,
+    "HS" => 3,
+    "KR" => 5,
+    "LI" => 3,
+    "MF" => 8,
+    "NG" => 8,
+    "OI" => 3,
+    "WW" => 6,
+    "WX" => 13,
+    "XS" => 6,
+    "XU" => 5,
+    "ZY" => 11
+  },
+  "NG" => %{
+    :rate => 21,
+    "AU" => 6,
+    "CX" => 9,
+    "GY" => 6,
+    "HS" => 10,
+    "KR" => 3,
+    "LI" => 9,
+    "MF" => 14,
+    "MV" => 8,
+    "OI" => 9,
+    "WW" => 13,
+    "WX" => 11,
+    "XS" => 6,
+    "XU" => 8,
+    "ZY" => 11
+  },
+  "OI" => %{
+    :rate => 5,
+    "AU" => 5,
+    "CX" => 8,
+    "GY" => 5,
+    "HS" => 3,
+    "KR" => 6,
+    "LI" => 6,
+    "MF" => 8,
+    "MV" => 3,
+    "NG" => 9,
+    "WW" => 6,
+    "WX" => 10,
+    "XS" => 3,
+    "XU" => 2,
+    "ZY" => 10
+  },
+  "WW" => %{
+    :rate => 6,
+    "AU" => 8,
+    "CX" => 7,
+    "GY" => 8,
+    "HS" => 3,
+    "KR" => 10,
+    "LI" => 9,
+    "MF" => 2,
+    "MV" => 6,
+    "NG" => 13,
+    "OI" => 6,
+    "WX" => 7,
+    "XS" => 7,
+    "XU" => 6,
+    "ZY" => 5
+  },
+  "WX" => %{
+    :rate => 16,
+    "AU" => 11,
+    "CX" => 2,
+    "GY" => 5,
+    "HS" => 10,
+    "KR" => 8,
+    "LI" => 14,
+    "MF" => 5,
+    "MV" => 13,
+    "NG" => 11,
+    "OI" => 10,
+    "WW" => 7,
+    "XS" => 7,
+    "XU" => 8,
+    "ZY" => 2
+  },
+  "XS" => %{
+    :rate => 4,
+    "AU" => 6,
+    "CX" => 5,
+    "GY" => 2,
+    "HS" => 4,
+    "KR" => 3,
+    "LI" => 9,
+    "MF" => 9,
+    "MV" => 6,
+    "NG" => 6,
+    "OI" => 3,
+    "WW" => 7,
+    "WX" => 7,
+    "XU" => 2,
+    "ZY" => 7
+  },
+  "XU" => %{
+    :rate => 3,
+    "AU" => 7,
+    "CX" => 6,
+    "GY" => 3,
+    "HS" => 3,
+    "KR" => 5,
+    "LI" => 8,
+    "MF" => 8,
+    "MV" => 5,
+    "NG" => 8,
+    "OI" => 2,
+    "WW" => 6,
+    "WX" => 8,
+    "XS" => 2,
+    "ZY" => 8
+  },
+  "ZY" => %{
+    :rate => 10,
+    "AU" => 11,
+    "CX" => 2,
+    "GY" => 5,
+    "HS" => 8,
+    "KR" => 8,
+    "LI" => 14,
+    "MF" => 3,
+    "MV" => 11,
+    "NG" => 11,
+    "OI" => 10,
+    "WW" => 5,
+    "WX" => 2,
+    "XS" => 7,
+    "XU" => 8
+  }
+}
 ```
 
-**QUESTION TWO?**
+Work out the steps to release the most pressure in 30 minutes. **What is the most pressure you can release?**
 
-Your puzzle answer was `answer two`.
-
-<!-- livebook:{"reevaluate_automatically":true} -->
+Your puzzle answer was `1647`.
 
 ```elixir
-Day16.part2(input)
+Day16.part1(grid)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+1647
+```
+
+**With you and an elephant working together for 26 minutes, what is the most pressure you could release?**
+
+Your puzzle answer was `2169`.
+
+```elixir
+Day16.part2(grid)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+2169
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -152,19 +617,20 @@ defmodule Day16Test do
 
   setup_all do
     [
-      input: ""
+      input:
+        "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB\nValve BB has flow rate=13; tunnels lead to valves CC, AA\nValve CC has flow rate=2; tunnels lead to valves DD, BB\nValve DD has flow rate=20; tunnels lead to valves CC, AA, EE\nValve EE has flow rate=3; tunnels lead to valves FF, DD\nValve FF has flow rate=0; tunnels lead to valves EE, GG\nValve GG has flow rate=0; tunnels lead to valves FF, HH\nValve HH has flow rate=22; tunnel leads to valve GG\nValve II has flow rate=0; tunnels lead to valves AA, JJ\nValve JJ has flow rate=21; tunnel leads to valve II"
     ]
   end
 
-  describe "part1/1" do
+  describe "part1" do
     test "returns expected value", %{input: input} do
-      assert Day16.part1(input) == [""]
+      assert Day16.part1(input) == 1651
     end
   end
 
-  describe "part2/1" do
+  describe "part2" do
     test "returns expected value", %{input: input} do
-      assert Day16.part2(input) == [""]
+      assert Day16.part2(input) == 1707
     end
   end
 end
@@ -176,10 +642,10 @@ ExUnit.run()
 
 ```
 ..
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
+Finished in 0.3 seconds (0.00s async, 0.3s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 278471
 ```
 
 <!-- livebook:{"output":true} -->
@@ -191,34 +657,13 @@ Randomized with seed 162351
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day16.part1(input)
-  end
-
-  def fun2(input) do
-    Day16.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day16.Input.parse(input) |> Enum.to_list()
 
 Benchee.run(
   %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
+    "Input Parse" => fn -> Day16.Input.parse(input) end,
+    "Part 1" => fn -> Day16.part1(grid) end,
+    "Part 2" => fn -> Day16.part2(grid) end
   },
   memory_time: 2,
   reduction_time: 2
@@ -230,7 +675,56 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 33 s
+
+Benchmarking Input Parse ...
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name                  ips        average  deviation         median         99th %
+Part 1               3.91         0.26 s     ±4.13%         0.26 s         0.27 s
+Part 2               0.80         1.25 s     ±0.31%         1.25 s         1.25 s
+Input Parse          0.25         4.02 s     ±1.23%         4.02 s         4.06 s
+
+Comparison: 
+Part 1               3.91
+Part 2               0.80 - 4.88x slower +0.99 s
+Input Parse          0.25 - 15.73x slower +3.77 s
+
+Memory usage statistics:
+
+Name           Memory usage
+Part 1            181.34 MB
+Part 2            278.10 MB - 1.53x memory usage +96.76 MB
+Input Parse      1537.30 MB - 8.48x memory usage +1355.96 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name                average  deviation         median         99th %
+Part 1              27.79 M     ±0.01%        27.79 M        27.80 M
+Part 2              37.83 M     ±0.00%        37.83 M        37.83 M
+Input Parse        408.95 M     ±0.00%       408.95 M       408.95 M
+
+Comparison: 
+Part 1              27.79 M
+Part 2              37.83 M - 1.36x reduction count +10.04 M
+Input Parse        408.95 M - 14.72x reduction count +381.16 M
 ```
 
 <!-- livebook:{"output":true} -->
