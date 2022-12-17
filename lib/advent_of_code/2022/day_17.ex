@@ -24,6 +24,7 @@ defmodule AdventOfCode.Y2022.Day17 do
     input
     |> parse()
     |> play(@start_grid)
+    |> Map.get(:top)
   end
 
   def part2(input \\ nil) do
@@ -46,7 +47,7 @@ defmodule AdventOfCode.Y2022.Day17 do
 
   def play_next_piece(input, grid, next_input, [piece | p_tail]) do
     next_piece = start_piece(grid, piece)
-    IO.puts("Rock begins falling (##{grid.piece_count + 1}):")
+    # IO.puts("Rock begins falling (##{grid.piece_count + 1}):")
     # draw_grid(next_piece, grid)
     play_piece(grid, next_piece, next_input, p_tail, input)
   end
