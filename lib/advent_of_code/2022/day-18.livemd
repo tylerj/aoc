@@ -54,7 +54,7 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-""
+"2,2,2\n1,2,2\n3,2,2\n2,1,2\n2,3,2\n2,2,1\n2,2,3\n2,2,4\n2,2,6\n1,2,5\n3,2,5\n2,1,5\n2,3,5"
 ```
 
 ## Solution
@@ -64,15 +64,33 @@ defmodule Day18 do
   defdelegate parse(input), to: __MODULE__.Input
 
   def part1(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    grid = input |> parse() |> MapSet.new()
+
+    grid
+    |> Enum.map(fn xyz ->
+      6 - neighbor_count(grid, xyz)
+    end)
+    |> Enum.sum()
   end
 
   def part2(input) do
     input
     |> parse()
     |> Enum.map(& &1)
+  end
+
+  def neighbor_count(set, {x, y, z}) do
+    [
+      {1, 0, 0},
+      {-1, 0, 0},
+      {0, 1, 0},
+      {0, -1, 0},
+      {0, 0, 1},
+      {0, 0, -1}
+    ]
+    |> Enum.count(fn {a, b, c} ->
+      MapSet.member?(set, {a + x, b + y, c + z})
+    end)
   end
 
   defmodule Input do
@@ -88,8 +106,9 @@ defmodule Day18 do
 
     def parse_line(line) do
       line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+      |> String.split(",", trim: true)
+      |> Enum.map(&String.to_integer/1)
+      |> List.to_tuple()
     end
   end
 end
@@ -98,7 +117,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day18, <<70, 79, 82, 49, 0, 0, 8, ...>>,
+{:module, Day18, <<70, 79, 82, 49, 0, 0, 12, ...>>,
  {:module, Day18.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -115,7 +134,7 @@ Day18.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+64
 ```
 
 **QUESTION TWO?**
