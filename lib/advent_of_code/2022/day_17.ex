@@ -1,7 +1,10 @@
 defmodule AdventOfCode.Y2022.Day17 do
   defdelegate parse(input), to: __MODULE__.Input
 
-  @start_grid %{top: 0, piece_count: 0, max_pieces: 2022}
+  @start_grid %{top: 0, bottom: 0, piece_count: 0}
+
+  @part1_num_pieces 2022
+  @part2_num_pieces 1_000_000_000_000
 
   # Each piece should have units placed according to the following:
   # {x, top + y}
@@ -23,34 +26,120 @@ defmodule AdventOfCode.Y2022.Day17 do
   def part1(input \\ nil) do
     input
     |> parse()
-    |> play(@start_grid)
+    |> play(@start_grid, @part1_num_pieces)
     |> Map.get(:top)
   end
 
   def part2(input \\ nil) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> calculate_top_row(@part2_num_pieces)
   end
 
-  def play(input, grid),
-    do: play_next_piece(input, grid, [], @pieces)
+  def calculate_top_row(input, total_pieces) when is_binary(input) do
+    parse(input) |> calculate_top_row(total_pieces)
+  end
+
+  def calculate_top_row(input, total_pieces) do
+    try do
+      [
+        {row_1_num_pieces, row_1_number},
+        {row_2_num_pieces, row_2_number},
+        {row_3_num_pieces, row_3_number}
+      ] = get_full_top_rows(input, @start_grid, 3).full_rows
+
+      diff_num_pieces_between_full_rows = row_2_num_pieces - row_1_num_pieces
+      diff_row_number_between_full_rows = row_2_number - row_1_number
+
+      if row_3_num_pieces - row_2_num_pieces != diff_num_pieces_between_full_rows or
+           row_3_number - row_2_number != diff_row_number_between_full_rows do
+        raise "Row differences are not identical as expected. Cannot proceed with this logic."
+      end
+
+      num_full_row_cycles =
+        div(total_pieces - row_1_num_pieces, diff_num_pieces_between_full_rows)
+
+      pieces_through_last_full_cycle =
+        row_1_num_pieces + num_full_row_cycles * diff_num_pieces_between_full_rows
+
+      pieces_remaining_after_last_full_cycle = total_pieces - pieces_through_last_full_cycle
+
+      pieces_to_simulate_remaining_count =
+        row_1_num_pieces + pieces_remaining_after_last_full_cycle
+
+      top_of_simulation = play(input, @start_grid, pieces_to_simulate_remaining_count).top
+      rows_added_to_top = top_of_simulation - row_1_number
+
+      final_top_row_count =
+        row_1_number + diff_row_number_between_full_rows * num_full_row_cycles + rows_added_to_top
+
+      final_top_row_count
+    rescue
+      MatchError -> raise "Could not find any full top rows. Cannot proceed."
+    end
+  end
+
+  def get_full_top_rows(input, grid, num_full_rows) do
+    play(
+      input,
+      Map.merge(grid, %{num_full_rows: num_full_rows, full_rows: []}),
+      100_000
+    )
+  end
+
+  def play(input, grid, max_pieces) do
+    play_next_piece(
+      input,
+      Map.put(grid, :max_pieces, max_pieces),
+      input,
+      @pieces
+    )
+  end
 
   # END GAME: max_pieces == piece_count
   def play_next_piece(_, %{piece_count: x, max_pieces: x} = grid, _, _), do: grid
 
+  def play_next_piece(_, %{num_full_rows: x, full_rows: rows} = grid, _, _)
+      when length(rows) >= x,
+      do: grid
+
   def play_next_piece(input, grid, next_input, []),
     do: play_next_piece(input, grid, next_input, @pieces)
 
-  # def play_next_piece(input, grid, [], pieces),
-  #   do: play_next_piece(input, grid, input, pieces)
-
   def play_next_piece(input, grid, next_input, [piece | p_tail]) do
+    # if grid.piece_count > 0 && rem(grid.piece_count, 1_000_000) == 0 do
+    #   IO.puts("#{grid.top / grid.piece_count}")
+    # end
+
+    grid = add_full_top_row(grid)
     next_piece = start_piece(grid, piece)
-    # IO.puts("Rock begins falling (##{grid.piece_count + 1}):")
     # draw_grid(next_piece, grid)
-    play_piece(grid, next_piece, next_input, p_tail, input)
+    play_piece(trim_grid(grid), next_piece, next_input, p_tail, input)
   end
+
+  def top_row_full?(grid), do: Enum.all?(1..7, fn x -> grid[{x, grid.top}] end)
+
+  def add_full_top_row(%{full_rows: rows} = grid) when is_list(rows) do
+    if top_row_full?(grid) do
+      # IO.puts("TOP ROW FULL. TOP: #{grid.top}, COUNT: #{grid.piece_count}")
+      Map.put(grid, :full_rows, [{grid.piece_count, grid.top} | rows])
+    else
+      grid
+    end
+  end
+
+  def add_full_top_row(grid), do: grid
+
+  def trim_grid(%{top: top, bottom: bottom} = grid) when top - bottom > 2000 do
+    # IO.puts("TRIMMING GRID - BOTTOM: #{bottom}, TOP: #{top}")
+    bottom..(bottom + 1000 - 1)
+    |> Enum.reduce(grid, fn y, acc ->
+      Map.drop(acc, Enum.map(1..7, &{&1, y}))
+    end)
+    |> Map.put(:bottom, bottom + 1000)
+  end
+
+  def trim_grid(grid), do: grid
 
   def play_piece(grid, piece, [], next_pieces, full_input),
     do: play_piece(grid, piece, full_input, next_pieces, full_input)
