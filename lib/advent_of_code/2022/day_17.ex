@@ -36,57 +36,6 @@ defmodule AdventOfCode.Y2022.Day17 do
     |> calculate_top_row(@part2_num_pieces)
   end
 
-  def calculate_top_row(input, total_pieces) when is_binary(input) do
-    parse(input) |> calculate_top_row(total_pieces)
-  end
-
-  def calculate_top_row(input, total_pieces) do
-    try do
-      [
-        {row_1_num_pieces, row_1_number},
-        {row_2_num_pieces, row_2_number},
-        {row_3_num_pieces, row_3_number}
-      ] = get_full_top_rows(input, @start_grid, 3).full_rows
-
-      diff_num_pieces_between_full_rows = row_2_num_pieces - row_1_num_pieces
-      diff_row_number_between_full_rows = row_2_number - row_1_number
-
-      if row_3_num_pieces - row_2_num_pieces != diff_num_pieces_between_full_rows or
-           row_3_number - row_2_number != diff_row_number_between_full_rows do
-        raise "Row differences are not identical as expected. Cannot proceed with this logic."
-      end
-
-      num_full_row_cycles =
-        div(total_pieces - row_1_num_pieces, diff_num_pieces_between_full_rows)
-
-      pieces_through_last_full_cycle =
-        row_1_num_pieces + num_full_row_cycles * diff_num_pieces_between_full_rows
-
-      pieces_remaining_after_last_full_cycle = total_pieces - pieces_through_last_full_cycle
-
-      pieces_to_simulate_remaining_count =
-        row_1_num_pieces + pieces_remaining_after_last_full_cycle
-
-      top_of_simulation = play(input, @start_grid, pieces_to_simulate_remaining_count).top
-      rows_added_to_top = top_of_simulation - row_1_number
-
-      final_top_row_count =
-        row_1_number + diff_row_number_between_full_rows * num_full_row_cycles + rows_added_to_top
-
-      final_top_row_count
-    rescue
-      MatchError -> raise "Could not find any full top rows. Cannot proceed."
-    end
-  end
-
-  def get_full_top_rows(input, grid, num_full_rows) do
-    play(
-      input,
-      Map.merge(grid, %{num_full_rows: num_full_rows, full_rows: []}),
-      100_000
-    )
-  end
-
   def play(input, grid, max_pieces) do
     play_next_piece(
       input,
@@ -233,6 +182,57 @@ defmodule AdventOfCode.Y2022.Day17 do
       end)
       |> IO.puts()
     end)
+  end
+
+  def calculate_top_row(input, total_pieces) when is_binary(input) do
+    parse(input) |> calculate_top_row(total_pieces)
+  end
+
+  def calculate_top_row(input, total_pieces) do
+    try do
+      [
+        {row_1_num_pieces, row_1_number},
+        {row_2_num_pieces, row_2_number},
+        {row_3_num_pieces, row_3_number}
+      ] = get_full_top_rows(input, @start_grid, 3).full_rows
+
+      diff_num_pieces_between_full_rows = row_2_num_pieces - row_1_num_pieces
+      diff_row_number_between_full_rows = row_2_number - row_1_number
+
+      if row_3_num_pieces - row_2_num_pieces != diff_num_pieces_between_full_rows or
+           row_3_number - row_2_number != diff_row_number_between_full_rows do
+        raise "Row differences are not identical as expected. Cannot proceed with this logic."
+      end
+
+      num_full_row_cycles =
+        div(total_pieces - row_1_num_pieces, diff_num_pieces_between_full_rows)
+
+      pieces_through_last_full_cycle =
+        row_1_num_pieces + num_full_row_cycles * diff_num_pieces_between_full_rows
+
+      pieces_remaining_after_last_full_cycle = total_pieces - pieces_through_last_full_cycle
+
+      pieces_to_simulate_remaining_count =
+        row_1_num_pieces + pieces_remaining_after_last_full_cycle
+
+      top_of_simulation = play(input, @start_grid, pieces_to_simulate_remaining_count).top
+      rows_added_to_top = top_of_simulation - row_1_number
+
+      final_top_row_count =
+        row_1_number + diff_row_number_between_full_rows * num_full_row_cycles + rows_added_to_top
+
+      final_top_row_count
+    rescue
+      MatchError -> raise "Could not find any full top rows. Cannot proceed."
+    end
+  end
+
+  def get_full_top_rows(input, grid, num_full_rows) do
+    play(
+      input,
+      Map.merge(grid, %{num_full_rows: num_full_rows, full_rows: []}),
+      100_000
+    )
   end
 
   defmodule Input do

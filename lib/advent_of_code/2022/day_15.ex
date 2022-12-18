@@ -20,8 +20,7 @@ defmodule AdventOfCode.Y2022.Day15 do
     |> Task.async_stream(
       fn chunk ->
         Enum.find_value(chunk, fn y_axis ->
-          if rem(y_axis, 100_000) == 0, do: IO.puts("Y-AXIS: #{y_axis}")
-
+          # if rem(y_axis, 100_000) == 0, do: IO.puts("Y-AXIS: #{y_axis}")
           case x_ranges_for_y_axis(input, y_axis) do
             [_] ->
               false
