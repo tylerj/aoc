@@ -178,7 +178,7 @@ defmodule Day21 do
   defmodule Input do
     def parse(input) when is_binary(input) do
       input
-      |> String.split("\n")
+      |> String.split("\n", trim: true)
       |> parse()
     end
 
@@ -190,7 +190,7 @@ defmodule Day21 do
 
     def parse_line(line) do
       line
-      |> String.split([": ", " "])
+      |> String.split([": ", " "], trim: true)
       |> then(fn
         [name, number] -> {name, String.to_integer(number)}
         [name, a, op, b] -> {name, {String.to_atom(op), a, b}}
@@ -272,13 +272,13 @@ defmodule Day21Test do
     ]
   end
 
-  describe "part1/1" do
+  describe "part1" do
     test "returns expected value", %{input: input} do
       assert Day21.part1(input) == 152
     end
   end
 
-  describe "part2/1" do
+  describe "part2" do
     test "returns expected value", %{input: input} do
       assert Day21.part2(input) == 301
     end
@@ -295,7 +295,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 823456
+Randomized with seed 259734
 ```
 
 <!-- livebook:{"output":true} -->
@@ -340,12 +340,12 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        231.64        4.32 ms     ±2.72%        4.27 ms        4.56 ms
-Part 2         36.91       27.09 ms     ±0.74%       27.09 ms       27.59 ms
+Part 1        232.30        4.30 ms     ±2.44%        4.28 ms        4.51 ms
+Part 2         36.91       27.09 ms     ±0.81%       27.09 ms       27.65 ms
 
 Comparison: 
-Part 1        231.64
-Part 2         36.91 - 6.28x slower +22.78 ms
+Part 1        232.30
+Part 2         36.91 - 6.29x slower +22.79 ms
 ```
 
 <!-- livebook:{"output":true} -->
