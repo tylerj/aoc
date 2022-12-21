@@ -1,0 +1,407 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 20 - Advent of Code 2022
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/20)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/20/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_20.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-20.livemd)
+
+## Prompt
+
+### --- Day 20: Grove Positioning System ---
+
+It's finally time to meet back up with the Elves. When you try to contact them, however, you get no reply. Perhaps you're out of range?
+
+You know they're headed to the grove where the **star** fruit grows, so if you can figure out where that is, you should be able to meet back up with them.
+
+Fortunately, your handheld device has a file (your puzzle input) that contains the grove's coordinates! Unfortunately, the file is **encrypted** - just in case the device were to fall into the wrong hands.
+
+Maybe you can decrypt it?
+
+When you were still back at the camp, you overheard some Elves talking about coordinate file encryption. The main operation involved in decrypting the file is called **mixing**.
+
+The encrypted file is a list of numbers. To **mix** the file, move each number forward or backward in the file a number of positions equal to the value of the number being moved. The list is **circular**, so moving a number off one end of the list wraps back around to the other end as if the ends were connected.
+
+For example, to move the `1` in a sequence like `4, 5, 6, 1, 7, 8, 9`, the `1` moves one position forward: `4, 5, 6, 7, 1, 8, 9`. To move the `-2` in a sequence like `4, -2, 5, 6, 7, 8, 9`, the `-2` moves two positions backward, wrapping around: `4, 5, 6, 7, 8, -2, 9`.
+
+The numbers should be moved in the order they originally appear in the encrypted file. Numbers moving around during the mixing process do not change the order in which the numbers are moved.
+
+Consider this encrypted file:
+
+```
+1
+2
+-3
+3
+-2
+0
+4
+```
+
+Mixing this file proceeds as follows:
+
+```
+Initial arrangement:
+1, 2, -3, 3, -2, 0, 4
+
+1 moves between 2 and -3:
+2, 1, -3, 3, -2, 0, 4
+
+2 moves between -3 and 3:
+1, -3, 2, 3, -2, 0, 4
+
+-3 moves between -2 and 0:
+1, 2, 3, -2, -3, 0, 4
+
+3 moves between 0 and 4:
+1, 2, -2, -3, 0, 3, 4
+
+-2 moves between 4 and 1:
+1, 2, -3, 0, 3, 4, -2
+
+0 does not move:
+1, 2, -3, 0, 3, 4, -2
+
+4 moves between -3 and 0:
+1, 2, -3, 4, 0, 3, -2
+```
+
+Then, the grove coordinates can be found by looking at the 1000th, 2000th, and 3000th numbers after the value 0, wrapping around the list as necessary. In the above example, the 1000th number after 0 is `4`, the 2000th is `-3`, and the 3000th is `2`; adding these together produces `3`.
+
+Mix your encrypted file exactly once. **What is the sum of the three numbers that form the grove coordinates?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/20/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+The grove coordinate values seem nonsensical. While you ponder the mysteries of Elf encryption, you suddenly remember the rest of the decryption routine you overheard back at camp.
+
+First, you need to apply the **decryption key**, `811589153`. Multiply each number by the decryption key before you begin; this will produce the actual list of numbers to mix.
+
+Second, you need to mix the list of numbers **ten times**. The order in which the numbers are mixed does not change during mixing; the numbers are still moved in the order they appeared in the original, pre-mixed list. (So, if -3 appears fourth in the original list of numbers to mix, -3 will be the fourth number to move during each round of mixing.)
+
+Using the same example as above:
+
+```
+Initial arrangement:
+811589153, 1623178306, -2434767459, 2434767459, -1623178306, 0, 3246356612
+
+After 1 round of mixing:
+0, -2434767459, 3246356612, -1623178306, 2434767459, 1623178306, 811589153
+
+After 2 rounds of mixing:
+0, 2434767459, 1623178306, 3246356612, -2434767459, -1623178306, 811589153
+
+After 3 rounds of mixing:
+0, 811589153, 2434767459, 3246356612, 1623178306, -1623178306, -2434767459
+
+After 4 rounds of mixing:
+0, 1623178306, -2434767459, 811589153, 2434767459, 3246356612, -1623178306
+
+After 5 rounds of mixing:
+0, 811589153, -1623178306, 1623178306, -2434767459, 3246356612, 2434767459
+
+After 6 rounds of mixing:
+0, 811589153, -1623178306, 3246356612, -2434767459, 1623178306, 2434767459
+
+After 7 rounds of mixing:
+0, -2434767459, 2434767459, 1623178306, -1623178306, 811589153, 3246356612
+
+After 8 rounds of mixing:
+0, 1623178306, 3246356612, 811589153, -2434767459, 2434767459, -1623178306
+
+After 9 rounds of mixing:
+0, 811589153, 1623178306, -2434767459, 3246356612, 2434767459, -1623178306
+
+After 10 rounds of mixing:
+0, -2434767459, 1623178306, 3246356612, -1623178306, 2434767459, 811589153
+```
+
+The grove coordinates can still be found in the same way. Here, the 1000th number after 0 is `811589153`, the 2000th is `2434767459`, and the 3000th is `-1623178306`; adding these together produces `1623178306`.
+
+Apply the decryption key and mix your encrypted file ten times. **What is the sum of the three numbers that form the grove coordinates?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/20/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"-7594\n-3313\n-7404\n-8208\n-9315\n-9537\n-5293\n860\n-1368\n1984\n7865\n3261\n-8361\n7267\n8401\n9525\n-6388\n1575\n-2979\n4074\n3379\n-491\n6952\n5987\n-4809\n7905\n5893\n-7169\n-4650\n-9473\n4438\n-8592\n-2454\n-110\n7510\n-2309\n-5571\n-8966\n5781\n905\n-7638\n-7436\n8821\n6952\n954\n6194\n-9722\n4210\n4548\n2907\n2543\n-6544\n2742\n-6822\n-5556\n-8895\n-9108\n-8759\n-2341\n7076\n-5188\n-9029\n5796\n-2045\n-8804\n3794\n3121\n7085\n-8338\n-3039\n6767\n3594\n2229\n5355\n6694\n1207\n-6718\n6920\n-4092\n-8567\n-6375\n8836\n244\n7560\n-7793\n-6655\n3756\n827\n-4075\n-9189\n-6625\n-4539\n-6433\n1742\n789\n-3230\n-2575\n8755\n8471\n4736\n3170\n-8943\n-2014\n-2729\n4700\n-1357\n2496\n746\n-3807\n9860\n1990\n-7597\n7366\n1432\n-1146\n-9647\n1332\n7913\n1234\n-1091\n4381\n5096\n3837\n952\n-8199\n-6018\n-581\n-6519\n7418\n274\n8781\n6382\n393\n5342\n-2353\n3534\n726\n-1895\n8540\n-5598\n-7041\n4927\n-3962\n-9798\n-7154\n-7497\n-3902\n-5906\n-5740\n1328\n7085\n-8173\n-5962\n-1706\n-8396\n2996\n-638\n3739\n7927\n-5041\n-8804\n-6869\n9210\n5838\n6646\n6211\n-6827\n-7068\n7788\n216\n-978\n-1190\n-6966\n-9187\n8438\n-7553\n4968\n4014\n-3818\n6693\n-2275\n8672\n4148\n9654\n-5520\n-5412\n-1689\n-8991\n1932\n-897\n-292\n9181\n3229\n-8960\n5333\n3810\n3938\n-1064\n9019\n-7495\n8516\n4642\n7434\n-7404\n-1823\n-2366\n715\n-6810\n-152\n-4154\n8479\n6389\n-3301\n-5421\n3424\n1726\n-5262\n-8135\n-9021\n-5901\n-8165\n-5152\n-1371\n-7666\n-4131\n-6878\n-9000\n-2303\n2689\n-4766\n-9607\n-292\n482\n9493\n-3764\n8361\n-436\n1694\n2458\n-96\n615\n9924\n-1306\n7557\n-8585\n291\n-7185\n-5387\n9841\n-3776\n5264\n6442\n1521\n3495\n761\n-5964\n-9123\n7595\n-5991\n5053\n7909\n-8804\n6012\n-4826\n-8081\n2728\n4402\n-5020\n247\n3388\n-2765\n-355\n8225\n1670\n-5092\n-7752\n-7594\n-1463\n-1518\n7141\n1974\n7673\n-9803\n-6573\n6616\n8998\n8434\n-8549\n3370\n-6046\n-8133\n-1190\n8190\n3525\n-4387\n3787\n-165\n490\n-9642\n-1014\n1721\n-4642\n-4636\n7182\n6870\n-9609\n2273\n839\n1247\n9654\n5613\n-8030\n-7587\n-8789\n2063\n8454\n4021\n9566\n2909\n9226\n4838\n58\n-657\n-82\n6871\n-6332\n-3012\n-4320\n8514\n2623\n-9294\n-3240\n-7936\n-8287\n4794\n-8718\n5235\n-5777\n-8847\n-8229\n564\n3204\n4950\n7962\n2844\n6639\n3507\n611\n-2513\n-6433\n-5194\n-4084\n-670\n3021\n-416\n-2309\n-5005\n-7518\n7207\n1259\n4790\n7801\n-1832\n-7692\n-176\n-3061\n-911\n7319\n-3908\n3050\n-5347\n5138\n2954\n9836\n-2356\n2775\n7565\n-6447\n-6480\n-3501\n-5695\n-254\n-5353\n-2538\n-2178\n-2532\n-7486\n5363\n8176\n837\n8438\n-2778\n9526\n3239\n-5365\n6775\n-7335\n-3886\n863\n6894\n-5439\n-6083\n-6479\n-5408\n-6783\n-4390\n-7032\n-5929\n-2115\n9778\n1148\n-1973\n3612\n-6204\n-2410\n-4825\n3015\n-3737\n-7273\n-5412\n6846\n-5157\n9397\n-5681\n5253\n8843\n1708\n-4796\n5860\n4739\n6276\n7041\n2566\n3470\n-6474\n8042\n9564\n-1936\n758\n-6420\n353\n9045\n8105\n6412\n6669\n8093\n2630\n-2275\n4337\n-6287\n3896\n2800\n-9557\n6789\n5264\n2756\n-7471\n6083\n-844\n-9186\n-9550\n669\n-1007\n1084\n150\n-4160\n-2950\n2120\n3350\n-9604\n-1102\n-355\n-5644\n4298\n8620\n-9017\n729\n201\n-2148\n3537\n4922\n-3863\n1200\n-4544\n6908\n7461\n-5902\n3184\n-5718\n-8506\n4482\n4660\n-384\n-4218\n-6858\n5161\n7827\n-7856\n7894\n2120\n2280\n8997\n-4150\n1939\n-1351\n9023\n2137\n-1656\n-9698\n5096\n7001\n8104\n-9274\n-2055\n-1627\n-2866\n-5020\n1543\n-6672\n-7601\n1399\n9446\n8338\n5236\n1400\n841\n3206\n-2650\n3519\n6161\n8982\n-8454\n-342\n1666\n-662\n-9294\n-170\n966\n4453\n9225\n8444\n8591\n7846\n-125\n-8517\n-6122\n-5371\n-1149\n-8818\n-4863\n-3537\n-859\n-5860\n7434\n6293\n-4037\n-8423\n8606\n9836\n6262\n7951\n15\n7550\n2927\n1295\n5831\n-5700\n789\n1484\n-4544\n6651\n2525\n-1342\n3295\n-7558\n-4797\n-6673\n-6663\n-2566\n4791\n-4663\n5856\n-1323\n6720\n1881\n-826\n-5116\n-1653\n353\n1913\n314\n7242\n2141\n7374\n2448\n5681\n3890\n-4020\n-2877\n-3510\n6333\n1369\n424\n7192\n6552\n-9173\n4443\n1429\n-3409\n-9622\n-4117\n8389\n9664\n-4650\n-4671\n4615\n3959\n5469\n6018\n-3038\n-7793\n-4445\n3737\n-8429\n3853\n7576\n9545\n-9895\n6295\n4253\n-3848\n6841\n-601\n-8764\n5063\n-6904\n-5577\n7003\n-5905\n-5156\n-3630\n2704\n-2625\n-2386\n7213\n380\n-9481\n-2845\n2808\n4411\n7658\n-7800\n-6080\n9612\n8190\n-150\n3911\n-5114\n-161\n6172\n-9083\n-152\n-2565\n6960\n-5897\n-3307\n-9226\n6214\n-3887\n-3792\n-2222\n-8301\n-1836\n7478\n-5831\n-6303\n-6240\n8677\n-8663\n5177\n4618\n-2326\n-4829\n2392\n4848\n-3393\n9443\n8452\n5455\n-340\n-5513\n1661\n-1966\n-2009\n-9334\n3433\n58\n-1011\n-3712\n1650\n-8973\n5584\n424\n9049\n-2629\n-9269\n-8940\n9342\n-4164\n-8823\n5079\n-5897\n5121\n-2009\n232\n1195\n1014\n5405\n-2122\n-7185\n8555\n5923\n576\n-5881\n3584\n-911\n-8612\n2254\n-8461\n-8819\n-1078\n6375\n-9792\n-8759\n-4612\n5707\n-937\n-5826\n-587\n3226\n7702\n5976\n5628\n-3836\n-7803\n4199\n8262\n9546\n3424\n3156\n7342\n-3580\n8787\n-35\n7607\n9951\n-4416\n-33\n207\n4857\n9397\n-7" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day20 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  @decryption_key 811_589_153
+
+  def part1(input) do
+    input = parse(input)
+    size = length(input)
+
+    input = Enum.with_index(input)
+    final_list = Enum.reduce(input, input, &move_element(&1, &2, size))
+    zero_index = Enum.find_index(final_list, fn {x, _} -> x == 0 end)
+
+    [1000, 2000, 3000]
+    |> Enum.map(fn offset ->
+      final_list
+      |> Enum.at(rem(zero_index + offset, size))
+      |> elem(0)
+    end)
+    |> Enum.sum()
+  end
+
+  def part2(input) do
+    input = parse(input)
+    size = length(input)
+
+    input =
+      input
+      |> Enum.map(&(&1 * @decryption_key))
+      |> Enum.with_index()
+
+    final_list =
+      1..10
+      |> Enum.reduce(input, fn _, acc ->
+        Enum.reduce(input, acc, &move_element(&1, &2, size))
+      end)
+
+    zero_index = Enum.find_index(final_list, fn {x, _} -> x == 0 end)
+
+    [1000, 2000, 3000]
+    |> Enum.map(fn offset ->
+      final_list
+      |> Enum.at(rem(zero_index + offset, size))
+      |> elem(0)
+    end)
+    |> Enum.sum()
+  end
+
+  def move_element({0, _}, list, _), do: list
+
+  def move_element({value, _} = element, list, size) do
+    current_index = Enum.find_index(list, fn x -> x == element end)
+
+    list
+    |> List.delete_at(current_index)
+    |> List.insert_at(new_index(current_index, value, size), element)
+  end
+
+  # To actually go backwards in the list, we can't just go from index 0 to -1.
+  # That's the same spot in the circle, just at the end of the list instead of the beginning.
+  # Therefore, we need to subtract one more to get the proper negative index.
+  def new_index(current_index, value, size) do
+    case rem(current_index + value, size - 1) do
+      i when i < 0 -> i - 1
+      i -> i
+    end
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Enum.map(input, &String.to_integer/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day20, <<70, 79, 82, 49, 0, 0, 19, ...>>,
+ {:module, Day20.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
+```
+
+Mix your encrypted file exactly once. **What is the sum of the three numbers that form the grove coordinates?**
+
+Your puzzle answer was `6640`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day20.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+6640
+```
+
+Apply the decryption key and mix your encrypted file ten times. **What is the sum of the three numbers that form the grove coordinates?**
+
+Your puzzle answer was `11893839037215`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day20.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+11893839037215
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/20/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day20Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "1\n2\n-3\n3\n-2\n0\n4"
+    ]
+  end
+
+  describe "part1" do
+    test "returns expected value", %{input: input} do
+      assert Day20.part1(input) == 3
+    end
+  end
+
+  describe "part2" do
+    test "returns expected value", %{input: input} do
+      assert Day20.part2(input) == 1_623_178_306
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 847913
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day20.part1(input) end,
+    "Part 2" => fn -> Day20.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1          3.65         0.27 s     ±0.52%         0.27 s         0.28 s
+Part 2          0.27         3.69 s     ±0.03%         3.69 s         3.69 s
+
+Comparison: 
+Part 1          3.65
+Part 2          0.27 - 13.46x slower +3.41 s
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         0.38 GB
+Part 2         5.16 GB - 13.44x memory usage +4.77 GB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1         55.78 M     ±0.00%        55.78 M        55.78 M
+Part 2        760.48 M     ±0.00%       760.48 M       760.48 M
+
+Comparison: 
+Part 1         55.78 M
+Part 2        760.48 M - 13.63x reduction count +704.70 M
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
