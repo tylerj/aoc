@@ -227,13 +227,15 @@ Day21.part1(input)
 
 Your puzzle answer was `3721298272959`.
 
-**NOTE**: I initially manually performed a search, using this function, until I arrived at the correct answer. This involved guessing a random number, and then increasing it significantly until it got closer to causing the two sides of this equation to match.
+**NOTE**: I initially manually performed a search, using this function and passing a value to manually set as `humn`, until I arrived at the correct answer. This involved starting with a random number like `1`, and then increasing it significantly until it got closer to causing the two sides of this equation to match.
 
 I just kept adding a zero to the end until the difference between the two numbers became negative (I went too far).
 
 Then, I backed up (removed the last zero) and began increasing the most significant digit until it became too big (the difference was negative again).
 
 I kept doing this until finally, while increasing the ones digit, I found the correct number that caused both sides of the equation to match.
+
+I have since seen this referred to as a [Hill climbing algorithm](https://en.wikipedia.org/wiki/Hill_climbing).
 
 I was then able to replicate that process via the `search/3` and `handle_result/4` functions implemented above.
 
