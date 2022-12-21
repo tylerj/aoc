@@ -12,7 +12,7 @@ defmodule AdventOfCode.Y2022.Day21 do
     input
     |> parse()
     |> Map.update!("root", fn {_, a, b} ->
-      {:=, a, b}
+      {:==, a, b}
     end)
     |> search(1, 0)
   end
@@ -20,7 +20,7 @@ defmodule AdventOfCode.Y2022.Day21 do
   def solve(map, key) when is_binary(key), do: solve(map, map[key])
   def solve(_, num) when is_integer(num), do: num
 
-  def solve(map, {:=, a, b}) do
+  def solve(map, {:==, a, b}) do
     a = solve(map, a) |> trunc()
     b = solve(map, b) |> trunc()
 
@@ -47,7 +47,7 @@ defmodule AdventOfCode.Y2022.Day21 do
 
   def handle_result({diff, _, _}, map, 1, 0) when diff < 0 do
     map
-    |> Map.update!("root", fn {:=, a, b} -> {:=, b, a} end)
+    |> Map.update!("root", fn {:==, a, b} -> {:==, b, a} end)
     |> search(1, 0)
   end
 
