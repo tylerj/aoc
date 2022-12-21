@@ -116,14 +116,13 @@ defmodule Day21 do
     |> trunc()
   end
 
-  def part2(input, value \\ nil) do
+  def part2(input) do
     input
     |> parse()
     |> Map.update!("root", fn {_, a, b} ->
       {:=, a, b}
     end)
-    |> Map.put("humn", value)
-    |> solve("root")
+    |> search(1, 0)
   end
 
   def solve(map, key) when is_binary(key), do: solve(map, map[key])
@@ -138,6 +137,43 @@ defmodule Day21 do
 
   def solve(map, {op, a, b}),
     do: apply(Kernel, op, [solve(map, a), solve(map, b)])
+
+  def search(map, root, exponent) do
+    value = root * 10 ** exponent
+
+    map
+    |> Map.put("humn", value)
+    |> solve("root")
+    # |> then(fn {diff, _, _} = res ->
+    #   IO.puts("DIFF: #{diff}, VALUE: #{value}")
+    #   res
+    # end)
+    |> handle_result(map, root, exponent)
+  end
+
+  def handle_result({0, _, _}, _map, root, exp), do: root * 10 ** exp
+
+  def handle_result({diff, _, _}, map, 1, 0) when diff < 0 do
+    map
+    |> Map.update!("root", fn {:=, a, b} -> {:=, b, a} end)
+    |> search(1, 0)
+  end
+
+  def handle_result({diff, _, _}, map, 1, exp) when diff > 0 do
+    search(map, 1, exp + 1)
+  end
+
+  def handle_result(_, map, 1, exp) do
+    search(map, 2, exp - 1)
+  end
+
+  def handle_result({diff, _, _}, map, root, exp) when diff > 0 do
+    search(map, root + 1, exp)
+  end
+
+  def handle_result(_, map, root, exp) do
+    search(map, (root - 1) * 10 + 1, exp - 1)
+  end
 
   defmodule Input do
     def parse(input) when is_binary(input) do
@@ -167,7 +203,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day21, <<70, 79, 82, 49, 0, 0, 14, ...>>,
+{:module, Day21, <<70, 79, 82, 49, 0, 0, 17, ...>>,
  {:module, Day21.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -191,7 +227,7 @@ Day21.part1(input)
 
 Your puzzle answer was `3721298272959`.
 
-**NOTE**: I manually performed a binary search, using this function, until I arrived at the correct answer. This involved guessing a random number, and then increasing it significantly until it got closer to causing the two sides of this equation to match.
+**NOTE**: I initially manually performed a search, using this function, until I arrived at the correct answer. This involved guessing a random number, and then increasing it significantly until it got closer to causing the two sides of this equation to match.
 
 I just kept adding a zero to the end until the difference between the two numbers became negative (I went too far).
 
@@ -199,18 +235,16 @@ Then, I backed up (removed the last zero) and began increasing the most signific
 
 I kept doing this until finally, while increasing the ones digit, I found the correct number that caused both sides of the equation to match.
 
-I will look into codifying this binary search process tomorrow.
-
-<!-- livebook:{"reevaluate_automatically":true} -->
+I was then able to replicate that process via the `search/3` and `handle_result/4` functions implemented above.
 
 ```elixir
-Day21.part2(input, 3_721_298_272_959)
+Day21.part2(input)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-{0, 22931068684876, 22931068684876}
+3721298272959
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -242,11 +276,11 @@ defmodule Day21Test do
     end
   end
 
-  # describe "part2/1" do
-  #   test "returns expected value", %{input: input} do
-  #     assert Day21.part2(input) == [""]
-  #   end
-  # end
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day21.part2(input) == 301
+    end
+  end
 end
 
 ExUnit.run()
@@ -255,17 +289,17 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-.
+..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-1 test, 0 failures
+2 tests, 0 failures
 
-Randomized with seed 8331
+Randomized with seed 823456
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 1}
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
 ```
 
 ## Benchmarking
@@ -274,8 +308,8 @@ Randomized with seed 8331
 # https://github.com/bencheeorg/benchee
 
 Benchee.run(%{
-  "Part 1" => fn -> Day21.part1(input) end
-  # "fun2" => fn -> Day21.part2(input) end
+  "Part 1" => fn -> Day21.part1(input) end,
+  "Part 2" => fn -> Day21.part2(input) end
 })
 
 nil
@@ -298,12 +332,18 @@ memory time: 0 ns
 reduction time: 0 ns
 parallel: 1
 inputs: none specified
-Estimated total run time: 7 s
+Estimated total run time: 14 s
 
 Benchmarking Part 1 ...
+Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        230.91        4.33 ms     ±2.79%        4.30 ms        4.62 ms
+Part 1        231.64        4.32 ms     ±2.72%        4.27 ms        4.56 ms
+Part 2         36.91       27.09 ms     ±0.74%       27.09 ms       27.59 ms
+
+Comparison: 
+Part 1        231.64
+Part 2         36.91 - 6.28x slower +22.78 ms
 ```
 
 <!-- livebook:{"output":true} -->
