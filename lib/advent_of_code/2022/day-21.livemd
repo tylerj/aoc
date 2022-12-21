@@ -138,8 +138,8 @@ defmodule Day21 do
   def solve(map, {op, a, b}),
     do: apply(Kernel, op, [solve(map, a), solve(map, b)])
 
-  def search(map, root, exponent) do
-    value = root * 10 ** exponent
+  def search(map, base, exponent) do
+    value = base * 10 ** exponent
 
     map
     |> Map.put("humn", value)
@@ -148,10 +148,10 @@ defmodule Day21 do
     #   IO.puts("DIFF: #{diff}, VALUE: #{value}")
     #   res
     # end)
-    |> handle_result(map, root, exponent)
+    |> handle_result(map, base, exponent)
   end
 
-  def handle_result({0, _, _}, _map, root, exp), do: root * 10 ** exp
+  def handle_result({0, _, _}, _map, base, exp), do: base * 10 ** exp
 
   def handle_result({diff, _, _}, map, 1, 0) when diff < 0 do
     map
@@ -167,12 +167,12 @@ defmodule Day21 do
     search(map, 2, exp - 1)
   end
 
-  def handle_result({diff, _, _}, map, root, exp) when diff > 0 do
-    search(map, root + 1, exp)
+  def handle_result({diff, _, _}, map, base, exp) when diff > 0 do
+    search(map, base + 1, exp)
   end
 
-  def handle_result(_, map, root, exp) do
-    search(map, (root - 1) * 10 + 1, exp - 1)
+  def handle_result(_, map, base, exp) do
+    search(map, (base - 1) * 10 + 1, exp - 1)
   end
 
   defmodule Input do
