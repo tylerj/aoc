@@ -21,11 +21,89 @@ Mix.install([:kino, :benchee])
 
 ## Prompt
 
-### --- Day 22: TBD ---
+### --- Day 22: Monkey Map ---
 
-Part One prompt
+The monkeys take you on a surprisingly easy trail through the jungle. They're even going in roughly the right direction according to your handheld device's Grove Positioning System.
 
-**QUESTION ONE?**
+As you walk, the monkeys explain that the grove is protected by a force field. To pass through the **force field**, you have to enter a password; doing so involves tracing a specific **path** on a strangely-shaped board.
+
+At least, you're pretty sure that's what you have to do; the elephants aren't exactly fluent in monkey.
+
+The monkeys give you notes that they took when they last saw the password entered (your puzzle input).
+
+For example:
+
+```
+        ...#
+        .#..
+        #...
+        ....
+...#.......#
+........#...
+..#....#....
+..........#.
+        ...#....
+        .....#..
+        .#......
+        ......#.
+
+10R5L5R10L4R5L5
+```
+
+The first half of the monkeys' notes is a **map of the board**. It is comprised of a set of **open tiles** (on which you can move, drawn `.`) and **solid walls** (tiles which you cannot enter, drawn `#`).
+
+The second half is a description of **the path you must follow**. It consists of alternating numbers and letters:
+
+* A **number** indicates the **number of tiles to move** in the direction you are facing. If you run into a wall, you stop moving forward and continue with the next instruction.
+* A **letter** indicates whether to turn 90 degrees **clockwise** (`R`) or **counterclockwise** (`L`). Turning happens in-place; it does not change your current tile.
+
+So, a path like `10R5` means "go forward 10 tiles, then turn clockwise 90 degrees, then go forward 5 tiles".
+
+You begin the path in the leftmost open tile of the top row of tiles. Initially, you are facing **to the right** (from the perspective of how the map is drawn).
+
+If a movement instruction would take you off of the map, you **wrap around** to the other side of the board. In other words, if your next tile is off of the board, you should instead look in the direction opposite of your current facing as far as you can until you find the opposite edge of the board, then reappear there.
+
+For example, if you are at `A` and facing to the right, the tile in front of you is marked `B`; if you are at `C` and facing down, the tile in front of you is marked `D`:
+
+```
+        ...#
+        .#..
+        #...
+        ....
+...#.D.....#
+........#...
+B.#....#...A
+.....C....#.
+        ...#....
+        .....#..
+        .#......
+        ......#.
+```
+
+It is possible for the next tile (after wrapping around) to be a **wall**; this still counts as there being a wall in front of you, and so movement stops before you actually wrap to the other side of the board.
+
+By drawing the **last facing you had** with an arrow on each tile you visit, the full path taken by the above example looks like this:
+
+```
+        >>v#    
+        .#v.    
+        #.v.    
+        ..v.    
+...#...v..v#    
+>>>v...>#.>>    
+..#v...#....    
+...>>>>v..#.    
+        ...#....
+        .....#..
+        .#......
+        ......#.
+```
+
+To finish providing the password to this strange input device, you need to determine numbers for your final **row**, **column**, and **facing** as your final position appears from the perspective of the original map. Rows start from 1 at the top and count downward; columns start from 1 at the left and count rightward. (In the above example, row 1, column 1 refers to the empty space with no tile on it in the top-left corner.) Facing is `0` for right (`>`), `1` for down (`v`), `2` for left (`<`), and `3` for up (`^`). The final password is the sum of 1000 times the row, 4 times the column, and the facing.
+
+In the above example, the final row is `6`, the final column is `8`, and the final facing is `0`. So, the final password is `1000 * 6 + 4 * 8 + 0: 6032`.
+
+Follow the path given in the monkeys' notes. **What is the final password?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/22/input).
 
@@ -54,42 +132,173 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-""
+"                                                  ..#...........##..#..............#.....................................#..#....#..#..#..............\n                                                  ...............#........#............#..........................................#..............#....\n                                                  ...........#..................................#.......#..#..#.................#...................#.\n                                                  ..........#.....#.................#.......#....#..#..........#................................#.....\n                                                  ...#............#...............................................................#...#.....#.........\n                                                  ..#............#..#........#.................#..#....#.......#....................#............#....\n                                                  ..#..........#......#...................#.........#.................................#.....#.........\n                                                  ......................#..#.....#....#........##....#...............#...............#......#..#......\n                                                  ..........#...............................##...................................#...#................\n                                                  .#................#...................#......#................#...........#.........#............#.#\n                                                  .#....................#....#........##.#.......##....#.......#.......................#............#.\n                                                  .......................#...#....................#...............#.....#....................#..#.....\n                                                  ..........##.......#...#......................#.....#........#..............#..##...................\n                                                  ........#.#.............................#.........#................................#....#.........#.\n                                                  ..........................................#.....#................#.............#...#................\n                                                  ...........#...............................................#..........#...#.....#....#.............#\n                                                  ..#....................##.........#.........#.............#...#.....#...............................\n                                                  ..#..#..#.............#....##....#...#...##....#.#............#....................#........#.......\n                                                  #........#......#...#......#............................#.............#...................#...#.....\n                                                  ....#............#.............#..........................................#.........#..........#....\n                                                  ...........#......#..#..........##..#.....#.....#.........................#.......###...........#...\n                                                  .....#...#............#.......#.....................................................#.....#....#....\n                                                  .......##..............#....#....#......#.....................#........#................#......#....\n                                                  #..........................#...#....#.....#..#.....................#................................\n                                                  .#.......................#..#....#.##......#..#......#....#......#................#.....#...........\n                                                  ...........#.#......#.......#.......#............#...............#.....................#....#.......\n                                                  #...#......#..##..#......#...#..#........#........................#.........................#...#.##\n                   " <> ...
 ```
 
 ## Solution
 
 ```elixir
 defmodule Day22 do
-  defdelegate parse(input), to: __MODULE__.Input
+  alias __MODULE__.Input
+
+  @facing_values %{
+    ?> => 0,
+    ?v => 1,
+    ?< => 2,
+    ?^ => 3
+  }
 
   def part1(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    {grid, instructions, start_point} = Input.parse(input)
+
+    instructions
+    |> Enum.reduce({start_point, ?>}, fn
+      dir, acc when dir in 'LR' ->
+        change_facing(dir, acc)
+
+      num, acc when is_integer(num) ->
+        move(num, acc, grid)
+    end)
+    |> then(fn {{col, row}, facing} ->
+      1000 * row + 4 * col + Map.get(@facing_values, facing)
+    end)
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    {_grid, _instructions, start_point} = Input.parse(input)
+    start_point
+  end
+
+  def change_facing(?R, {point, ?^}), do: {point, ?>}
+  def change_facing(?R, {point, ?>}), do: {point, ?v}
+  def change_facing(?R, {point, ?v}), do: {point, ?<}
+  def change_facing(?R, {point, ?<}), do: {point, ?^}
+  def change_facing(?L, {point, ?^}), do: {point, ?<}
+  def change_facing(?L, {point, ?<}), do: {point, ?v}
+  def change_facing(?L, {point, ?v}), do: {point, ?>}
+  def change_facing(?L, {point, ?>}), do: {point, ?^}
+
+  def move(num_moves, {point, facing}, grid) do
+    {
+      Enum.reduce_while(1..num_moves, point, fn
+        _num, acc_point ->
+          case move_one(acc_point, facing, grid) do
+            :blocked -> {:halt, acc_point}
+            new_point -> {:cont, new_point}
+          end
+      end),
+      facing
+    }
+  end
+
+  def move_one(point, facing, grid) do
+    next_point = next_point(point, facing)
+
+    case Map.get(grid, next_point) do
+      ?# -> :blocked
+      ?. -> next_point
+      nil -> wrap_next_point(point, facing, grid)
+    end
+  end
+
+  def next_point({x, y}, ?^), do: {x, y - 1}
+  def next_point({x, y}, ?>), do: {x + 1, y}
+  def next_point({x, y}, ?v), do: {x, y + 1}
+  def next_point({x, y}, ?<), do: {x - 1, y}
+
+  def find_point(?., point), do: point
+  def find_point(?#, _), do: :blocked
+  def find_point(_, _), do: nil
+
+  # If facing is ?^, then start at y = num_rows and go down to 1
+  # Find the first ?. or ?# value
+  def wrap_next_point({x, _}, ?^, grid) do
+    Enum.find_value(
+      grid.num_rows..1//-1,
+      &find_point(grid[{x, &1}], {x, &1})
+    )
+  end
+
+  # If facing is ?>, then start at x = 1 and go up to num_cols
+  def wrap_next_point({_, y}, ?>, grid) do
+    Enum.find_value(
+      1..grid.num_cols//1,
+      &find_point(grid[{&1, y}], {&1, y})
+    )
+  end
+
+  # If facing is ?v, then start at y = 1 and go up to num_rows
+  def wrap_next_point({x, _}, ?v, grid) do
+    Enum.find_value(
+      1..grid.num_rows//1,
+      &find_point(grid[{x, &1}], {x, &1})
+    )
+  end
+
+  # If facing is ?<, then start at x = num_cols go down to 1
+  def wrap_next_point({_, y}, ?<, grid) do
+    Enum.find_value(
+      grid.num_cols..1//-1,
+      &find_point(grid[{&1, y}], {&1, y})
+    )
   end
 
   defmodule Input do
     def parse(input) when is_binary(input) do
-      input
-      |> String.split("\n")
-      |> parse()
+      with [grid, instructions] <- String.split(input, "\n\n", trim: true) do
+        grid = parse_grid(grid)
+
+        {
+          grid,
+          parse_instructions(instructions),
+          start_point(grid)
+        }
+      end
     end
 
-    def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
+    def parse_grid(input) do
+      grid_lines = String.split(input, "\n", trim: true)
+
+      grid_lines
+      |> Enum.with_index(1)
+      |> Enum.reduce(%{}, &parse_grid_line/2)
+      |> then(fn grid ->
+        grid
+        |> Map.put(
+          :num_rows,
+          grid |> Stream.map(fn {{_, y}, _} -> y end) |> Enum.max()
+        )
+        |> Map.put(
+          :num_cols,
+          grid |> Stream.map(fn {{x, _}, _} -> x end) |> Enum.max()
+        )
+      end)
     end
 
-    def parse_line(line) do
+    def parse_grid_line({line, row}, grid) do
       line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+      |> String.to_charlist()
+      |> Enum.with_index(1)
+      |> Enum.reduce(grid, fn
+        {?\s, _}, acc -> acc
+        {char, col}, acc -> Map.put(acc, {col, row}, char)
+      end)
+    end
+
+    def parse_instructions(instructions) do
+      Regex.scan(~r/(\d+|[LR])/, instructions, capture: :all_but_first)
+      |> Enum.map(fn
+        ["L"] -> ?L
+        ["R"] -> ?R
+        [num] -> String.to_integer(num)
+      end)
+    end
+
+    def start_point(grid, col \\ 1) do
+      case Map.get(grid, {col, 1}) do
+        ?. -> {col, 1}
+        _ -> start_point(grid, col + 1)
+      end
     end
   end
 end
@@ -98,13 +307,35 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day22, <<70, 79, 82, 49, 0, 0, 8, ...>>,
- {:module, Day22.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day22, <<70, 79, 82, 49, 0, 0, 25, ...>>,
+ {:module, Day22.Input, <<70, 79, 82, ...>>, {:start_point, 2}}}
 ```
 
-**QUESTION ONE?**
+```elixir
+{grid, instructions, start_point} = Day22.Input.parse(input)
 
-Your puzzle answer was `answer one`.
+Map.take(grid, [:num_rows, :num_cols])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{num_cols: 150, num_rows: 200}
+```
+
+```elixir
+List.to_string([62])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+">"
+```
+
+Follow the path given in the monkeys' notes. **What is the final password?**
+
+Your puzzle answer was `88226`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -115,7 +346,7 @@ Day22.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+88226
 ```
 
 **QUESTION TWO?**
@@ -131,7 +362,7 @@ Day22.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+{51, 1}
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -152,21 +383,22 @@ defmodule Day22Test do
 
   setup_all do
     [
-      input: ""
+      input:
+        "        ...#\n        .#..\n        #...\n        ....\n...#.......#\n........#...\n..#....#....\n..........#.\n        ...#....\n        .....#..\n        .#......\n        ......#.\n\n10R5L5R10L4R5L5"
     ]
   end
 
-  describe "part1/1" do
+  describe "part1" do
     test "returns expected value", %{input: input} do
-      assert Day22.part1(input) == [""]
+      assert Day22.part1(input) == 6032
     end
   end
 
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day22.part2(input) == [""]
-    end
-  end
+  # describe "part2" do
+  #   test "returns expected value", %{input: input} do
+  #     assert Day22.part2(input) == 5031
+  #   end
+  # end
 end
 
 ExUnit.run()
@@ -175,54 +407,27 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-..
+.
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
+1 test, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 962705
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
+%{excluded: 0, failures: 0, skipped: 0, total: 1}
 ```
 
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day22.part1(input)
-  end
-
-  def fun2(input) do
-    Day22.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day22.Input.parse(input) |> Enum.to_list()
-
-Benchee.run(
-  %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+Benchee.run(%{
+  "Part 1" => fn -> Day22.part1(input) end
+  # "Part 2" => fn -> Day22.part2(input) end
+})
 
 nil
 ```
@@ -230,7 +435,26 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 7 s
+
+Benchmarking Part 1 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        117.48        8.51 ms     ±4.15%        8.65 ms        9.15 ms
 ```
 
 <!-- livebook:{"output":true} -->
