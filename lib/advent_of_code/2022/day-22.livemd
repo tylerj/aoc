@@ -111,9 +111,83 @@ To begin, [get your puzzle input](https://adventofcode.com/2022/day/22/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+As you reach the force field, you think you hear some Elves in the distance. Perhaps they've already arrived?
 
-**QUESTION TWO?**
+You approach the strange **input device**, but it isn't quite what the monkeys drew in their notes. Instead, you are met with a large **cube**; each of its six faces is a square of 50x50 tiles.
+
+To be fair, the monkeys' map **does** have six 50x50 regions on it. If you were to **carefully fold the map**, you should be able to shape it into a cube!
+
+In the example above, the six (smaller, 4x4) faces of the cube are:
+
+```
+        1111
+        1111
+        1111
+        1111
+222233334444
+222233334444
+222233334444
+222233334444
+        55556666
+        55556666
+        55556666
+        55556666
+```
+
+You still start in the same position and with the same facing as before, but the **wrapping** rules are different. Now, if you would walk off the board, you instead **proceed around the cube**. From the perspective of the map, this can look a little strange. In the above example, if you are at `A` and move to the right, you would arrive at `B` facing down; if you are at `C` and move down, you would arrive at `D` facing up:
+
+```
+        ...#
+        .#..
+        #...
+        ....
+...#.......#
+........#..A
+..#....#....
+.D........#.
+        ...#..B.
+        .....#..
+        .#......
+        ..C...#.
+```
+
+Walls still block your path, even if they are on a different face of the cube. If you are at `E` facing up, your movement is blocked by the wall marked by the arrow:
+
+```
+        ...#
+        .#..
+     -->#...
+        ....
+...#..E....#
+........#...
+..#....#....
+..........#.
+        ...#....
+        .....#..
+        .#......
+        ......#.
+```
+
+Using the same method of drawing the last facing you had with an arrow on each tile you visit, the full path taken by the above example now looks like this:
+
+```
+        >>v#    
+        .#v.    
+        #.v.    
+        ..v.    
+...#..^...v#    
+.>>>>>^.#.>>    
+.^#....#....    
+.^........#.    
+        ...#..v.
+        .....#v.
+        .#v<<<<.
+        ..v...#.
+```
+
+The final password is still calculated from your final position and facing from the perspective of the map. In this example, the final row is `5`, the final column is `7`, and the final facing is `3`, so the final password is `1000 * 5 + 4 * 7 + 3 = 5031`.
+
+Fold the map into a cube, **then** follow the path given in the monkeys' notes. **What is the final password?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/22/input).
 
@@ -151,22 +225,27 @@ defmodule Day22 do
   def part1(input) do
     {grid, instructions, start_point} = Input.parse(input)
 
+    process_all_instructions(grid, instructions, start_point, :flat)
+  end
+
+  def part2(input) do
+    {grid, instructions, start_point} = Input.parse(input)
+
+    process_all_instructions(grid, instructions, start_point, :cube)
+  end
+
+  def process_all_instructions(grid, instructions, start_point, shape) do
     instructions
     |> Enum.reduce({start_point, ?>}, fn
       dir, acc when dir in 'LR' ->
         change_facing(dir, acc)
 
       num, acc when is_integer(num) ->
-        move(num, acc, grid)
+        move(num, acc, grid, shape)
     end)
     |> then(fn {{col, row}, facing} ->
       1000 * row + 4 * col + Map.get(@facing_values, facing)
     end)
-  end
-
-  def part2(input) do
-    {_grid, _instructions, start_point} = Input.parse(input)
-    start_point
   end
 
   def change_facing(?R, {point, ?^}), do: {point, ?>}
@@ -178,26 +257,23 @@ defmodule Day22 do
   def change_facing(?L, {point, ?v}), do: {point, ?>}
   def change_facing(?L, {point, ?>}), do: {point, ?^}
 
-  def move(num_moves, {point, facing}, grid) do
-    {
-      Enum.reduce_while(1..num_moves, point, fn
-        _num, acc_point ->
-          case move_one(acc_point, facing, grid) do
-            :blocked -> {:halt, acc_point}
-            new_point -> {:cont, new_point}
-          end
-      end),
-      facing
-    }
+  def move(num_moves, {point, facing}, grid, shape) do
+    Enum.reduce_while(1..num_moves, {point, facing}, fn
+      _num, acc ->
+        case move_one(acc, grid, shape) do
+          {:blocked, _} -> {:halt, acc}
+          new_acc -> {:cont, new_acc}
+        end
+    end)
   end
 
-  def move_one(point, facing, grid) do
+  def move_one({point, facing}, grid, shape) do
     next_point = next_point(point, facing)
 
     case Map.get(grid, next_point) do
-      ?# -> :blocked
-      ?. -> next_point
-      nil -> wrap_next_point(point, facing, grid)
+      ?# -> {:blocked, facing}
+      ?. -> {next_point, facing}
+      nil -> wrap_next_point(point, facing, grid, shape)
     end
   end
 
@@ -206,40 +282,171 @@ defmodule Day22 do
   def next_point({x, y}, ?v), do: {x, y + 1}
   def next_point({x, y}, ?<), do: {x - 1, y}
 
-  def find_point(?., point), do: point
-  def find_point(?#, _), do: :blocked
-  def find_point(_, _), do: nil
+  def find_point(grid, point, new_facing, old_facing \\ nil) do
+    case grid[point] do
+      ?. -> {point, new_facing}
+      ?# -> {:blocked, old_facing || new_facing}
+      _ -> nil
+    end
+  end
+
+  def wrap_next_point(xy, facing, grid, :flat), do: flat_wrap_next_point(xy, facing, grid)
+  def wrap_next_point(xy, facing, grid, :cube), do: cube_wrap_next_point(xy, facing, grid)
+
+  @doc """
+    _ 2 1
+    _ 3 _
+    5 4 _
+    6 _ _
+  """
+  # Up from 2
+  # Right from left of 6
+  # Same 6 y relative to 2 x
+  def cube_wrap_next_point({x, 1}, ?^, grid) when x in 51..100 do
+    find_point(grid, {1, x + 100}, ?>, ?^)
+  end
+
+  # Up from 1
+  # Up from bottom of 6
+  # Same 6 x relative to 1 x
+  def cube_wrap_next_point({x, 1}, ?^, grid) when x in 101..150 do
+    find_point(grid, {x - 100, 200}, ?^, ?^)
+  end
+
+  # Right from 1
+  # Left from right of 4
+  # Inverted y top to bottom
+  # 1 -> 150
+  # 2 -> 149
+  # ...
+  # 50 -> 101
+  def cube_wrap_next_point({150, y}, ?>, grid) when y in 1..50 do
+    find_point(grid, {100, 151 - y}, ?<, ?>)
+  end
+
+  # Down from 1
+  # Left from right of 3
+  # Same 3 y relative to 1 x
+  # 101 -> 51
+  # 102 -> 52
+  # ...
+  # 150 -> 100
+  def cube_wrap_next_point({x, 50}, ?v, grid) when x in 101..150 do
+    find_point(grid, {100, x - 50}, ?<, ?v)
+  end
+
+  # Right from 3
+  # Up from bottom of 1
+  # Same 1 x relative to 3 y
+  def cube_wrap_next_point({100, y}, ?>, grid) when y in 51..100 do
+    find_point(grid, {y + 50, 50}, ?^, ?>)
+  end
+
+  # Right from 4
+  # Left from right of 1
+  # Inverted y
+  # 101 -> 50
+  # 102 -> 49
+  # ...
+  # 150 -> 1
+  def cube_wrap_next_point({100, y}, ?>, grid) when y in 101..150 do
+    find_point(grid, {150, 151 - y}, ?<, ?>)
+  end
+
+  # Down from 4
+  # Left from right of 6
+  # Same 6 y relative to 4 x
+  def cube_wrap_next_point({x, 150}, ?v, grid) when x in 51..100 do
+    find_point(grid, {50, x + 100}, ?<, ?v)
+  end
+
+  # Right from 6
+  # Up from bottom of 4
+  # Same 4 x relative to 6 y
+  def cube_wrap_next_point({50, y}, ?>, grid) when y in 151..200 do
+    find_point(grid, {y - 100, 150}, ?^, ?>)
+  end
+
+  # Down from 6
+  # Down from top of 1
+  # Same 1 x relative to 6 x
+  def cube_wrap_next_point({x, 200}, ?v, grid) when x in 1..50 do
+    find_point(grid, {x + 100, 1}, ?v, ?v)
+  end
+
+  # Left from 6
+  # Down from top of 2
+  # Same 2 x relative to 6 y
+  def cube_wrap_next_point({1, y}, ?<, grid) when y in 151..200 do
+    find_point(grid, {y - 100, 1}, ?v, ?<)
+  end
+
+  # Left from 5
+  # Right from left of 2
+  # Inverted y
+  # 101 -> 50
+  # 102 -> 49
+  # ...
+  # 150 -> 1
+  def cube_wrap_next_point({1, y}, ?<, grid) when y in 101..150 do
+    find_point(grid, {51, 151 - y}, ?>, ?<)
+  end
+
+  # Up from 5
+  # Right from left of 3
+  # Same 3 y relative to 5 x
+  def cube_wrap_next_point({x, 101}, ?^, grid) when x in 1..50 do
+    find_point(grid, {51, x + 50}, ?>, ?^)
+  end
+
+  # Left from 3
+  # Down from top of 5
+  # Same 5 x relative to 3 y
+  def cube_wrap_next_point({51, y}, ?<, grid) when y in 51..100 do
+    find_point(grid, {y - 50, 101}, ?v, ?<)
+  end
+
+  # Left from 2
+  # Right from left of 5
+  # Inverted y
+  # 1 -> 150
+  # 2 ->
+  # ...
+  # 50 -> 101
+  def cube_wrap_next_point({51, y}, ?<, grid) when y in 1..50 do
+    find_point(grid, {1, 151 - y}, ?>, ?<)
+  end
 
   # If facing is ?^, then start at y = num_rows and go down to 1
   # Find the first ?. or ?# value
-  def wrap_next_point({x, _}, ?^, grid) do
+  def flat_wrap_next_point({x, _}, ?^, grid) do
     Enum.find_value(
       grid.num_rows..1//-1,
-      &find_point(grid[{x, &1}], {x, &1})
+      &find_point(grid, {x, &1}, ?^)
     )
   end
 
   # If facing is ?>, then start at x = 1 and go up to num_cols
-  def wrap_next_point({_, y}, ?>, grid) do
+  def flat_wrap_next_point({_, y}, ?>, grid) do
     Enum.find_value(
       1..grid.num_cols//1,
-      &find_point(grid[{&1, y}], {&1, y})
+      &find_point(grid, {&1, y}, ?>)
     )
   end
 
   # If facing is ?v, then start at y = 1 and go up to num_rows
-  def wrap_next_point({x, _}, ?v, grid) do
+  def flat_wrap_next_point({x, _}, ?v, grid) do
     Enum.find_value(
       1..grid.num_rows//1,
-      &find_point(grid[{x, &1}], {x, &1})
+      &find_point(grid, {x, &1}, ?v)
     )
   end
 
   # If facing is ?<, then start at x = num_cols go down to 1
-  def wrap_next_point({_, y}, ?<, grid) do
+  def flat_wrap_next_point({_, y}, ?<, grid) do
     Enum.find_value(
       grid.num_cols..1//-1,
-      &find_point(grid[{&1, y}], {&1, y})
+      &find_point(grid, {&1, y}, ?<)
     )
   end
 
@@ -307,30 +514,8 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day22, <<70, 79, 82, 49, 0, 0, 25, ...>>,
+{:module, Day22, <<70, 79, 82, 49, 0, 0, 38, ...>>,
  {:module, Day22.Input, <<70, 79, 82, ...>>, {:start_point, 2}}}
-```
-
-```elixir
-{grid, instructions, start_point} = Day22.Input.parse(input)
-
-Map.take(grid, [:num_rows, :num_cols])
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-%{num_cols: 150, num_rows: 200}
-```
-
-```elixir
-List.to_string([62])
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-">"
 ```
 
 Follow the path given in the monkeys' notes. **What is the final password?**
@@ -349,9 +534,9 @@ Day22.part1(input)
 88226
 ```
 
-**QUESTION TWO?**
+Fold the map into a cube, **then** follow the path given in the monkeys' notes. **What is the final password?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `57305`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -362,7 +547,7 @@ Day22.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-{51, 1}
+57305
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -393,12 +578,6 @@ defmodule Day22Test do
       assert Day22.part1(input) == 6032
     end
   end
-
-  # describe "part2" do
-  #   test "returns expected value", %{input: input} do
-  #     assert Day22.part2(input) == 5031
-  #   end
-  # end
 end
 
 ExUnit.run()
@@ -425,8 +604,8 @@ Randomized with seed 962705
 ```elixir
 # https://github.com/bencheeorg/benchee
 Benchee.run(%{
-  "Part 1" => fn -> Day22.part1(input) end
-  # "Part 2" => fn -> Day22.part2(input) end
+  "Part 1" => fn -> Day22.part1(input) end,
+  "Part 2" => fn -> Day22.part2(input) end
 })
 
 nil
@@ -449,12 +628,18 @@ memory time: 0 ns
 reduction time: 0 ns
 parallel: 1
 inputs: none specified
-Estimated total run time: 7 s
+Estimated total run time: 14 s
 
 Benchmarking Part 1 ...
+Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        117.48        8.51 ms     ±4.15%        8.65 ms        9.15 ms
+Part 2        120.38        8.31 ms     ±4.25%        8.45 ms        8.89 ms
+Part 1        115.83        8.63 ms     ±4.08%        8.69 ms        9.27 ms
+
+Comparison: 
+Part 2        120.38
+Part 1        115.83 - 1.04x slower +0.33 ms
 ```
 
 <!-- livebook:{"output":true} -->
