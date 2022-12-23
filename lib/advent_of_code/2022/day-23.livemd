@@ -21,11 +21,170 @@ Mix.install([:kino, :benchee])
 
 ## Prompt
 
-### --- Day 23: TBD ---
+### --- Day 23: Unstable Diffusion ---
 
-Part One prompt
+You enter a large crater of gray dirt where the grove is supposed to be. All around you, plants you imagine were expected to be full of fruit are instead withered and broken. A large group of Elves has formed in the middle of the grove.
 
-**QUESTION ONE?**
+"...but this volcano has been dormant for months. Without ash, the fruit can't grow!"
+
+You look up to see a massive, snow-capped mountain towering above you.
+
+"It's not like there are other active volcanoes here; we've looked everywhere."
+
+"But our scanners show active magma flows; clearly it's going **somewhere**."
+
+They finally notice you at the edge of the grove, your pack almost overflowing from the random **star** fruit you've been collecting. Behind you, elephants and monkeys explore the grove, looking concerned. Then, the Elves recognize the ash cloud slowly spreading above your recent detour.
+
+"Why do you--" "How is--" "Did you just--"
+
+Before any of them can form a complete question, another Elf speaks up: "Okay, new plan. We have almost enough fruit already, and ash from the plume should spread here eventually. If we quickly plant new seedlings now, we can still make it to the extraction point. Spread out!"
+
+The Elves each reach into their pack and pull out a tiny plant. The plants rely on important nutrients from the ash, so they can't be planted too close together.
+
+There isn't enough time to let the Elves figure out where to plant the seedlings themselves; you quickly scan the grove (your puzzle input) and note their positions.
+
+For example:
+
+```
+....#..
+..###.#
+#...#.#
+.#...##
+#.###..
+##.#.##
+.#..#..
+```
+
+The scan shows Elves `#` and empty ground `.`; outside your scan, more empty ground extends a long way in every direction. The scan is oriented so that north is up; orthogonal directions are written `N` (north), `S` (south), `W` (west), and `E` (east), while diagonal directions are written `NE`, `NW`, `SE`, `SW`.
+
+The Elves follow a time-consuming process to figure out where they should each go; you can speed up this process considerably. The process consists of some number of **rounds** during which Elves alternate between considering where to move and actually moving.
+
+During the **first half** of each round, each Elf considers the eight positions adjacent to themself. If no other Elves are in one of those eight positions, the Elf **does not do anything** during this round. Otherwise, the Elf looks in each of four directions in the following order and **proposes** moving one step in the **first valid direction**:
+
+* If there is no Elf in the `N`, `NE`, or `NW` adjacent positions, the Elf proposes moving **north** one step.
+* If there is no Elf in the `S`, `SE`, or `SW` adjacent positions, the Elf proposes moving **south** one step.
+* If there is no Elf in the `W`, `NW`, or `SW` adjacent positions, the Elf proposes moving **west** one step.
+* If there is no Elf in the `E`, `NE`, or `SE` adjacent positions, the Elf proposes moving **east** one step.
+
+After each Elf has had a chance to propose a move, the **second half** of the round can begin. Simultaneously, each Elf moves to their proposed destination tile if they were the **only** Elf to propose moving to that position. If two or more Elves propose moving to the same position, **none** of those Elves move.
+
+Finally, at the end of the round, the **first direction** the Elves considered is moved to the end of the list of directions. For example, during the second round, the Elves would try proposing a move to the south first, then west, then east, then north. On the third round, the Elves would first consider west, then east, then north, then south.
+
+As a smaller example, consider just these five Elves:
+
+```
+.....
+..##.
+..#..
+.....
+..##.
+.....
+```
+
+The northernmost two Elves and southernmost two Elves all propose moving north, while the middle Elf cannot move north and proposes moving south. The middle Elf proposes the same destination as the southwest Elf, so neither of them move, but the other three do:
+
+```
+..##.
+.....
+..#..
+...#.
+..#..
+.....
+```
+
+Next, the northernmost two Elves and the southernmost Elf all propose moving south. Of the remaining middle two Elves, the west one cannot move south and proposes moving west, while the east one cannot move south or west and proposes moving east. All five Elves succeed in moving to their proposed positions:
+
+```
+.....
+..##.
+.#...
+....#
+.....
+..#..
+```
+
+Finally, the southernmost two Elves choose not to move at all. Of the remaining three Elves, the west one proposes moving west, the east one proposes moving east, and the middle one proposes moving north; all three succeed in moving:
+
+```
+..#..
+....#
+#....
+....#
+.....
+..#..
+```
+
+At this point, no Elves need to move, and so the process ends.
+
+The larger example above proceeds as follows:
+
+```
+== Initial State ==
+..............
+..............
+.......#......
+.....###.#....
+...#...#.#....
+....#...##....
+...#.###......
+...##.#.##....
+....#..#......
+..............
+..............
+..............
+
+== End of Round 1 ==
+..............
+.......#......
+.....#...#....
+...#..#.#.....
+.......#..#...
+....#.#.##....
+..#..#.#......
+..#.#.#.##....
+..............
+....#..#......
+..............
+..............
+
+After a few more rounds...
+
+== End of Round 10 ==
+.......#......
+...........#..
+..#.#..#......
+......#.......
+...#.....#..#.
+.#......##....
+.....##.......
+..#........#..
+....#.#..#....
+..............
+....#..#..#...
+..............
+```
+
+([SEE WEBSITE FOR FULL EXAMPLE](https://adventofcode.com/2022/day/23))
+
+To make sure they're on the right track, the Elves like to check after round 10 that they're making good progress toward covering enough ground. To do this, count the number of empty ground tiles contained by the smallest rectangle that contains every Elf. (The edges of the rectangle should be aligned to the N/S/E/W directions; the Elves do not have the patience to calculate arbitrary rectangles.) In the above example, that rectangle is:
+
+```
+......#.....
+..........#.
+.#.#..#.....
+.....#......
+..#.....#..#
+#......##...
+....##......
+.#........#.
+...#.#..#...
+............
+...#..#..#..
+```
+
+In this region, the number of empty ground tiles is `110`.
+
+Simulate the Elves' process and find the smallest rectangle that contains the Elves after 10 rounds. **How many empty ground tiles does that rectangle contain?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2022/day/23/input).
 
@@ -33,9 +192,26 @@ To begin, [get your puzzle input](https://adventofcode.com/2022/day/23/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+It seems you're on the right track. Finish simulating the process and figure out where the Elves need to go. How many rounds did you save them?
 
-**QUESTION TWO?**
+In the example above, the **first round where no Elf moved** was round `20`:
+
+```
+.......#......
+....#......#..
+..#.....#.....
+......#.......
+...#....#.#..#
+#.............
+....#.....#...
+..#.....#.....
+....#.#....#..
+.........#....
+....#......#..
+.......#......
+```
+
+Figure out where the Elves need to go. **What is the number of the first round where no Elf moves?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/23/input).
 
@@ -54,7 +230,7 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-""
+".###..##....#.#...###.###.#.#..#.########.#.###.##....####.#.##....#...##\n.#.####.###..####.##..##...#.#....#....#.#..###..###....##.##..###..#.#.#\n.#..###..#....##.####.#.#.##.##...######..##......###..#.#....#...#######\n#.###..#.....#.#.##.....##.#####..####...##.#.....###..#....#..#.#.#..##.\n..###.##..#.##.#######.#####..###....##...#.##..##..##....#.#.#..#####..#\n.#.#..#..#..##..####..#....####..##.#..#..##...##.#####..#..#.#..#...##..\n#.....#..#.####.#.....#.#....#...#.###.#.####...##.#..##..#.#.###...####.\n###...#.#...#...##....##.#...#.....###..##..#....###.#...###.###..###..##\n...###.#.#.....###..#.#..#.##....#..##...#.###..####...#.##.....##.###..#\n.##.#.....#..#..#.......#..###.....###.##.###..###.##..#..#.###...#...###\n...##.##..#.#.##.##.#.#.#...#.##.##.##...##....#.#######..##.#.##.....###\n##...........#.....##.#.##.###..#..#.#....##.#...#.#.##.###.#...###.####.\n#..##.##.#..##..#...##.##..#...#.##..##..#..#.....#..#.#####.#..##....#..\n...#...###.#..##.....##.#..#.##...#.##.###..####.###..#....#.##..###..###\n...#.#..########..###.#.####............####.####.##.......#....#.##.#..#\n#.#....#...#....#.#..###.#.#..###.#..####...##.######..####...#####..#.#.\n#.#..##.......#..#..#....##...#..###..##...#.....####.##.#...#.##.#....##\n#.....#.###..#########..###.#..#####.#..###.####.####.#.....#.#...###.##.\n#...#..####...######.##.#.##.##.#.#..#.....#..#.##.#.##.#.#...##.#.#...#.\n##.#....###...##...##....#..#####.#.##..####.#...####..#..#...#..####.###\n#.##.....#.#...#..#....##..##.#####..##....#####.####..#..####....#..##..\n.....##..#..####...#####...##..#.#.##.#.##...####....#.####.#.#.....#..##\n#.####.###.##.#.#....##.######...#.#.##.###.##.#..####..#..#......#.##...\n.###.##.##.###..###.#.#.###.##....##.#.###..#..##...#...#.##.#..#.##.#..#\n####.####...#####....###.#####..##..##...####..####.##..###.##..#..#.#..#\n#.....##..##.###.#.#.###.###..#..##..##.#.###..#..##.#......#.###.###.##.\n####..#.#..#..#.#..#..#.#..#.#..#.##.##..##.##.###...##..#...####.#.###..\n###.#....#.#.#.####.#.###.##.#....#..#.#..###.#.#.###.#.######.#....#..##\n.####.###.#.##.###...#.##.#.#....#.#..###.##.#...#.....#....##.##..#.#.##\n##.#####..#.#..#.#...##..#.#########..##...#..####...#.#...###.####.#...#\n###.#...#.#.##.###.....#...##.###...#.#.#.##..##.##.#..####....####...#..\n...#.......##.##.#..#.##.....###.##.##.#.#.#.#..##..##..##..###..####..#.\n#.#...#..##..##.###...##.....##.#.###.##..######.#.####...##.###...##..#.\n.#...#.#####.###.#..#.#...##.#.###.###.####...#...#.#..#...##.#####.#.##.\n##.#.##....#..#..#..#....###.######..##.###..#..#.##.##.##.#...##...##.##\n#..#..######....##..####..#....####..#.#....#..###...###.###.....#.#..#.#\n##....#...###.#####.###.##..###..##.##.#.....###...#.####.#....###..#.##.\n##......#..####.#....####.#..#....#.####.#..####.##..###.#..#.#..#.#.#...\n.#.#..#........#.#.#####.##.###...#..##....###...###.#.#.#.##......##.###\n.##....#.#.#...#.###..###.##.####.#.####.##......##..##.####.##..#####.#.\n#.##..#.######..####....#####...#.######..#..#.##.#..##..#..###.....#.###\n.....###.##.#.#.#..####....####.######.##.##...#####..#...#...#..##..##.#\n.#.#..#...#..######..#..##....#.#..#..##.##.#.#...##.##.#..####.#..##.###\n.#.######....#.##.##.#..##......##..##...#.##..#..##.....###..#.#....#.#.\n...#...##.####......#.######..##.##.####.#....#.#####.....#.##.#....###..\n.....#.##..#..###..#.##...#..#.#.#.#..#####....###.#.##.##..####...###.##\n......##.###.#.##..#..#.##.#......#...#.#.#..###.#....###....##.##..###..\n.....###...#..###.#.....#.####.....#..###..###..#.#.#.###..#.....##.###..\n##.#.###.#.#..#..#....#.##..###.#.#.#...###.###.#.#..#.#.##.#..#.#....#..\n.###..##.#...####.#.#####.##..##..######...#...#.#..####..#.##..#.####..#\n...###.#...#..#.##.####.#..##.###..#.##..##...##.#####..###.######.#.###.\n..#.#....####....##.#.#....###.......#.###.#..#.###..#..#..#......###...#\n.#...##..##.#...#....#..#..##.#.####..####........##.#.##.#..##..##.....#\n.#..###.#.##.####......###.#......##.#####....######.....#.#####..#.#..#.\n##.##.....###.##.#.#....#...##.##...###.##.###.##.###.###..##..#...#.#.#.\n.##...##.##....###.###.###" <> ...
 ```
 
 ## Solution
@@ -63,33 +239,148 @@ input = input |> Kino.Input.read()
 defmodule Day23 do
   defdelegate parse(input), to: __MODULE__.Input
 
+  @directions ~w(N S W E)a
+
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> move_elves(@directions, 1, 10)
+    |> count_empty_tiles()
   end
 
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> move_elves(@directions, 1)
+    |> elem(1)
+  end
+
+  def move_elves(grid, directions, round, stop_round \\ nil) do
+    with {:ok, proposals} <- gather_proposals(grid, directions) do
+      grid
+      |> move_proposals(proposals)
+      |> then(fn grid ->
+        if stop_round && round == stop_round do
+          grid
+        else
+          move_elves(grid, next_directions(directions), round + 1, stop_round)
+        end
+      end)
+    else
+      :done -> {grid, round}
+    end
+  end
+
+  def next_directions([head | tail]), do: tail ++ [head]
+
+  def gather_proposals(grid, directions) do
+    grid
+    |> Map.keys()
+    |> Enum.map(&find_next_spot(&1, grid, directions))
+    |> Enum.reject(&is_nil/1)
+    |> return_proposals()
+  end
+
+  def find_next_spot(xy, grid, directions) do
+    if neighbors_empty?(xy, nil, grid) do
+      nil
+    else
+      directions
+      |> Enum.find_value(fn direction ->
+        if neighbors_empty?(xy, direction, grid) do
+          {xy, move_direction(xy, direction)}
+        else
+          nil
+        end
+      end)
+    end
+  end
+
+  def neighbors_empty?(xy, direction, grid) do
+    neighbors(xy, direction)
+    |> Enum.all?(fn neighbor -> grid[neighbor] |> is_nil() end)
+  end
+
+  def neighbors({x, y}, :N),
+    do: [{x - 1, y - 1}, {x, y - 1}, {x + 1, y - 1}]
+
+  def neighbors({x, y}, :S),
+    do: [{x - 1, y + 1}, {x, y + 1}, {x + 1, y + 1}]
+
+  def neighbors({x, y}, :W),
+    do: [{x - 1, y - 1}, {x - 1, y}, {x - 1, y + 1}]
+
+  def neighbors({x, y}, :E),
+    do: [{x + 1, y - 1}, {x + 1, y}, {x + 1, y + 1}]
+
+  def neighbors({x, y}, nil) do
+    [
+      {x, y - 1},
+      {x + 1, y - 1},
+      {x + 1, y},
+      {x + 1, y + 1},
+      {x, y + 1},
+      {x - 1, y + 1},
+      {x - 1, y},
+      {x - 1, y - 1}
+    ]
+  end
+
+  def move_direction({x, y}, :N), do: {x, y - 1}
+  def move_direction({x, y}, :S), do: {x, y + 1}
+  def move_direction({x, y}, :W), do: {x - 1, y}
+  def move_direction({x, y}, :E), do: {x + 1, y}
+
+  def return_proposals([]), do: :done
+
+  def return_proposals(proposals) do
+    {:ok,
+     proposals
+     |> Enum.reduce(%{}, fn {from, to}, acc ->
+       Map.update(acc, to, [from], fn from_list -> [from | from_list] end)
+     end)}
+  end
+
+  def move_proposals(grid, proposed_moves) do
+    proposed_moves
+    |> Enum.reduce(grid, fn
+      {xy, [from]}, acc -> acc |> Map.delete(from) |> Map.put(xy, ?#)
+      _, acc -> acc
+    end)
+  end
+
+  def count_empty_tiles(grid) do
+    {min_x, max_x} = grid |> Enum.map(fn {{x, _}, _} -> x end) |> Enum.min_max()
+    {min_y, max_y} = grid |> Enum.map(fn {{_, y}, _} -> y end) |> Enum.min_max()
+
+    min_x..max_x
+    |> Enum.map(fn x ->
+      Enum.count(min_y..max_y, fn y -> grid[{x, y}] |> is_nil() end)
+    end)
+    |> Enum.sum()
   end
 
   defmodule Input do
     def parse(input) when is_binary(input) do
       input
-      |> String.split("\n")
+      |> String.split("\n", trim: true)
       |> parse()
     end
 
     def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
+      input
+      |> Enum.with_index()
+      |> Enum.reduce(%{}, &parse_line/2)
     end
 
-    def parse_line(line) do
+    def parse_line({line, row}, grid) do
       line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+      |> String.to_charlist()
+      |> Enum.with_index()
+      |> Enum.reduce(grid, fn
+        {?#, col}, acc -> Map.put(acc, {col, row}, ?#)
+        _, acc -> acc
+      end)
     end
   end
 end
@@ -98,13 +389,13 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day23, <<70, 79, 82, 49, 0, 0, 8, ...>>,
- {:module, Day23.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day23, <<70, 79, 82, 49, 0, 0, 34, ...>>,
+ {:module, Day23.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
 ```
 
-**QUESTION ONE?**
+Simulate the Elves' process and find the smallest rectangle that contains the Elves after 10 rounds. **How many empty ground tiles does that rectangle contain?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `4075`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -115,12 +406,12 @@ Day23.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+4075
 ```
 
-**QUESTION TWO?**
+Figure out where the Elves need to go. **What is the number of the first round where no Elf moves?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `950`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -131,7 +422,7 @@ Day23.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+950
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -152,19 +443,19 @@ defmodule Day23Test do
 
   setup_all do
     [
-      input: ""
+      input: "....#..\n..###.#\n#...#.#\n.#...##\n#.###..\n##.#.##\n.#..#.."
     ]
   end
 
-  describe "part1/1" do
+  describe "part1" do
     test "returns expected value", %{input: input} do
-      assert Day23.part1(input) == [""]
+      assert Day23.part1(input) == 110
     end
   end
 
-  describe "part2/1" do
+  describe "part2" do
     test "returns expected value", %{input: input} do
-      assert Day23.part2(input) == [""]
+      assert Day23.part2(input) == 20
     end
   end
 end
@@ -179,7 +470,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 203706
 ```
 
 <!-- livebook:{"output":true} -->
@@ -191,34 +482,12 @@ Randomized with seed 162351
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day23.part1(input)
-  end
-
-  def fun2(input) do
-    Day23.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day23.Input.parse(input) |> Enum.to_list()
 
 Benchee.run(
   %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
+    "Part 1" => fn -> Day23.part1(input) end,
+    "Part 2" => fn -> Day23.part2(input) end
   },
   memory_time: 2,
   reduction_time: 2
@@ -230,7 +499,52 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1         39.97       0.0250 s     ±1.23%       0.0250 s       0.0258 s
+Part 2          0.46         2.17 s     ±0.06%         2.17 s         2.17 s
+
+Comparison: 
+Part 1         39.97
+Part 2          0.46 - 86.56x slower +2.14 s
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1       0.0330 GB     ±0.01%      0.0330 GB      0.0331 GB
+Part 2         2.43 GB     ±0.00%        2.43 GB        2.43 GB
+
+Comparison: 
+Part 1       0.0330 GB
+Part 2         2.43 GB - 73.61x memory usage +2.40 GB
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1          2.75 M     ±0.00%         2.75 M         2.75 M
+Part 2        205.78 M     ±0.00%       205.78 M       205.78 M
+
+Comparison: 
+Part 1          2.75 M
+Part 2        205.78 M - 74.71x reduction count +203.02 M
 ```
 
 <!-- livebook:{"output":true} -->
