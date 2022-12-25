@@ -4,34 +4,37 @@ defmodule AdventOfCode.Y2022.Day24 do
   def part1(input \\ nil) do
     grid = parse(input)
 
-    progress_minute([grid.start_point], 1, grid)
+    grid
+    |> journey([grid.start_point], grid.end_point, 1)
+    |> elem(0)
   end
 
   def part2(input \\ nil) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    grid = parse(input)
+
+    with {min_a, grid_a} <- journey(grid, [grid.start_point], grid.end_point, 1),
+         {min_b, grid_b} <- journey(grid_a, [grid.end_point], grid.start_point, 1),
+         {min_c, _grid_c} <- journey(grid_b, [grid.start_point], grid.end_point, 1) do
+      min_a + min_b + min_c
+    end
   end
 
-  def progress_minute(points, minute, grid) do
+  def journey(grid, points, destination, minute) do
     with new_grid <- progress_blizzard(grid),
          new_points <- expand_points(points, new_grid) do
       # :timer.sleep(1000)
       # IO.puts("Minute #{minute}:")
       # draw(new_grid, new_points)
 
-      if grid.end_point in new_points do
-        minute
+      if destination in new_points do
+        {minute, new_grid}
       else
-        progress_minute(new_points, minute + 1, new_grid)
+        journey(new_grid, new_points, destination, minute + 1)
       end
     end
   end
 
-  def expand_points(
-        points,
-        %{min_x: min_x, max_x: max_x, min_y: min_y, max_y: max_y, end_point: end_point} = grid
-      ) do
+  def expand_points(points, grid) do
     points
     |> Enum.flat_map(fn {x, y} ->
       [
@@ -45,10 +48,10 @@ defmodule AdventOfCode.Y2022.Day24 do
     |> Enum.uniq()
     # |> IO.inspect(label: "NEW POINTS PRE")
     |> Enum.filter(fn
-      ^end_point ->
+      xy when xy in [grid.start_point, grid.end_point] ->
         true
 
-      {x, y} when x in min_x..max_x and y in min_y..max_y ->
+      {x, y} when x in grid.min_x..grid.max_x and y in grid.min_y..grid.max_y ->
         Enum.empty?(grid[{x, y}])
 
       _ ->

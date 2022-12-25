@@ -176,9 +176,15 @@ To begin, [get your puzzle input](https://adventofcode.com/2022/day/24/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+As the expedition reaches the far side of the valley, one of the Elves looks especially dismayed:
 
-**QUESTION TWO?**
+He **forgot his snacks** at the entrance to the valley!
+
+Since you're so good at dodging blizzards, the Elves humbly request that you go back for his snacks. From the same initial conditions, how quickly can you make it from the start to the goal, then back to the start, then back to the goal?
+
+In the above example, the first trip to the goal takes `18` minutes, the trip back to the start takes `23` minutes, and the trip back to the goal again takes `13` minutes, for a total time of `54` minutes.
+
+**What is the fewest number of minutes required to reach the goal, go back to the start, then reach the goal again?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/24/input).
 
@@ -209,24 +215,33 @@ defmodule Day24 do
   def part1(input) do
     grid = parse(input)
 
-    progress_minute([grid.start_point], 1, grid)
+    grid
+    |> journey([grid.start_point], grid.end_point, 1)
+    |> elem(0)
   end
 
-  def progress_minute(points, minute, grid) do
+  def part2(input) do
+    grid = parse(input)
+
+    with {min_a, grid_a} <- journey(grid, [grid.start_point], grid.end_point, 1),
+         {min_b, grid_b} <- journey(grid_a, [grid.end_point], grid.start_point, 1),
+         {min_c, _grid_c} <- journey(grid_b, [grid.start_point], grid.end_point, 1) do
+      min_a + min_b + min_c
+    end
+  end
+
+  def journey(grid, points, destination, minute) do
     with new_grid <- progress_blizzard(grid),
          new_points <- expand_points(points, new_grid) do
-      if grid.end_point in new_points do
-        minute
+      if destination in new_points do
+        {minute, new_grid}
       else
-        progress_minute(new_points, minute + 1, new_grid)
+        journey(new_grid, new_points, destination, minute + 1)
       end
     end
   end
 
-  def expand_points(
-        points,
-        %{min_x: min_x, max_x: max_x, min_y: min_y, max_y: max_y, end_point: end_point} = grid
-      ) do
+  def expand_points(points, grid) do
     points
     |> Enum.flat_map(fn {x, y} ->
       [
@@ -239,10 +254,10 @@ defmodule Day24 do
     end)
     |> Enum.uniq()
     |> Enum.filter(fn
-      ^end_point ->
+      xy when xy in [grid.start_point, grid.end_point] ->
         true
 
-      {x, y} when x in min_x..max_x and y in min_y..max_y ->
+      {x, y} when x in grid.min_x..grid.max_x and y in grid.min_y..grid.max_y ->
         Enum.empty?(grid[{x, y}])
 
       _ ->
@@ -380,6 +395,13 @@ defmodule Day24 do
 end
 ```
 
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day24, <<70, 79, 82, 49, 0, 0, 39, ...>>,
+ {:module, Day24.Input, <<70, 79, 82, ...>>, {:parse_row, 2}}}
+```
+
 **What is the fewest number of minutes required to avoid the blizzards and reach the goal?**
 
 Your puzzle answer was `260`.
@@ -396,20 +418,20 @@ Day24.part1(input)
 260
 ```
 
-**QUESTION TWO?**
+**What is the fewest number of minutes required to reach the goal, go back to the start, then reach the goal again?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `747`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-# Day24.part2(input)
+Day24.part2(input)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-nil
+747
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -440,14 +462,30 @@ defmodule Day24Test do
     end
   end
 
-  # describe "part2" do
-  #   test "returns expected value", %{input: input} do
-  #     assert Day24.part2(input) == [""]
-  #   end
-  # end
+  describe "part2" do
+    test "returns expected value", %{input: input} do
+      assert Day24.part2(input) == 54
+    end
+  end
 end
 
 ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 427176
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
 ```
 
 ## Benchmarking
@@ -457,8 +495,8 @@ ExUnit.run()
 
 Benchee.run(
   %{
-    "Part 1" => fn -> Day24.part1(input) end
-    # "Part 2" => fn -> Day24.part2(input) end
+    "Part 1" => fn -> Day24.part1(input) end,
+    "Part 2" => fn -> Day24.part2(input) end
   },
   memory_time: 2,
   reduction_time: 2
@@ -484,22 +522,38 @@ memory time: 2 s
 reduction time: 2 s
 parallel: 1
 inputs: none specified
-Estimated total run time: 11 s
+Estimated total run time: 22 s
 
 Benchmarking Part 1 ...
+Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1          1.52      658.90 ms     ±0.70%      659.53 ms      665.78 ms
+Part 1          1.32         0.76 s     ±1.82%         0.76 s         0.78 s
+Part 2          0.50         2.01 s     ±0.14%         2.01 s         2.01 s
+
+Comparison: 
+Part 1          1.32
+Part 2          0.50 - 2.64x slower +1.25 s
 
 Memory usage statistics:
 
 Name           average  deviation         median         99th %
-Part 1       957.68 MB     ±0.00%      957.69 MB      957.69 MB
+Part 1         0.93 GB     ±0.02%        0.93 GB        0.93 GB
+Part 2         2.65 GB     ±0.00%        2.65 GB        2.65 GB
+
+Comparison: 
+Part 1         0.93 GB
+Part 2         2.65 GB - 2.84x memory usage +1.72 GB
 
 Reduction count statistics:
 
 Name           average  deviation         median         99th %
-Part 1         30.95 M     ±0.00%        30.95 M        30.95 M
+Part 1         31.35 M     ±0.00%        31.35 M        31.35 M
+Part 2         86.68 M     ±0.00%        86.68 M        86.68 M
+
+Comparison: 
+Part 1         31.35 M
+Part 2         86.68 M - 2.77x reduction count +55.33 M
 ```
 
 <!-- livebook:{"output":true} -->

@@ -15,9 +15,9 @@ defmodule AdventOfCode.Y2022.Day24Test do
     end
   end
 
-  # describe "part2" do
-  #   test "returns expected value", %{input: input} do
-  #     assert Day24.part2(input) == []
-  #   end
-  # end
+  describe "part2" do
+    test "returns expected value", %{input: input} do
+      assert Day24.part2(input) == 54
+    end
+  end
 end
