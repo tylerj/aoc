@@ -1,0 +1,509 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 24 - Advent of Code 2022
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2022/day/24)
+* [AoC Puzzle Input](https://adventofcode.com/2022/day/24/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day_24.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2022/day-24.livemd)
+
+## Prompt
+
+### --- Day 24: Blizzard Basin ---
+
+With everything replanted for next year (and with elephants and monkeys to tend the grove), you and the Elves leave for the extraction point.
+
+Partway up the mountain that shields the grove is a flat, open area that serves as the extraction point. It's a bit of a climb, but nothing the expedition can't handle.
+
+At least, that would normally be true; now that the mountain is covered in snow, things have become more difficult than the Elves are used to.
+
+As the expedition reaches a valley that must be traversed to reach the extraction site, you find that strong, turbulent winds are pushing small **blizzards** of snow and sharp ice around the valley. It's a good thing everyone packed warm clothes! To make it across safely, you'll need to find a way to avoid them.
+
+Fortunately, it's easy to see all of this from the entrance to the valley, so you make a map of the valley and the blizzards (your puzzle input). For example:
+
+```
+#.#####
+#.....#
+#>....#
+#.....#
+#...v.#
+#.....#
+#####.#
+```
+
+The walls of the valley are drawn as `#`; everything else is ground. Clear ground - where there is currently no blizzard - is drawn as `.`. Otherwise, blizzards are drawn with an arrow indicating their direction of motion: up (`^`), down (`v`), left (`<`), or right (`>`).
+
+The above map includes two blizzards, one moving right (`>`) and one moving down (`v`). In one minute, each blizzard moves one position in the direction it is pointing:
+
+```
+#.#####
+#.....#
+#.>...#
+#.....#
+#.....#
+#...v.#
+#####.#
+```
+
+Due to conservation of blizzard energy, as a blizzard reaches the wall of the valley, a new blizzard forms on the opposite side of the valley moving in the same direction. After another minute, the bottom downward-moving blizzard has been replaced with a new downward-moving blizzard at the top of the valley instead:
+
+```
+#.#####
+#...v.#
+#..>..#
+#.....#
+#.....#
+#.....#
+#####.#
+```
+
+Because blizzards are made of tiny snowflakes, they pass right through each other. After another minute, both blizzards temporarily occupy the same position, marked 2:
+
+```
+#.#####
+#.....#
+#...2.#
+#.....#
+#.....#
+#.....#
+#####.#
+```
+
+After another minute, the situation resolves itself, giving each blizzard back its personal space:
+
+```
+#.#####
+#.....#
+#....>#
+#...v.#
+#.....#
+#.....#
+#####.#
+```
+
+Finally, after yet another minute, the rightward-facing blizzard on the right is replaced with a new one on the left facing the same direction:
+
+```
+#.#####
+#.....#
+#>....#
+#.....#
+#...v.#
+#.....#
+#####.#
+```
+
+This process repeats at least as long as you are observing it, but probably forever.
+
+Here is a more complex example:
+
+```
+#.######
+#>>.<^<#
+#.<..<<#
+#>v.><>#
+#<^v^^>#
+######.#
+```
+
+Your expedition begins in the only non-wall position in the top row and needs to reach the only non-wall position in the bottom row. On each minute, you can **move** up, down, left, or right, or you can **wait** in place. You and the blizzards act **simultaneously**, and you cannot share a position with a blizzard.
+
+In the above example, the fastest way to reach your goal requires `18` steps. Drawing the position of the expedition as E, one way to achieve this is:
+
+```
+Initial state:
+#E######
+#>>.<^<#
+#.<..<<#
+#>v.><>#
+#<^v^^>#
+######.#
+
+Minute 1, move down:
+#.######
+#E>3.<.#
+#<..<<.#
+#>2.22.#
+#>v..^<#
+######.#
+
+Minute 2, move down:
+#.######
+#.2>2..#
+#E^22^<#
+#.>2.^>#
+#.>..<.#
+######.#
+
+...
+
+Minute 17, move down:
+#.######
+#2.v.<>#
+#<.<..<#
+#.^>^22#
+#.2..2E#
+######.#
+
+Minute 18, move down:
+#.######
+#>2.<.<#
+#.2v^2<#
+#>..>2>#
+#<....>#
+######E#
+```
+
+([SEE WEBSITE FOR FULL EXAMPLE](https://adventofcode.com/2022/day/24))
+
+**What is the fewest number of minutes required to avoid the blizzards and reach the goal?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2022/day/24/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2022/day/24/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"#.####################################################################################################\n#>^v^v>><.>>><>^v<>^v>v<>^<<>>v>>.>><v>^<>^.<>v.>v^>vvvv<<<<>>^v^^^>><><.^^^.<<<>><^v^vv^v<.v.v>>.vv<#\n#>^><>^v^<>.<v><.<.v<v>vv<^<vvvv.^^...<<<^^vv<<v<>>>>v^<>>^^^><.>>>>v<<>^.>.^^<v<.><<.<><.>>>^^^>>.<>#\n#<.vvv^^v>^<<^^^>.^<..v.v<<^>vv<>>>v^>vv<><v<<vv<v^>v<^^^^v>.<.vv><v>v<v<^v^>>^<^^<>^>v^<^.^^v><>.><>#\n#>..<^^<>>v>><>vv^<v.^v.>^<.v^<v><<^<><v^v<.vv^>>vvv.vvv<>v>><<.>^><v^<<<v<<>><v><^v.v.<>^>v><v<^<<.>#\n#>^^<v>v><^<^>^<vvv^.>^^><^>><^^.vv>v<>v<>^>^v><v>>.>>^<v><^v^v^>v^<.<v^^^<>vvv^^<.<v<>>>.^>><<.vvv.>#\n#><v>v^>^<>v^>>^^<>.><^v<^vvv>vv<.><>v>v<..<^>>v^v<<<<v>v^.<<<^^^^.^v^<<>^vvv>^><.^v<^<>vv><<^<>^<^<<#\n#.^vvv<vv>^^v<>v<<v^^>.<<<v><<vv<v>>^<vv<v>><<^>^vv<<>^<<>^v.>>.<>>^<^<v<^^^<.vv^vv><^><v^^v>v^v>^vv.#\n#<v.>^<^><^..>^.>>v>>vv<^<.<vv<<v^v<.vvv>>.^v^^<^v<^<.^vv>v>^><v<v^>^v>>>>^^^v>^^>>>v<v^vv<.^><vv<>^<#\n#><>v^>^v<.<.>.<^.<>>^^>v^<v^<v>vvv<<^>vv<^^>^<^>v<.^.v<<.v.v^v>v><>..^^<.v^^<.<<<<<><>v><v<^^v<^<vv<#\n#><<>v><>^^^.<.<<>^v>v^>^>>>>v>.^>.v>.^>^.v<^<>v.v>v^v^^>^v>>>.<^v^^.>>>>^<<v<.^^>>>>^><v^v>vvv^>^><<#\n#><vvvv.>v^.v>>><>^>><><v^<.>.^<^v.>.^<^>>^v<.<^^v<^><..<vv^v<>vv<<vv^v.>>^.<v^>^>^<^<^>><><v<<>.><<>#\n#>.<^^v^><<<.v<vv<>^<>v^vv<^^.<>>.^<vv>>^.v.>^><v^^>.<<>v<>^v<v><v^^<v.v><<>vvv.v<>v>vvv^<>v^>^v<<<><#\n#.>><<vv><>vv>v..<<^^vv^>^<>^^v>v^vv>.><>^<vv^^<v><^^>><>>v<<v>^v^^><>.^.vv>v.^^>^vv<><.>>^^<^<><>v>.#\n#><<v>v<><^<<^><..<^>v<<^.^^<.^^v<>>^v>.^^^<<v>v>><><.<>>^v<^.v<vv<<^>>>vv^<vv.>^^^<><>v.>.^<^v<vv^><#\n#<.>vvv<v>^.vv.>.<v^.<..<>^v<>>^^vv>.>^v^>>>vv^<v><^v.v^>>>>><>v>v<>v^^>.^^v>^v><<>vv^<><>>v<^<v<<<<>#\n#<v<><^v<>>.<v^><<>^>v<<.v^v.<^v.^<vv<.v.^<v><><><v^^>v<>.vv^>vv<<^^<^^^><<>^>.^v<<<^<^<^^>>vv.<v.v<.#\n#<>vv^^<<^^^v^^<v^vvv^>^^.vvv^^^^v^>^^^v<^v><<^^^.<><v.vv<<^v<^>^><.^><^<>.v>^vv^v<<^<.<^.^>vv>^v>^<.#\n#<.vv>><.<vv<^^^<.^v><>>>><<^^<><^<vv<<>^v..>v<^^v><^><<^^^<<>^^>.>v><^<v<><v>v^<v<v^v.vv>v^<<<v>.^>>#\n#<^vv<<v^><>^^<<^.<v^>^vv.><^>v.>^vv.<^v^^<v<<v<><^<>v<<v<<><>^v^>v^^^><^>>^.<v.^<.^^.v<^v<>>.<<<v>^<#\n#>>..^^^<v.v<>>^^<v^..^vv<>.<>>>^><>^<v><<.v.^v^^<^<><>..>^<>.>^^<v.^v<v<<^v>^vv.v>.<.^^<v^<<>^^<^v<.#\n#>>vvv^v^v^>v<<vv.^.^<<vv^>^>v<.^>^<v^>^^<^<>^.><^v<<<v>>..v><>v^>^>><^^<>.v<vv^>>>>v<^v.v>v.>^vv^.^<#\n#<^<>.^<>>^<^v>.^v.><.<v.v.^v><^>.>^<>^^>>^^^.<^<>><>^><vvv^>^.v^^v>vv<<vvv>^.^>><.<>^.^<>.>>>v>v<v^>#\n#<^^vv<<^<^.<^>^<vv.>>.>><^<^^^<<>.v>v>v>v.^<<v<.<>v<<<>v<>^<v.^<<<v<<>>>>.^><^^<>>>^<><^.^.v^^v^^>..#\n#..v>vv^<vv>><^>^^^<v>><v^^><>.^^><^<><>^>><v>^v<><v.^<>><.>^>v^>^v<><v^v>><><^>v>.v^v>v<><.^^.>.v.^<#\n#.<v>v<^v.<<<vv<>^v^vv<^v^>^^v^<>^>>vv<^^v^^^^<.^v<>^<<^<v^v<><v>v^<<>>.vvv.>>^v>>>vv<<><^v<v^v<<.>>>#\n#<<vv.v^.>..v><v<><vv<<<<.>vv>v>>^v^v<v^<v<>v<<v^v^v^<<v^>v<^^^>v<^^^^^>>><<v<>v<>.>v^v<><.<<v<>^.^^.#\n#>>>>>^^.><^<>^<>v>.<^vv^^<>>^v><^<^>vv^<v><.>^v>.v<v<>>>>^.^>^v^^^<vvv^.<<..^v<.>^><<>><<^<.<<v<>^v<#\n#<.v.^>.^<.v<^^<.<^<<^.^<>><^<<^<><.<>.><<<><^v<v>^^v<<v>><^<>>^>^^>vv>^<.^<v><>.><v^v<vv^<^^<v>>>^v<#\n#<>v^>^^v>>^<^>v>>>.>^.><>..>^v>><>v<>^>.^v<<<<^>v>v><v^<^>^^>^<<>^>vv><<<v>v^^v<vv<^<^>vv^<.v^<^v>^>#\n#><<vvv.<<<vv<vv^^^v^v<^>vv^<>^^v<>v<^^^^><>^^>^<<<>v.vv^<><<><.^<<<^>>^vv<.v^^>vv><<<>v.<><v^><^^^v.#\n#<><v<v><^<^^vvv^>><><<<.<<vv<^<>.^<>>^v^>>vvv>>v..><<^^.v<><^^><^>>^<<v<<^v^>v>vvvvv...^<v^<^<v<.^<.#\n#>><<<v^^v^>^<<.>>vvv^v<^<>.^v^<^v<^^>>v<.>v<v..^^v.^>.v>^>>v^<<.v<^<..>.v<<..^^^v>v<.^<.>v^v^<v^v>^>#\n#<^>v<>^<<v>>vv>.><^v<^.><<^v>v<^<<<v^.^v.><>v><>^v><<<v.>vv<>vv>><>>^><><v>>v^.^v<<v^vvv<.<<>.v^^v<>#\n#<^<^><<>v..>v^>v>.v<<<^<<<v^v<<>^<.<.<v.v^<><v^<<>^><vv.v>>vv^.v^.^^>^^<<^^>.vv<.>.^^<>.<<v><vv<<>>>#\n#>v>>vv<.v<v.<^.^^><><^^v>^>>>>^>vv><<v>vv^.>>v^^vv^v^.>^v<>>>^^^>..vv^.^><..>>v<>^>^^<<.v<>v^^^v>^v>#\n####################################################################################################.#"
+```
+
+## Solution
+
+```elixir
+defmodule Day24 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    grid = parse(input)
+
+    progress_minute([grid.start_point], 1, grid)
+  end
+
+  def progress_minute(points, minute, grid) do
+    with new_grid <- progress_blizzard(grid),
+         new_points <- expand_points(points, new_grid) do
+      if grid.end_point in new_points do
+        minute
+      else
+        progress_minute(new_points, minute + 1, new_grid)
+      end
+    end
+  end
+
+  def expand_points(
+        points,
+        %{min_x: min_x, max_x: max_x, min_y: min_y, max_y: max_y, end_point: end_point} = grid
+      ) do
+    points
+    |> Enum.flat_map(fn {x, y} ->
+      [
+        {x, y},
+        {x - 1, y},
+        {x + 1, y},
+        {x, y - 1},
+        {x, y + 1}
+      ]
+    end)
+    |> Enum.uniq()
+    |> Enum.filter(fn
+      ^end_point ->
+        true
+
+      {x, y} when x in min_x..max_x and y in min_y..max_y ->
+        Enum.empty?(grid[{x, y}])
+
+      _ ->
+        false
+    end)
+  end
+
+  def progress_blizzard(grid) do
+    grid
+    |> Enum.reduce(grid, fn
+      {_, []}, acc ->
+        acc
+
+      {xy, directions}, acc when is_list(directions) ->
+        Enum.reduce(directions, acc, &move_direction(&1, xy, &2))
+
+      _, acc ->
+        acc
+    end)
+  end
+
+  def move_direction(direction, xy, grid) do
+    grid
+    |> Map.update!(
+      xy,
+      fn list -> List.delete(list, direction) end
+    )
+    |> Map.update!(
+      new_xy(direction, xy, grid),
+      fn list -> [direction | list] end
+    )
+  end
+
+  def new_xy(?^, {x, y}, %{min_y: y, max_y: max_y}), do: {x, max_y}
+  def new_xy(?v, {x, y}, %{max_y: y, min_y: min_y}), do: {x, min_y}
+  def new_xy(?<, {x, y}, %{min_x: x, max_x: max_x}), do: {max_x, y}
+  def new_xy(?>, {x, y}, %{max_x: x, min_x: min_x}), do: {min_x, y}
+
+  def new_xy(?^, {x, y}, _), do: {x, y - 1}
+  def new_xy(?v, {x, y}, _), do: {x, y + 1}
+  def new_xy(?<, {x, y}, _), do: {x - 1, y}
+  def new_xy(?>, {x, y}, _), do: {x + 1, y}
+
+  def draw(grid, points \\ []) do
+    0..(grid.max_y + 1)
+    |> Enum.each(fn y ->
+      0..(grid.max_x + 1)
+      |> Enum.map(fn x ->
+        cond do
+          {x, y} in points ->
+            "E"
+
+          grid.start_point == {x, y} ->
+            "."
+
+          grid.end_point == {x, y} ->
+            "."
+
+          x < grid.min_x ->
+            "#"
+
+          x > grid.max_x ->
+            "#"
+
+          y < grid.min_y ->
+            "#"
+
+          y > grid.max_y ->
+            "#"
+
+          grid[{x, y}] == [] ->
+            "."
+
+          true ->
+            case grid[{x, y}] do
+              [] -> "."
+              [dir] -> List.to_string([dir])
+              list -> list |> length() |> to_string()
+            end
+        end
+      end)
+      |> Enum.join("")
+      |> IO.puts()
+    end)
+
+    grid
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      input =
+        input
+        |> Enum.map(&String.to_charlist/1)
+        |> Enum.with_index()
+
+      first_row = Enum.at(input, 0)
+      last_row = Enum.at(input, -1)
+
+      rows = Enum.slice(input, 1..-2)
+
+      grid = %{
+        min_x: 1,
+        max_x: (first_row |> elem(0) |> length()) - 2,
+        min_y: 1,
+        max_y: (last_row |> elem(1)) - 1,
+        start_point: {
+          first_row |> elem(0) |> Enum.find_index(&(&1 == ?.)),
+          first_row |> elem(1)
+        },
+        end_point: {
+          last_row |> elem(0) |> Enum.find_index(&(&1 == ?.)),
+          last_row |> elem(1)
+        }
+      }
+
+      Enum.reduce(rows, grid, &parse_row/2)
+    end
+
+    def parse_row({chars, y}, grid) do
+      chars
+      |> Enum.with_index()
+      |> Enum.reduce(grid, fn
+        {?#, _}, acc -> acc
+        {?., x}, acc -> Map.put(acc, {x, y}, [])
+        {char, x}, acc -> Map.put(acc, {x, y}, [char])
+      end)
+    end
+  end
+end
+```
+
+**What is the fewest number of minutes required to avoid the blizzards and reach the goal?**
+
+Your puzzle answer was `260`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day24.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+260
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+# Day24.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2022) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2022/day/24/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day24Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "#.######\n#>>.<^<#\n#.<..<<#\n#>v.><>#\n#<^v^^>#\n######.#"
+    ]
+  end
+
+  describe "part1" do
+    test "returns expected value", %{input: input} do
+      assert Day24.part1(input) == 18
+    end
+  end
+
+  # describe "part2" do
+  #   test "returns expected value", %{input: input} do
+  #     assert Day24.part2(input) == [""]
+  #   end
+  # end
+end
+
+ExUnit.run()
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day24.part1(input) end
+    # "Part 2" => fn -> Day24.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 11 s
+
+Benchmarking Part 1 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1          1.52      658.90 ms     ±0.70%      659.53 ms      665.78 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1       957.68 MB     ±0.00%      957.69 MB      957.69 MB
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1         30.95 M     ±0.00%        30.95 M        30.95 M
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
