@@ -2,17 +2,8 @@ defmodule AdventOfCode.Y2022.Day19 do
   defdelegate parse(input), to: __MODULE__.Input
 
   @priority_keys [:geode, :obsidian, :clay, :ore]
-
   @empty_robots Map.new(@priority_keys, &{&1, 0})
-
-  @doc """
-    {
-      minute,
-      {ore_robot, coal_robot, obsidian_robot, }
-    }
-  """
   @initial_state %{
-    minute: 0,
     robots: Map.put(@empty_robots, :ore, 1),
     building_robot: nil,
     ore: 0,
@@ -23,49 +14,87 @@ defmodule AdventOfCode.Y2022.Day19 do
 
   def initial_state(), do: @initial_state
 
-  def part1(input, num_minutes) do
+  def part1(input \\ nil, num_minutes \\ 24) do
     parse(input)
     |> Enum.map(fn blueprint ->
-      {
-        blueprint,
+      Task.async(fn ->
+        {
+          blueprint.id,
+          simulate(@initial_state, blueprint, num_minutes)
+        }
+      end)
+    end)
+    |> Task.await_many(:infinity)
+    |> Enum.map(fn {id, geodes} -> id * geodes end)
+    |> Enum.sum()
+  end
+
+  def part2(input \\ nil, num_minutes \\ 32) do
+    parse(input)
+    |> Enum.take(3)
+    |> Enum.map(fn blueprint ->
+      Task.async(fn ->
         simulate(@initial_state, blueprint, num_minutes)
-      }
+      end)
     end)
+    |> Task.await_many(:infinity)
+    |> Enum.product()
   end
 
-  def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+  def simulate(state, blueprint, minutes) do
+    cache = :ets.new(String.to_atom("cache_#{blueprint.id}"), [:set])
+    stats = :ets.new(String.to_atom("stats_#{blueprint.id}"), [:set])
+    :ets.update_counter(stats, :hits, 0, {:hits, 0})
+    :ets.update_counter(stats, :misses, 0, {:misses, 0})
+    geodes = simulate(state, blueprint, minutes, cache, stats)
+
+    [hits, misses] =
+      Enum.map([:hits, :misses], fn key -> Keyword.fetch!(:ets.lookup(stats, key), key) end)
+
+    IO.puts("Blueprint #{blueprint.id} cache hits: #{hits} misses: #{misses} #{inspect(self())}")
+
+    :ets.delete(cache)
+    :ets.delete(stats)
+
+    geodes
   end
 
-  def simulate([%{minute: minute} | _] = states, _, total_minutes) when minute >= total_minutes,
-    do: states
+  def simulate(state, _, 0, _cache, _stats), do: state.geode
 
-  def simulate(states, blueprint, total_minutes) do
-    states
-    |> Enum.map(&simulate_minute(&1, blueprint))
-    |> simulate(blueprint, total_minutes)
-  end
+  def simulate(state, blueprint, minutes, cache, stats) do
+    cache_key = {Map.drop(state, [:building_robot]), minutes}
 
-  def simulate_minute(state, blueprint) do
-    possible_robot_builds(state, blueprint)
-    |> Enum.map(fn robot_type_to_build ->
-      state
-      |> build_robot(robot_type_to_build, blueprint)
-      |> mine_resources()
-      |> add_built_robot()
-      |> Map.update!(:minute, &(&1 + 1))
-    end)
-    |> Enum.uniq()
-  end
+    case :ets.lookup(cache, cache_key) do
+      [{_, cached}] ->
+        :ets.update_counter(stats, :hits, 1, {:hits, 0})
 
-  def possible_robot_builds(state, blueprint) do
-    if can_build_robot?(state, :geode, blueprint) do
-      [:geode]
-    else
-      [nil | Enum.filter(@priority_keys, &can_build_robot?(state, &1, blueprint))]
+        cached
+
+      [] ->
+        :ets.update_counter(stats, :misses, 1, {:misses, 0})
+
+        possible_robot_builds(state, blueprint, minutes)
+        |> Enum.map(&simulate_minute(&1, state, blueprint))
+        |> Enum.map(&simulate(&1, blueprint, minutes - 1, cache, stats))
+        |> Enum.max()
+        |> tap(fn score -> :ets.insert(cache, {cache_key, score}) end)
     end
+  end
+
+  def simulate_minute(robot_type_to_build, state, blueprint) do
+    state
+    |> build_robot(robot_type_to_build, blueprint)
+    |> mine_resources()
+    |> add_built_robot()
+  end
+
+  def possible_robot_builds(state, blueprint, minutes) do
+    @priority_keys
+    |> Enum.filter(&should_build_robot?(state, &1, blueprint, minutes))
+    |> Enum.take(2)
+    |> then(fn types ->
+      if :geode in types or :obsidian in types, do: types, else: [nil | types]
+    end)
   end
 
   def mine_resources(%{robots: robots} = state) do
@@ -79,27 +108,35 @@ defmodule AdventOfCode.Y2022.Day19 do
     end)
   end
 
-  # def build_robot?(state, type, blueprint) do
-  #   can_build_robot?(state, type, blueprint) and need_robot?(state, type, blueprint)
-  # end
-
-  # def need_robot?(%{minute: minute}, :ore, _) when minute > 5, do: false
-  # def need_robot?(%{minute: minute}, :clay, _) when minute > 14, do: false
-  # def need_robot?(%{minute: minute}, :obsidian, _) when minute > 20, do: false
-
-  # def need_robot?(%{robots: robots}, type, _) when minute > 20, do: false
-
-  # def need_robot?(%{robots: robots}, type, blueprint) do
-  #   Enum.any?(blueprint, fn
-  #     {_, %{^type => v}} -> robots[type] < v
-  #     _ -> false
-  #   end)
-  # end
+  def should_build_robot?(state, type, blueprint, minutes) do
+    can_build_robot?(state, type, blueprint) and
+      need_robot?(state, type, blueprint) and
+      worthwhile?(state, type, blueprint, minutes)
+  end
 
   def can_build_robot?(state, type, blueprint) do
     Map.get(blueprint, type)
     |> Enum.all?(fn {k, cost} -> state[k] >= cost end)
   end
+
+  def need_robot?(%{robots: robots}, type, blueprint),
+    do: blueprint.max[type] > robots[type]
+
+  def worthwhile?(_, :geode, _, minutes), do: minutes > 1
+  def worthwhile?(_, :obsidian, _, minutes) when minutes <= 2, do: false
+
+  def worthwhile?(state, :obsidian, %{max: max}, minutes),
+    do: state.obsidian + state.robots.obsidian * (minutes - 2) < (minutes - 1) * max.obsidian
+
+  def worthwhile?(_, :ore, _, minutes) when minutes <= 2, do: false
+
+  def worthwhile?(state, :ore, %{max: max}, minutes),
+    do: state.ore + state.robots.ore * (minutes - 2) < (minutes - 1) * max.ore
+
+  def worthwhile?(_, :clay, _, minutes) when minutes <= 3, do: false
+
+  def worthwhile?(state, :clay, %{max: max}, minutes),
+    do: state.clay + state.robots.clay * (minutes - 3) < (minutes - 2) * max.clay
 
   def build_robot(state, type, blueprint) do
     state
@@ -150,11 +187,12 @@ defmodule AdventOfCode.Y2022.Day19 do
       |> Enum.reject(&is_nil/1)
       |> then(fn [a, b, c, d, e, f, g] ->
         %{
-          index: a,
+          id: a,
           ore: %{ore: b},
           clay: %{ore: c},
           obsidian: %{ore: d, clay: e},
-          geode: %{ore: f, obsidian: g}
+          geode: %{ore: f, obsidian: g},
+          max: %{ore: Enum.max([b, c, d, f]), clay: e, obsidian: g}
         }
       end)
     end
@@ -163,11 +201,5 @@ defmodule AdventOfCode.Y2022.Day19 do
 
     defp return_int({int, ""}, _), do: int
     defp return_int(:error, _input), do: nil
-
-    def flatten([]), do: []
-    def flatten(nil), do: []
-    def flatten([[a | _] = path | b]) when is_binary(a), do: [Enum.reverse(path) | flatten(b)]
-    def flatten([a | b]), do: flatten(a) ++ flatten(b)
-    def flatten(v), do: [v]
   end
 end
