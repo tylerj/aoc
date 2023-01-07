@@ -98,8 +98,45 @@ defmodule Day01 do
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Enum.reduce_while({?N, {0, 0}, MapSet.new([])}, fn tn, acc ->
+      with {:ok, xy} <- full_move(tn, acc) do
+        {:halt, xy}
+      else
+        acc -> {:cont, acc}
+      end
+    end)
+    |> then(fn {x, y} -> abs(x) + abs(y) end)
   end
+
+  defp full_move({t, n}, {d, xy, set}) do
+    Enum.reduce_while(
+      1..n,
+      {new_direction(t, d), xy, set},
+      fn _, {d, xy, set} ->
+        xy = new_xy(d, xy)
+
+        if MapSet.member?(set, xy) do
+          {:halt, {:ok, xy}}
+        else
+          {:cont, {d, xy, MapSet.put(set, xy)}}
+        end
+      end
+    )
+  end
+
+  defp new_direction("R", ?N), do: ?E
+  defp new_direction("R", ?E), do: ?S
+  defp new_direction("R", ?S), do: ?W
+  defp new_direction("R", ?W), do: ?N
+  defp new_direction("L", ?N), do: ?W
+  defp new_direction("L", ?W), do: ?S
+  defp new_direction("L", ?S), do: ?E
+  defp new_direction("L", ?E), do: ?N
+
+  defp new_xy(?N, {x, y}), do: {x, y - 1}
+  defp new_xy(?E, {x, y}), do: {x + 1, y}
+  defp new_xy(?S, {x, y}), do: {x, y + 1}
+  defp new_xy(?W, {x, y}), do: {x - 1, y}
 
   defmodule Input do
     def parse(input) when is_binary(input) do
@@ -113,7 +150,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day01, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 20, ...>>,
  {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
 ```
 
@@ -133,9 +170,9 @@ Day01.part1(input)
 300
 ```
 
-**QUESTION TWO?**
+**How many blocks away is the first location you visit twice?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `159`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -146,59 +183,7 @@ Day01.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[
-  {"R", 3},
-  {"R", 1},
-  {"R", 4},
-  {"L", 4},
-  {"R", 3},
-  {"R", 1},
-  {"R", 1},
-  {"L", 3},
-  {"L", 5},
-  {"L", 5},
-  {"L", 3},
-  {"R", 1},
-  {"R", 4},
-  {"L", 2},
-  {"L", 1},
-  {"R", 3},
-  {"L", 3},
-  {"R", 2},
-  {"R", 1},
-  {"R", 1},
-  {"L", 5},
-  {"L", 2},
-  {"L", 1},
-  {"R", 2},
-  {"L", 4},
-  {"R", 1},
-  {"L", 2},
-  {"L", 4},
-  {"R", 2},
-  {"R", 2},
-  {"L", 2},
-  {"L", 4},
-  {"L", 3},
-  {"R", 1},
-  {"R", 4},
-  {"R", 3},
-  {"L", 1},
-  {"R", 1},
-  {"L", 5},
-  {"R", 4},
-  {"L", 2},
-  {"R", 185},
-  {"L", 2},
-  {"R", 4},
-  {"R", 49},
-  {"L", 3},
-  {"L", 4},
-  {"R", 5},
-  {"R", ...},
-  {...},
-  ...
-]
+159
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -262,38 +247,12 @@ Randomized with seed 973368
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day01.part1(input)
-  end
-
-  def fun2(input) do
-    Day01.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day01.Input.parse(input) |> Enum.to_list()
 
-Benchee.run(
-  %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+Benchee.run(%{
+  "Part 1" => fn -> Day01.part1(input) end,
+  "Part 2" => fn -> Day01.part2(input) end
+})
 
 nil
 ```
@@ -301,7 +260,32 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1       10.12 K       98.86 μs     ±4.62%       98.41 μs      116.07 μs
+Part 2        5.21 K      191.99 μs     ±7.87%      187.69 μs      252.46 μs
+
+Comparison: 
+Part 1       10.12 K
+Part 2        5.21 K - 1.94x slower +93.13 μs
 ```
 
 <!-- livebook:{"output":true} -->
