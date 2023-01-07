@@ -1,0 +1,311 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 1 - Advent of Code 2016
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2016/day/1)
+* [AoC Puzzle Input](https://adventofcode.com/2016/day/1/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day_01.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day-01.livemd)
+
+## Prompt
+
+### --- Day 1: No Time for a Taxicab ---
+
+Santa's sleigh uses a very high-precision clock to guide its movements, and the clock's oscillator is regulated by stars. Unfortunately, the stars have been stolen... by the Easter Bunny. To save Christmas, Santa needs you to retrieve all **fifty stars** by December 25th.
+
+Collect stars by solving puzzles. Two puzzles will be made available on each day in the Advent calendar; the second puzzle is unlocked when you complete the first. Each puzzle grants **one star**. Good luck!
+
+You're airdropped near **Easter Bunny Headquarters** in a city somewhere. "Near", unfortunately, is as close as you can get - the instructions on the Easter Bunny Recruiting Document the Elves intercepted start here, and nobody had time to work them out further.
+
+The Document indicates that you should start at the given coordinates (where you just landed) and face North. Then, follow the provided sequence: either turn left (`L`) or right (`R`) 90 degrees, then walk forward the given number of blocks, ending at a new intersection.
+
+There's no time to follow such ridiculous instructions on foot, though, so you take a moment and work out the destination. Given that you can only walk on the [street grid of the city](https://en.wikipedia.org/wiki/Taxicab_geometry), how far is the shortest path to the destination?
+
+For example:
+
+* Following `R2`, `L3` leaves you 2 blocks East and 3 blocks North, or 5 blocks away.
+* `R2`, `R2`, `R2` leaves you 2 blocks due South of your starting position, which is 2 blocks away.
+* `R5`, `L5`, `R5`, `R3` leaves you 12 blocks away.
+
+**How many blocks away is Easter Bunny HQ?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2016/day/1/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Then, you notice the instructions continue on the back of the Recruiting Document. Easter Bunny HQ is actually at the first location you visit twice.
+
+For example, if your instructions are `R8`, `R4`, `R4`, `R8`, the first location you visit twice is 4 blocks away, due East.
+
+**How many blocks away is the first location you visit twice?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2016/day/1/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"R3, R1, R4, L4, R3, R1, R1, L3, L5, L5, L3, R1, R4, L2, L1, R3, L3, R2, R1, R1, L5, L2, L1, R2, L4, R1, L2, L4, R2, R2, L2, L4, L3, R1, R4, R3, L1, R1, L5, R4, L2, R185, L2, R4, R49, L3, L4, R5, R1, R1, L1, L1, R2, L1, L4, R4, R5, R4, L3, L5, R1, R71, L1, R1, R186, L5, L2, R5, R4, R1, L5, L2, R3, R2, R5, R5, R4, R1, R4, R2, L1, R4, L1, L4, L5, L4, R4, R5, R1, L2, L4, L1, L5, L3, L5, R2, L5, R4, L4, R3, R3, R1, R4, L1, L2, R2, L1, R4, R2, R2, R5, R2, R5, L1, R1, L4, R5, R4, R2, R4, L5, R3, R2, R5, R3, L3, L5, L4, L3, L2, L2, R3, R2, L1, L1, L5, R1, L3, R3, R4, R5, L3, L5, R1, L3, L5, L5, L2, R1, L3, L1, L3, R4, L1, R3, L2, L2, R3, R3, R4, R4, R1, L4, R1, L5"
+```
+
+## Solution
+
+```elixir
+defmodule Day01 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.reduce({?N, {0, 0}}, fn
+      {"R", n}, {?N, {x, y}} -> {?E, {x + n, y}}
+      {"R", n}, {?E, {x, y}} -> {?S, {x, y + n}}
+      {"R", n}, {?S, {x, y}} -> {?W, {x - n, y}}
+      {"R", n}, {?W, {x, y}} -> {?N, {x, y - n}}
+      {"L", n}, {?N, {x, y}} -> {?W, {x - n, y}}
+      {"L", n}, {?W, {x, y}} -> {?S, {x, y + n}}
+      {"L", n}, {?S, {x, y}} -> {?E, {x + n, y}}
+      {"L", n}, {?E, {x, y}} -> {?N, {x, y - n}}
+    end)
+    |> then(fn {_, {x, y}} -> abs(x) + abs(y) end)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      Regex.scan(~r{([LR])(\d+)}, input, capture: :all_but_first)
+      |> Enum.map(fn [d, n] -> {d, String.to_integer(n)} end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+ {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
+```
+
+**How many blocks away is Easter Bunny HQ?**
+
+Your puzzle answer was `300`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+300
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {"R", 3},
+  {"R", 1},
+  {"R", 4},
+  {"L", 4},
+  {"R", 3},
+  {"R", 1},
+  {"R", 1},
+  {"L", 3},
+  {"L", 5},
+  {"L", 5},
+  {"L", 3},
+  {"R", 1},
+  {"R", 4},
+  {"L", 2},
+  {"L", 1},
+  {"R", 3},
+  {"L", 3},
+  {"R", 2},
+  {"R", 1},
+  {"R", 1},
+  {"L", 5},
+  {"L", 2},
+  {"L", 1},
+  {"R", 2},
+  {"L", 4},
+  {"R", 1},
+  {"L", 2},
+  {"L", 4},
+  {"R", 2},
+  {"R", 2},
+  {"L", 2},
+  {"L", 4},
+  {"L", 3},
+  {"R", 1},
+  {"R", 4},
+  {"R", 3},
+  {"L", 1},
+  {"R", 1},
+  {"L", 5},
+  {"R", 4},
+  {"L", 2},
+  {"R", 185},
+  {"L", 2},
+  {"R", 4},
+  {"R", 49},
+  {"L", 3},
+  {"L", 4},
+  {"R", 5},
+  {"R", ...},
+  {...},
+  ...
+]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2016) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2016/day/1/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day01Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input1: "R2, L3",
+      input2: "R2, R2, R2",
+      input3: "R5, L5, R5, R3"
+    ]
+  end
+
+  describe "part1" do
+    test "returns expected value", inputs do
+      assert Day01.part1(inputs.input1) == 5
+      assert Day01.part1(inputs.input2) == 2
+      assert Day01.part1(inputs.input3) == 12
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", _inputs do
+      assert Day01.part2("R8, R4, R4, R8") == 4
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 973368
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmark do
+  def fun1(input) do
+    Day01.part1(input)
+  end
+
+  def fun2(input) do
+    Day01.part2(input)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
+```
+
+```elixir
+# https://github.com/bencheeorg/benchee
+input = Day01.Input.parse(input) |> Enum.to_list()
+
+Benchee.run(
+  %{
+    "fun1" => fn _ -> Benchmark.fun1(input) end,
+    "fun2" => fn _ -> Benchmark.fun2(input) end
+  },
+  inputs: %{
+    "Part 1" => 1
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
