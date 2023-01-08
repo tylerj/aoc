@@ -1,0 +1,336 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 2 - Advent of Code 2016
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2016/day/2)
+* [AoC Puzzle Input](https://adventofcode.com/2016/day/2/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day_02.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day-02.livemd)
+
+## Prompt
+
+### --- Day 2: Bathroom Security ---
+
+You arrive at **Easter Bunny Headquarters** under cover of darkness. However, you left in such a rush that you forgot to use the bathroom! Fancy office buildings like this one usually have keypad locks on their bathrooms, so you search the front desk for the code.
+
+"In order to improve security," the document you find says, "bathroom codes will no longer be written down. Instead, please memorize and follow the procedure below to access the bathrooms."
+
+The document goes on to explain that each button to be pressed can be found by starting on the previous button and moving to adjacent buttons on the keypad: U moves up, D moves down, L moves left, and R moves right. Each line of instructions corresponds to one button, starting at the previous button (or, for the first line, **the "5" button**); press whatever button you're on at the end of each line. If a move doesn't lead to a button, ignore it.
+
+You can't hold it much longer, so you decide to figure out the code as you walk to the bathroom. You picture a keypad like this:
+
+```
+1 2 3
+4 5 6
+7 8 9
+```
+
+Suppose your instructions are:
+
+```
+ULL
+RRDDD
+LURDL
+UUUUD
+```
+
+* You start at "5" and move up (to "2"), left (to "1"), and left (you can't, and stay on "1"), so the first button is `1`.
+* Starting from the previous button ("1"), you move right twice (to "3") and then down three times (stopping at "9" after two moves and ignoring the third), ending up with `9`.
+* Continuing from "9", you move left, up, right, down, and left, ending with `8`.
+* Finally, you move up four times (stopping at "2"), then down once, ending with `5`.
+
+So, in this example, the bathroom code is `1985`.
+
+Your puzzle input is the instructions from the document you found at the front desk. **What is the bathroom code?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2016/day/2/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+You finally arrive at the bathroom (it's a several minute walk from the lobby so visitors can behold the many fancy conference rooms and water coolers on this floor) and go to punch in the code. Much to your bladder's dismay, the keypad is not at all like you imagined it. Instead, you are confronted with the result of hundreds of man-hours of bathroom-keypad-design meetings:
+
+```
+    1
+  2 3 4
+5 6 7 8 9
+  A B C
+    D
+```
+
+You still start at "5" and stop when you're at an edge, but given the same instructions as above, the outcome is very different:
+
+You start at "5" and don't move at all (up and left are both edges), ending at 5.
+Continuing from "5", you move right twice and down three times (through "6", "7", "B", "D", "D"), ending at D.
+Then, from "D", you move five more times (through "D", "B", "C", "C", "B"), ending at B.
+Finally, after five more moves, you end at 3.
+So, given the actual keypad layout, the code would be 5DB3.
+
+Using the same instructions in your puzzle input, **what is the correct bathroom code?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2016/day/2/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"UULLULLUULLLURDLDUURRDRRLDURDULLRURDUDULLLUULURURLRDRRRRULDRUULLLLUUDURDULDRRDRUDLRRLDLUDLDDRURURUURRRDDDLLRUDURDULUULLRRULLRULDUDRDRLDLURURUDDUDLURUDUDURLURURRURLUDDRURRDLUURLLRURRDUDLULULUDULDLLRRRDLRDLDUDRDDDRRUURRRRRUURRDRRDLURDRRURDLLUULULLRURDLDDDRRLLRRUURULURUUDDLRRUDDRURUUDLRLRDLRURRRDULLDLRUDDUULRDULURUURDULUDLLRRLDDLRDLRUDRLDDRLRRRDURDULLRRRDRRLUURURDRRDRRLDLUDURURLDUURDRUDRDDRLDRRLDLURURULLUURUDUUDLRLL\nLLLULLULDDULRLLURLLLRUUDDLRUULRLULLDLLRRDRLRLRLLDRUUURULDRDDLUDLLDUDULLLRLULLLRULDRDRUDLLRLRLLUDULRRRLDRUULDDULLDULULLUDUDLDRDURDLDLLDUDRRRDLUURRUURULLURLDURLRRLLDDUUULDRLUUDUDLURLULUDURRDRLLDDDDDRRULLRLDULULDDRUURRDLUDDDUDURDDRDRULULLLLUURDURUUUULUDLRURRULRDDRURURLLRLUUDUUURDLLDDLUDRLLLUDLLLLULRLURDRRRDUUDLLDLDDDURRDDRURUURDDRURRLDDDURDLLUURUUULRLUURRUDRLLDLURDUDRLULDLRLULULUDDLRDUDRUDLUULUULDURDRRRRLRULLUDRDDRDLDUDRDRRLDLLLLUDDLRULDLLDDUULDDRRULRRUURUDRDURLLLDDUUDRUUDLULLDR\nUDUUULLDDDDLUDLDULRLRDLULLDDRULDURRLURRUDLRRUDURRDUDRRRUULRLLRLUDLDRRDUURDDRDRDUUUDUDLDLLRRLUURLUUUDDDUURLULURRLURRRDRDURURUDRLRUURUDRUDDDRDRDLDRDURDLDRRDUUDLLURLDDURRRLULDRDRLLRLLLRURLDURDRLDRUURRLDLDRLDDDRLDLRLDURURLLLLDDRDUDLRULULLRDDLLUDRDRRLUUULDRLDURURDUDURLLDRRDUULDUUDLLDDRUUULRRULDDUDRDRLRULUUDUURULLDLLURLRRLDDDLLDRRDDRLDDLURRUDURULUDLLLDUDDLDLDLRUDUDRDUDDLDDLDULURDDUDRRUUURLDUURULLRLULUURLLLLDUUDURUUDUULULDRULRLRDULDLLURDLRUUUDDURLLLLDUDRLUUDUDRRURURRDRDDRULDLRLURDLLRRDRUUUURLDRURDUUDLDURUDDLRDDDDURRLRLUDRRDDURDDRLDDLLRR\nULDRUDURUDULLUDUDURLDLLRRULRRULRUDLULLLDRULLDURUULDDURDUUDLRDRUDUDDLDRDLUULRRDLRUULULUUUDUUDDRDRLLULLRRDLRRLUDRLULLUUUUURRDURLLRURRULLLRLURRULRDUURRLDDRRDRLULDDRRDRLULLRDLRRURUDURULRLUDRUDLUDDDUDUDDUDLLRDLLDRURULUDRLRRULRDDDDDRLDLRRLUUDLUURRDURRDLDLDUDRLULLULRLDRDUDLRULLULLRLDDRURLLLRLDDDLLLRURDDDLLUDLDLRLUULLLRULDRRDUDLRRDDULRLLDUURLLLLLDRULDRLLLUURDURRULURLDDLRRUDULUURRLULRDRDDLULULRRURLDLRRRUDURURDURDULURULLRLDD\nDURLRRRDRULDLULUDULUURURRLULUDLURURDDURULLRRUUDLRURLDLRUDULDLLRRULLLLRRLRUULDLDLLRDUDLLRLULRLLUUULULRDLDLRRURLUDDRRLUUDDRRUDDRRURLRRULLDDULLLURRULUDLRRRURRULRLLLRULLRRURDRLURULLDULRLLLULLRLRLLLDRRRRDDDDDDULUUDUDULRURDRUDRLUULURDURLURRDRRRRDRRLLLLUDLRRDURURLLULUDDLRLRLRRUURLLURLDUULLRRDURRULRULURLLLRLUURRULLLURDDDRURDUDDULLRULUUUDDRURUUDUURURRDRURDUDRLLRRULURUDLDURLDLRRRRLLUURRLULDDDUUUURUULDLDRLDUDULDRRULDRDULURRUURDU"
+```
+
+## Solution
+
+```elixir
+defmodule Day02 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.scan(5, &process_digit/2)
+    |> Integer.undigits()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.scan(?5, &process_char/2)
+  end
+
+  defp process_digit([], digit), do: digit
+
+  defp process_digit([h | t], digit) do
+    process_digit(t, move_digit(h, digit))
+  end
+
+  defp move_digit(?U, n) when n <= 3, do: n
+  defp move_digit(?D, n) when n >= 7, do: n
+  defp move_digit(?L, n) when n in [1, 4, 7], do: n
+  defp move_digit(?R, n) when n in [3, 6, 9], do: n
+  defp move_digit(?U, n), do: n - 3
+  defp move_digit(?D, n), do: n + 3
+  defp move_digit(?L, n), do: n - 1
+  defp move_digit(?R, n), do: n + 1
+
+  defp process_char([], digit), do: digit
+
+  defp process_char([h | t], digit) do
+    process_char(t, move_char(h, digit))
+  end
+
+  defp move_char(?U, c) when c in '52149', do: c
+  defp move_char(?D, c) when c in '5ADC9', do: c
+  defp move_char(?L, c) when c in '125AD', do: c
+  defp move_char(?R, c) when c in '149CD', do: c
+
+  @up %{
+    ?3 => ?1,
+    ?6 => ?2,
+    ?7 => ?3,
+    ?8 => ?4,
+    ?A => ?6,
+    ?B => ?7,
+    ?C => ?8,
+    ?D => ?B
+  }
+  @down for {k, v} <- @up, into: %{}, do: {v, k}
+
+  @left %{
+    ?3 => ?2,
+    ?4 => ?3,
+    ?6 => ?5,
+    ?7 => ?6,
+    ?8 => ?7,
+    ?9 => ?8,
+    ?B => ?A,
+    ?C => ?B
+  }
+  @right for {k, v} <- @left, into: %{}, do: {v, k}
+  defp move_char(?U, c), do: @up[c]
+  defp move_char(?D, c), do: @down[c]
+  defp move_char(?L, c), do: @left[c]
+  defp move_char(?R, c), do: @right[c]
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.to_charlist(line)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day02, <<70, 79, 82, 49, 0, 0, 14, ...>>,
+ {:module, Day02.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Your puzzle input is the instructions from the document you found at the front desk. **What is the bathroom code?**
+
+Your puzzle answer was `45973`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day02.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+45973
+```
+
+Using the same instructions in your puzzle input, **what is the correct bathroom code?**
+
+Your puzzle answer was `27CA4`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day02.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+'27CA4'
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2016) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2016/day/2/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day02Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "ULL\nRRDDD\nLURDL\nUUUUD"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day02.part1(input) == 1985
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day02.part2(input) == '5DB3'
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 229686
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(%{
+  "Part 1" => fn -> Day02.part1(input) end,
+  "Part 2" => fn -> Day02.part2(input) end
+})
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1       58.02 K       17.24 μs    ±17.97%       16.91 μs       20.87 μs
+Part 2       30.20 K       33.11 μs     ±7.63%       32.61 μs       37.15 μs
+
+Comparison: 
+Part 1       58.02 K
+Part 2       30.20 K - 1.92x slower +15.87 μs
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
