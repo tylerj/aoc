@@ -1,0 +1,178 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 3 - Advent of Code 2016
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2016/day/3)
+* [AoC Puzzle Input](https://adventofcode.com/2016/day/3/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day_03.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day-03.livemd)
+
+## Prompt
+
+### --- Day 3: Squares With Three Sides ---
+
+Now that you can think clearly, you move deeper into the labyrinth of hallways and office furniture that makes up this part of Easter Bunny HQ. This must be a graphic design department; the walls are covered in specifications for triangles.
+
+Or are they?
+
+The design document gives the side lengths of each triangle it describes, but... `5 10 25`? Some of these aren't triangles. You can't help but mark the impossible ones.
+
+In a valid triangle, the sum of any two sides must be larger than the remaining side. For example, the "triangle" given above is impossible, because `5 + 10` is not larger than `25`.
+
+In your puzzle input, **how many of the listed triangles are possible?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2016/day/3/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Now that you've helpfully marked up their design documents, it occurs to you that triangles are specified in groups of three **vertically**. Each set of three numbers in a column specifies a triangle. Rows are unrelated.
+
+For example, given the following specification, numbers with the same hundreds digit would be part of the same triangle:
+
+```
+101 301 501
+102 302 502
+103 303 503
+201 401 601
+202 402 602
+203 403 603
+```
+
+In your puzzle input, and instead reading by columns, **how many of the listed triangles are possible?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2016/day/3/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"  330  143  338\n  769  547   83\n  930  625  317\n  669  866  147\n   15  881  210\n  662   15   70\n  273  277  707\n   50  592  770\n  280  313  407\n  642  487  372\n   94  619  295\n  734  243  141\n  220  141  515\n  198  824  745\n  210  787  964\n  213  627  601\n  918    4  447\n  805  630  802\n  711  237  987\n  938  552  388\n  643  405  779\n  803  747  525\n  917  832  631\n  899  292  843\n   81  206  445\n  141  874  465\n  177  974   54\n  520  725  814\n  271  958  554\n  779  579  264\n  358   18  257\n  978   77  270\n  984   88  131\n  475  702  940\n  183  756  160\n  383  941  820\n  806  142  646\n  793  275  804\n   53  272  368\n  942  821  785\n  863  830  902\n  219   52  199\n  473  479  351\n  860  522  361\n  890  240  216\n   94  756  407\n  310  189  468\n  234  909  178\n  889  667  756\n  429  485  730\n  825  405   30\n  943  806  253\n   98  455  365\n  998  454  290\n  971  576  223\n   64  429  273\n  945  779   63\n  352  960   59\n  672  948  577\n  782   43  567\n  460  315  719\n  825  604  183\n  453  442  788\n  694  632  334\n  569  619  317\n  337   49   17\n  878  468  660\n  393  598  717\n  550  827  159\n  540  362  346\n   66  713  380\n  491  477   44\n  411  114  320\n  554   96  250\n  306   67  196\n  769  553  333\n  762  436  382\n  278  322  153\n  894  603  334\n  539  441  844\n  486  162  927\n  197    9  218\n   94  221  804\n  250  220  913\n  557  626  486\n  562  705  630\n  968  922  285\n  518   36  468\n   18  608   83\n  512  611  530\n  534   37   65\n  621  136   90\n  239  113  139\n  371  640  956\n  629   54  959\n  531  620  338\n  682  499  810\n  798  170  968\n  187  640  645\n  660  535  332\n  663  530  314\n   64   26   65\n   55  285  488\n  620  288   52\n  642  474  450\n  455    9  962\n   51  760  489\n  426  760  833\n  304  783  772\n  498  765  695\n  635   53  126\n   44  430  774\n  979  943  838\n  962  892   64\n  494  709  614\n    7  695  120\n  503  114  606\n  362  340  689\n  509  367  389\n  673  410  664\n  773  262  558\n  897  958  245\n  140  773  483\n  965  468  584\n  546  209  668\n  856  381  184\n  274  237  762\n  888  677  906\n  871  516  405\n  102  529  912\n  285  724  885\n  352  501   53\n  774  139  245\n  380  309  594\n  813  185  765\n  530  645  965\n  958  618  120\n  851  202  957\n  737  476  131\n  595  546  108\n  716  113   66\n  327  215  318\n  397  343  390\n  351  143  103\n  138   91   31\n  108  224  919\n  230  276  896\n  426  975  177\n  327  975  918\n  238  365  764\n  328  799  775\n  590  906  967\n  578  460  338\n  507  619  647\n  711  617  867\n  933  478  734\n  820  760  721\n  199  711  824\n  983  214  228\n  382  150  648\n  415  782  242\n  615  754  445\n  693  689  590\n  382  784  482\n  997  181  322\n  682  241  172\n  587  302  252\n  184  135  254\n  574  104  549\n   88  738  796\n  486  715  861\n   62  491  815\n  463  434  569\n  519  622  310\n  199  443  782\n  572  657   85\n  763  517  844\n  750  175  835\n  228  269  710\n  611  316  551\n  883  546  296\n  169  693   18\n  992  743  316\n  263  529  529\n  705  570    4\n  918  706  527\n  609  285  971\n  260  533  112\n  711  486  904\n  820   40  472\n  997  301  129\n  257  288  343\n  635  439  375\n  560  381  417\n  773  105  145\n   58  963  267\n  976  742  424\n  994  441  384\n  389  770  514\n  782  463  335\n  919  727  276\n  780  794  372\n  326  180  590\n  918  946  257\n  889  842  181\n  507   61  464\n  762  835  443\n  827  607  982\n  174  875  544\n  934  885  589\n   32  343  757\n  987  826  257\n  981  782  844\n  446  291  397\n  443  800  421\n  165  668  539\n  410  373  487\n  422  803  881\n  546  998  953\n  291  607  160\n  919  894   62\n  842  718  117\n  110  816  582\n  470  836  596\n  575  687   35\n   37  835  374\n   90  954  354\n  101  141  407\n  174  398  499\n  173  737  964\n    4  365  950\n  946  616  634\n  906  904  619\n   40  789   16\n  788  769   76\n  737  867   88\n  565  812   31\n  508  380  201\n   34  935  339\n  500  862  326\n  431  181  475\n  403  346  585\n   88  530  708\n  731  137  781\n  715  563  272\n  817  659  932\n  396  368  360\n  162  683  376\n  278  620   39\n  525  910  371\n  688  524  149\n  488  998  279\n  286  392  523\n  325  144  406\n   79  532  419\n  540  460  465\n" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day03 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.count(fn [a, b, c] ->
+      a + b > c and a + c > b and b + c > a
+    end)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.chunk_every(3)
+    |> Enum.flat_map(fn [[a, b, c], [d, e, f], [g, h, i]] ->
+      [[a, d, g], [b, e, h], [c, f, i]]
+    end)
+    |> part1()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) when is_binary(line) do
+      line
+      |> String.split(" ", trim: true)
+      |> Enum.map(&String.to_integer/1)
+    end
+
+    def parse_line(line) when is_list(line), do: line
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day03, <<70, 79, 82, 49, 0, 0, 10, ...>>,
+ {:module, Day03.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+```elixir
+[[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+|> Enum.zip()
+|> Enum.map(&Tuple.to_list/1)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+```
+
+In your puzzle input, **how many of the listed triangles are possible?**
+
+Your puzzle answer was `917`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day03.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+917
+```
+
+In your puzzle input, and instead reading by columns, **how many of the listed triangles are possible?**
+
+Your puzzle answer was `1649`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day03.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1649
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2016) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2016/day/3/input).
