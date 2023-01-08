@@ -1,0 +1,286 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 4 - Advent of Code 2016
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2016/day/4)
+* [AoC Puzzle Input](https://adventofcode.com/2016/day/4/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day_04.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day-04.livemd)
+
+## Prompt
+
+### --- Day 4: Security Through Obscurity ---
+
+Finally, you come across an information kiosk with a list of rooms. Of course, the list is encrypted and full of decoy data, but the instructions to decode the list are barely hidden nearby. Better remove the decoy data first.
+
+Each room consists of an encrypted name (lowercase letters separated by dashes) followed by a dash, a sector ID, and a checksum in square brackets.
+
+A room is real (not a decoy) if the checksum is the five most common letters in the encrypted name, in order, with ties broken by alphabetization. For example:
+
+* `aaaaa-bbb-z-y-x-123[abxyz]` is a real room because the most common letters are a (5), b (3), and then a tie between x, y, and z, which are listed alphabetically.
+* `a-b-c-d-e-f-g-h-987[abcde]` is a real room because although the letters are all tied (1 of each), the first five are listed alphabetically.
+* `not-a-real-room-404[oarel]` is a real room.
+* `totally-real-room-200[decoy]` is not.
+
+Of the real rooms from the list above, the sum of their sector IDs is 1514.
+
+**What is the sum of the sector IDs of the real rooms?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2016/day/4/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+With all the decoy data out of the way, it's time to decrypt this list and get moving.
+
+The room names are encrypted by a state-of-the-art [shift cipher](https://en.wikipedia.org/wiki/Caesar_cipher), which is nearly unbreakable without the right software. However, the information kiosk designers at Easter Bunny HQ were not expecting to deal with a master cryptographer like yourself.
+
+To decrypt a room name, rotate each letter forward through the alphabet a number of times equal to the room's sector ID. A becomes B, B becomes C, Z becomes A, and so on. Dashes become spaces.
+
+For example, the real name for `qzmt-zixmtkozy-ivhz-343` is very encrypted name.
+
+**What is the sector ID of the room where North Pole objects are stored?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2016/day/4/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"nzydfxpc-rclop-qwzhpc-qtylyntyr-769[oshgk]\nqzlozfhmf-bzmcx-bnzshmf-zbpthrhshnm-339[zmxdi]\nxtwtelcj-rclop-upwwjmply-zapcletzyd-743[itbds]\nmrxivrexmsrep-fewoix-ywiv-xiwxmrk-308[kzypw]\nibghopzs-qobrm-difqvogwbu-142[lnrzo]\nirgyyolokj-xghhoz-lotgtiotm-228[vnmxd]\nfoadouwbu-gqojsbusf-vibh-fsgsofqv-376[ymswi]\njvuzbtly-nyhkl-wyvqljapsl-wshzapj-nyhzz-ylzlhyjo-903[jnyaz]\namjmpdsj-cee-qcptgacq-236[caejm]\nnvrgfezqvu-avccpsvre-crsfirkfip-217[nrzcd]\nvdzonmhydc-bzmcx-bnzshmf-zbpthrhshnm-235[znyot]\noxaflxzqfsb-mixpqfz-doxpp-abmxoqjbkq-393[xqbfo]\ndrxevkzt-upv-crsfirkfip-893[rfikp]\nrkpqxyib-zelzlixqb-obzbfsfkd-627[wzymt]\najvyjprwp-kdwwh-bjunb-563[jwbpa]\nnzcczdtgp-eza-dpncpe-mldvpe-opalcexpye-171[wjzyc]\njxdkbqfz-zixppfcfba-mixpqfz-doxpp-abmilvjbkq-809[nbaoc]\ntbxmlkfwba-zelzlixqb-xkxivpfp-315[yixla]\ngvcskirmg-gerhc-gsexmrk-hizipstqirx-620[zyosg]\nygcrqpkbgf-ecpfa-eqcvkpi-uvqtcig-440[sbpfj]\nirdgrxzex-vxx-rthlzjzkzfe-425[zdqok]\nszfyrqriuflj-tfcfiwlc-wcfnvi-uvjzxe-425[lfipb]\nzgmfyxypbmsq-aylbw-bcqgel-912[dqtlr]\nubhatstkwhnl-cxeeruxtg-wxitkmfxgm-475[ectpi]\nejpanjwpekjwh-fahhuxawj-wymqeoepekj-316[utnvq]\nqlm-pbzobq-ciltbo-pqloxdb-601[lktqh]\nvotubcmf-fhh-efwfmpqnfou-493[aiyzx]\njqwpihizlwca-uqtqbizg-ozilm-kivlg-twoqabqka-382[frmkh]\nzovldbkfz-bdd-tlohpelm-497[dcfxw]\natyzghrk-yigbktmkx-natz-jkyomt-748[ktyag]\niuxxuyobk-hgyqkz-iayzuskx-ykxboik-566[yzsxi]\njvsvymbs-zjhclunly-obua-klzpnu-903[ckmyr]\nsbnqbhjoh-ezf-tbmft-623[bfhte]\nforwcoqhwjs-rms-difqvogwbu-870[owfqr]\nyhtwhnpun-ibuuf-zopwwpun-721[tjlfz]\nguahyncw-wbiwifuny-omyl-nymncha-968[nywac]\nykjoqian-cnwza-bhksan-zaoecj-576[btksq]\nckgvutofkj-igtje-zxgototm-800[mlqgz]\nipvohghykvbz-jvsvymbs-lnn-dvyrzovw-227[pysto]\njqwpihizlwca-zilqwikbqdm-ntwemz-kwvbiqvumvb-382[antsy]\nnjmjubsz-hsbef-cvooz-mbcpsbupsz-805[bferv]\nojk-nzxmzo-xgvnndadzy-xcjxjgvoz-mzxzdqdib-785[vzpun]\nyhkpvhjapcl-ihzrla-svnpzapjz-747[pahzj]\nhtqtwkzq-zsxyfgqj-kqtbjw-rfsfljrjsy-827[wzxif]\nfubrjhqlf-sodvwlf-judvv-ilqdqflqj-257[flqdj]\nforwcoqhwjs-qobrm-qcohwbu-rsgwub-116[gtsir]\nnzydfxpc-rclop-mfyyj-cpdplcns-483[gzysm]\ncjpibabsepvt-cbtlfu-nbobhfnfou-857[bfcno]\noxmeeuruqp-ngzzk-geqd-fqefuzs-222[equzf]\nmvkccspson-lexxi-bomosfsxq-614[ybgsn]\nfrqvxphu-judgh-fdqgb-frdwlqj-vhuylfhv-231[bojwc]\nsno-rdbqds-bgnbnkzsd-btrsnldq-rdquhbd-989[dbnsq]\nwrs-vhfuhw-fdqgb-frdwlqj-uhvhdufk-179[fhduw]\nftzgxmbv-ynssr-vahvhetmx-mktbgbgz-397[truqi]\nxst-wigvix-tpewxmg-kveww-ywiv-xiwxmrk-984[nmrid]\ndkqjcbctfqwu-rncuvke-itcuu-ucngu-544[inaxl]\nhwdtljsnh-wfggny-fsfqdxnx-151[anbvm]\naflwjfslagfsd-bwddqtwsf-vwhdgqewfl-970[sjqtc]\nhmsdqmzshnmzk-okzrshb-fqzrr-sqzhmhmf-885[qzbly]\nxcitgcpixdcpa-qphzti-gtrtxkxcv-141[ctxip]\nnbhofujd-tdbwfohfs-ivou-gjobodjoh-649[fnwgk]\nwfruflnsl-wfggny-xjwanhjx-905[lnztx]\njrncbavmrq-rtt-fgbentr-975[rtbna]\njqwpihizlwca-akidmvomz-pcvb-bziqvqvo-460[zakpd]\noxmeeuruqp-nmewqf-eqdhuoqe-560[vtznk]\nplolwdub-judgh-udeelw-uhvhdufk-985[fnsty]\nkfg-jvtivk-treup-ivrthlzjzkzfe-503[ktvze]\nbqvvu-ywjzu-ykwpejc-naoawnyd-550[txaws]\ngsvvswmzi-wgezirkiv-lyrx-qerekiqirx-984[irevg]\nvcibutulxiom-yaa-uhufsmcm-552[gpimb]\nugjjgkanw-usfvq-ugslafy-lwuzfgdgyq-918[gufaj]\nqfmcusbwq-foadouwbu-dzoghwq-ufogg-hsqvbczcum-506[uoqbc]\nqzchnzbshud-rbzudmfdq-gtms-zmzkxrhr-547[gxjyh]\naflwjfslagfsd-usfvq-ugslafy-esjcwlafy-450[kjnil]\nnzwzcqfw-nsznzwlep-afcnsldtyr-951[hjrdi]\naoubshwq-pogysh-kcfygvcd-740[pxyzt]\nzbytomdsvo-lkcuod-nocsqx-380[rqsuo]\nfmsledevhsyw-jpsaiv-wivzmgiw-542[pitok]\nqvbmzvibqwvit-ntwemz-abwziom-304[urjat]\ngvaaz-tdbwfohfs-ivou-eftjho-389[inlud]\nwlqqp-avccpsvre-ivjvrity-399[qcgto]\nshmml-pelbtravp-pubpbyngr-znantrzrag-897[prabn]\niruzfrtkzmv-jtrmvexvi-ylek-jvimztvj-477[vijmr]\nhdgdovmt-bmvyz-xjgjmapg-xviyt-xjvodib-yzqzgjkhzio-499[tsira]\nwillimcpy-yaa-omyl-nymncha-916[jtwau]\ndpssptjwf-gmpxfs-bobmztjt-389[kjlin]\ngpbepvxcv-snt-tcvxcttgxcv-245[etyfm]\njxdkbqfz-ciltbo-cfkxkzfkd-367[xldij]\nudglrdfwlyh-sodvwlf-judvv-pdunhwlqj-231[rslnt]\nygcrqpkbgf-ecpfa-eqcvkpi-gpikpggtkpi-440[pgkci]\nsno-rdbqds-eknvdq-otqbgzrhmf-391[yzexr]\nlzfmdshb-atmmx-bnmszhmldms-313[bacsl]\nqczcftiz-xszzmpsob-aofyshwbu-974[nxzyq]\nnwzekwypera-fahhuxawj-iwngapejc-420[yzguv]\nsbnqbhjoh-gmpxfs-efwfmpqnfou-389[sbwne]\nugjjgkanw-xdgowj-ksd" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day04 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.filter(&checksum/1)
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.sum()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.filter(&checksum/1)
+    |> Enum.map(&rotate_name/1)
+    |> Enum.find(&(elem(&1, 0) == "northpole object storage"))
+    |> elem(1)
+  end
+
+  defp checksum({name, _sector_id, checksum}) do
+    name
+    |> String.replace("-", "")
+    |> String.to_charlist()
+    |> Enum.frequencies()
+    |> Enum.sort_by(fn {k, v} ->
+      {-v, k}
+    end)
+    |> Enum.take(5)
+    |> Enum.map(&elem(&1, 0))
+    |> then(fn
+      ^checksum -> true
+      _ -> false
+    end)
+  end
+
+  defp rotate_name({name, sector_id, checksum}) do
+    name
+    |> String.to_charlist()
+    |> Enum.map(fn
+      ?- -> ?\s
+      c -> rem(c - ?a + rem(sector_id, 26), 26) + ?a
+    end)
+    |> then(fn new_name ->
+      {List.to_string(new_name), sector_id, checksum}
+    end)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      ~r{([a-z\-]+)\-(\d+)\[([a-z]+)\]}
+      |> Regex.run(line, capture: :all_but_first)
+      |> then(fn [a, b, c] ->
+        {a, String.to_integer(b), String.to_charlist(c)}
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day04, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+ {:module, Day04.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**What is the sum of the sector IDs of the real rooms?**
+
+Your puzzle answer was `158835`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+158835
+```
+
+**What is the sector ID of the room where North Pole objects are stored?**
+
+Your puzzle answer was `993`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+993
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2016) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2016/day/4/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day04Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "aaaaa-bbb-z-y-x-123[abxyz]\na-b-c-d-e-f-g-h-987[abcde]\nnot-a-real-room-404[oarel]\ntotally-real-room-200[decoy]"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day04.part1(input) == 1514
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+.
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+1 test, 0 failures
+
+Randomized with seed 325183
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 1}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(%{
+  "Part 1" => fn -> Day04.part1(input) end,
+  "Part 2" => fn -> Day04.part2(input) end
+})
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        260.64        3.84 ms     ±2.33%        3.82 ms        4.12 ms
+Part 2        245.82        4.07 ms     ±1.38%        4.06 ms        4.25 ms
+
+Comparison: 
+Part 1        260.64
+Part 2        245.82 - 1.06x slower +0.23 ms
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
