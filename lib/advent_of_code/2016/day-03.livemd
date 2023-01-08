@@ -92,8 +92,10 @@ defmodule Day03 do
     input
     |> parse()
     |> Enum.chunk_every(3)
-    |> Enum.flat_map(fn [[a, b, c], [d, e, f], [g, h, i]] ->
-      [[a, d, g], [b, e, h], [c, f, i]]
+    |> Enum.flat_map(fn triplet ->
+      triplet
+      |> Enum.zip()
+      |> Enum.map(&Tuple.to_list/1)
     end)
     |> part1()
   end
