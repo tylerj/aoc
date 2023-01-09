@@ -1,0 +1,276 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 6 - Advent of Code 2016
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2016/day/6)
+* [AoC Puzzle Input](https://adventofcode.com/2016/day/6/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day-06.livemd)
+
+## Prompt
+
+### --- Day 6: Signals and Noise ---
+
+Something is jamming your communications with Santa. Fortunately, your signal is only partially jammed, and protocol in situations like this is to switch to a simple [repetition code](https://en.wikipedia.org/wiki/Repetition_code) to get the message through.
+
+In this model, the same message is sent repeatedly. You've recorded the repeating message signal (your puzzle input), but the data seems quite corrupted - almost too badly to recover. **Almost**.
+
+All you need to do is figure out which character is most frequent for each position. For example, suppose you had recorded the following messages:
+
+```
+eedadn
+drvtee
+eandsr
+raavrd
+atevrs
+tsrnev
+sdttsa
+rasrtv
+nssdts
+ntnada
+svetve
+tesnvt
+vntsnd
+vrdear
+dvrsen
+enarar
+```
+
+The most common character in the first column is `e`; in the second, `a`; in the third, `s`, and so on. Combining these characters returns the error-corrected message, easter.
+
+Given the recording in your puzzle input, **what is the error-corrected version** of the message being sent?
+
+To begin, [get your puzzle input](https://adventofcode.com/2016/day/6/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Of course, that **would** be the message - if you hadn't agreed to use a **modified repetition code** instead.
+
+In this modified code, the sender instead transmits what looks like random data, but for each character, the character they actually want to send is **slightly less likely** than the others. Even after signal-jamming noise, you can look at the letter distributions in each column and choose the **least common** letter to reconstruct the original message.
+
+In the above example, the least common character in the first column is a; in the second, d, and so on. Repeating this process for the remaining characters produces the original message, advent.
+
+Given the recording in your puzzle input and this new decoding methodology, **what is the original message that Santa is trying to send?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2016/day/6/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"bgpmxqws\nmxvdaluh\nwpgcrcix\ndjugxgak\nurjgbqde\nvcsylkay\nruyowwjt\neepdbfaa\nkpzjujdv\nilsbjxbf\nxljdcdpc\nvnmtqzbu\ndsiruyjs\noemrvmqj\nbunqbyjw\nwixyxnwq\ntfmpgyen\nrxjphoyf\nkeohkpwv\ngbpfqodg\npalgwnye\nzzriwene\nwmczggbk\nxikxduml\nestibkpk\nivcghhot\nuvczidij\nqmdmpfxn\nxjgypmry\nxwzgzxeu\nejvoqgyr\nqzbnawul\nmhtvpsma\nvzddmtyx\nckhdphcd\nrrxiqrqd\ntdnauotp\nzsoqslob\noxbleyra\ndfspawmw\namewbjnz\ndhryqzsg\ngevzondd\ngjtlhacs\nywoghawg\nxgiglflw\njlfewwky\nxvhjgvhk\nbaocvjcl\nwnweoaib\nuepsdnur\nvmynttbb\naoqezdgl\noahtcpli\nhixokbhp\nrsdwsjnv\nnqckpjlt\njksheyvr\nasabcisr\njirzozrt\njypcypek\nhbeimsej\nvzwnchwy\nozjqqyaz\nhbxcqvne\nyfmthknj\nyxicfnav\nfhfwaetl\nlyhvemqr\nkyyzkgfb\nunigfcbx\njyszsjto\nqoomixgp\nvwqlvanp\nwteqnjhj\ndtcfvira\nwztxowzh\nrjuayajd\nmcvaqelp\nwazbrrej\nqwuiszub\nfohaxlyl\nvizomswk\npkjhxghs\nxhygtcbp\ngrzjvlas\ntgssuvej\njypumznm\nymiymxbk\nfdnhxmpc\nnqwlpigo\necpyhmgw\nhbxpvgoh\npkflsrjo\nzrjugqge\njwvlowtd\nmkslbbql\nhsektxsi\npsanaqop\nylorypou\ntkfircdx\nftkfzmno\nrdasheam\neulndcvo\ngpetuqvl\nfelsxwks\nxckkdvyc\nnlbymfrt\ngcqxmyse\ngbbnguow\ncdaduwiv\nsqikwrbi\nppwteldh\ntyurlqsr\noogkdood\nslxekxkj\ntunmorwo\nmphktfgp\nylkifdek\nbyopdakn\nzgpqnghe\nlltqwxuf\npalhjqcb\nxxrbywel\nxolycxlx\nbkiimxvx\nhtztessk\naamwgfrm\nextuovqh\nbpkmstaf\nhazuzhkf\ncjiqycqs\nsxafxxpp\nmtfowzth\npoosymcj\nvbykdleq\nbxhhfyak\nkbyminxs\ngviprbxv\nbqxhjffd\nwmuwlzoy\niwazluuu\nuhwxfelq\ngfvqwfgj\nuqvyjkgr\neanwjhhl\nizpooten\ngkqhaiel\njforeagg\nhrqjylmb\nkcvfbohb\njkoskwff\nymuqatcy\nnaeceeru\nalghunmu\nygsgeyxy\nfhsxqtsx\niikldgzj\nzwsdownm\nsvbdvddw\nujwdwmju\npuszwwxg\npwzuivlo\nnoqjcwqu\nlsnvidsn\nrhuvjosk\nrxktxanu\niftbsfjc\nkgrxrkwl\nrfzknqde\nafqcjguq\nsghybsrn\nqtipzcwy\nyyqhuufw\nzaeukrhr\nrqtlcflu\nridxvnur\nwcxzmvka\npqxcddgq\neetnhsux\nkblokhxx\nbmctwlgo\ncpojyilz\nyhnmkhjp\nbtudgpci\nmzvjtlhh\nxabfbuvt\njgoltfpy\ngsjdsaco\nbmxhpnri\nncdkduzl\njhzyshfz\nqhruewva\ncgkafvvm\nntjbaria\nrpfxuhht\nwnqbudow\nbcezvcpt\nnqrhgrkn\ntceyjrqf\npyszfamz\nnctlttmt\nbvhanhoc\nilffiatn\nfwmskxwg\nvezsripn\nhbjxpdyd\ntjnpgdib\ntiuniqdj\nmrzlrnmn\nngqrtjxr\neoyorrfy\nrtkidptz\nzwglnkeu\nanjcxsgc\ndbuotxcq\nsqpsxbmt\nczyxgtcv\nojhmhssl\nlfbhgnox\npecipazx\nnvcfxguk\ngdniujcm\ntcdfhgez\nzxzybtvb\noddtlvmw\nvxdcfivs\nldgbhriu\nlcuccuup\ndwzyuvkh\npdoomnps\njfaqworq\nzfeecwuy\nzxytmbzh\niuzcfqac\nkxvxqpam\ngyfryaqu\ndusowjue\nuwrofbxz\njwhbtsgg\ntjpubrqi\nvncupbao\nlbusnztb\nkbpkhcau\nprrcxgti\naflcpnsq\nxtspjvwl\nfqjgujib\ntnlahhpp\nboovsuro\neytzygmd\nvdyysubn\nsyxcupva\nulgjkkdy\npzhevrme\nvynmztwh\nwrwebmrb\npdfniopo\nnnusdprq\nqzrnxboz\nfhvnyafq\nisbzhjnq\nnxfvcxvy\niuzgpevj\napjpvsdk\nunltokdk\nneccyyrf\ngkkafbth\nudnurvso\ngzosdaws\nsnetsjdd\nzcsgluqb\nfdsvyiho\nkjvmexiu\nugfpphts\ndbkvkdok\ndrpkejfw\nlwyshtxq\nqilaojzn\nqilwixhi\nhbuzdkgg\namdettxe\nrilvspmg\ncyvfwmwg\nkqbmwvvi\nnuxdfinf\nozfvzigf\nvhjvfosm\nvfmgntex\ncswjzkft\nkvqqlvbh\nppwpiqcb\nwewsncdj\nndkjslvd\nlivwaogi\nslupeobk\nchvlbixa\noprvhtpn\nwrgwrzic\nmeyhlwzr\nwcwplger\ncfdwqikc\nvokgnzjv\nsxmxzlwh\nrttwwsrg\napqmweoc\nxcrgliqw\negjenpzi\nuuaoghhw\nubaubqir\nslxfrqfz\nuooravpz\njukdeivx\nqvelgzzi\nzbcnzjsj\nnoivjeht\ntomkyktn\nowixssbg\nqrjikjok\nopieopkj\nhzrratbf\ntawhmgiz\nzojlupqh\niuxrcduy\ngxdvgzke\ntcsqiada\noqanfwxs\nhoeavozw\nkteefzjp\nxjepfoho\nacaimhfz\nifeqkbqc\nszwlvqwc\njrtfkzxv\naqgmlcyg\nstsejxzs\nmukbwojc\nyorhqkqz\nqgkehpbu\nqrpealli\nmcwerdgx\nvqxkeyqe\npmstbkfy\nuriiqytq\npuyrfebm\ncljqpflg\nyhjxqfee\nwvyitlyj\nstvxunze\nsurpasjh\nlaqbwefs\ntmhzxhcp\nxnrmdgci\ncvoziimt\ndbeqiwio\nbncszppp\nwajpsycd\nncmrinrp\nzsctcqzy\nvkfwzoda\nzeturmnd\ndydeylro\ngggkrwzw\noobmkfhz\nvimgaxkq\ncuftcyxg\njzczmzab\njqvvaljj\nfvlbbduo\ntvoipipg\nihdqovcz\nfhylllit\nwngiyeld\npanifluc\nnariaulb\nuiqpccns\nvdeevhcb\nfjddbcfa\nnymgtdmf\nqvkrocra\nlelplbmu\nqwajtxne\ncjgljjwm\nkdyecbii\nrmhccint\nmeclgocv\nahvvcbck\nuktuwuag\ndcnpzwjn\nigfbtmnr\nwdioghpd\nkeuuecam\nclxwiylf\noqsbygex\ndbxhlukg\nrkxjjlvn\nvotomymd\nhqyfigpr\nqnuvattu\nflrxtbsl\nzinwdott\nwxpzgsxk\nglvwrzqv\nasruvcjq\naanwzupj\nkrbxlowc\nnfbrzogr\nivvbjgyt\nmxbuttye\nrhzksroq\nskipgtsv\nwrfnmsgm\nckdgipqw\nuxbylsdi\nbazhagcz\nmelrnxrj\nqqqoyhqf\nhrfjpsrx\nhafnvrdg\nwzasinyu\nfrbkqlzq\npkpasbfh\nuaadlrys\ntjxovpar\nlvqxahjd\nereefqow\ntmwalbhi\neflnfinc\nhwmxucjt\niedrvuyy\nmnmxdbhv\nqghmvftt\nboqbamap\nrjfncukp\njsyshihy\nkwfcnspx\nlsvaiysm\nxlypkceq\nuvpxfarx\nonktnulb\ncrycggor\nhzntxzxs\njodwwaaj\nasmnoijg\nlkgabxtn\nyinohytm\ncymfafvu\npfwnxkga\nfcaepans\ndrpzqntz\ndmtlraxa\nxpuaeobo\nnpwbdnyw\nprgddqif\ncfjaozss\ny" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day06 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> List.zip()
+    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.map(&Enum.frequencies/1)
+    |> Enum.map(&Enum.max_by(&1, fn {_, v} -> v end))
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.join("")
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> List.zip()
+    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.map(&Enum.frequencies/1)
+    |> Enum.map(&Enum.min_by(&1, fn {_, v} -> v end))
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.join("")
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Enum.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.split(line, "", trim: true)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day06, <<70, 79, 82, 49, 0, 0, 12, ...>>,
+ {:module, Day06.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Given the recording in your puzzle input, **what is the error-corrected version of the message being sent**?
+
+Your puzzle answer was `qqqluigu`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"qqqluigu"
+```
+
+Given the recording in your puzzle input and this new decoding methodology, **what is the original message that Santa is trying to send?**
+
+Your puzzle answer was `lsoypmia`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"lsoypmia"
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2016) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2016/day/6/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day06Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "eedadn\ndrvtee\neandsr\nraavrd\natevrs\ntsrnev\nsdttsa\nrasrtv\nnssdts\nntnada\nsvetve\ntesnvt\nvntsnd\nvrdear\ndvrsen\nenarar"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day06.part1(input) == "easter"
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day06.part2(input) == "advent"
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 336999
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(%{
+  "Part 1" => fn -> Day06.part1(input) end,
+  "Part 2" => fn -> Day06.part2(input) end
+})
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        618.44        1.62 ms     ±4.96%        1.62 ms        1.79 ms
+Part 2        604.22        1.66 ms     ±4.75%        1.66 ms        1.83 ms
+
+Comparison: 
+Part 1        618.44
+Part 2        604.22 - 1.02x slower +0.0381 ms
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
