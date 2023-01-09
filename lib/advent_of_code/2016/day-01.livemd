@@ -16,7 +16,6 @@ Mix.install([:kino, :benchee])
 
 * [Advent of Code (AoC)](https://adventofcode.com/2016/day/1)
 * [AoC Puzzle Input](https://adventofcode.com/2016/day/1/input)
-* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day_01.ex)
 * [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day-01.livemd)
 
 ## Prompt

@@ -191,34 +191,12 @@ Randomized with seed 162351
 ## Benchmarking
 
 ```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day01.part1(input)
-  end
-
-  def fun2(input) do
-    Day01.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
 # https://github.com/bencheeorg/benchee
-input = Day01.Input.parse(input) |> Enum.to_list()
 
 Benchee.run(
   %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
+    "Part 1" => fn -> Day01.part1(input) end,
+    "Part 2" => fn -> Day01.part2(input) end
   },
   memory_time: 2,
   reduction_time: 2
