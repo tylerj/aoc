@@ -16,7 +16,6 @@ Mix.install([:kino, :benchee])
 
 * [Advent of Code (AoC)](https://adventofcode.com/2016/day/5)
 * [AoC Puzzle Input](https://adventofcode.com/2016/day/5/input)
-* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day_05.ex)
 * [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day-05.livemd)
 
 ## Prompt
@@ -47,11 +46,25 @@ To begin, [get your puzzle input](https://adventofcode.com/2016/day/5/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+As the door slides open, you are presented with a second door that uses a slightly more inspired security mechanism. Clearly unimpressed by the last version (in what movie is the password decrypted **in order**?!), the Easter Bunny engineers have worked out [a better solution](https://www.youtube.com/watch?v=NHWjlCaIrQo&t=25s).
 
-**QUESTION TWO?**
+Instead of simply filling in the password from left to right, the hash now also indicates the **position** within the password to fill. You still look for hashes that begin with five zeroes; however, now, the **sixth** character represents the **position** (0-7), and the **seventh** character is the character to put in that position.
+
+A hash result of `000001f` means that `f` is the second character in the password. Use only the **first result** for each position, and ignore invalid positions.
+
+For example, if the Door ID is abc:
+
+* The first interesting hash is from `abc3231929`, which produces `0000015...`; so, `5` goes in position `1`: `_5______`.
+* In the previous method, `5017308` produced an interesting hash; however, it is ignored, because it specifies an invalid position (`8`).
+* The second interesting hash is at index `5357525`, which produces `000004e...`; so, `e` goes in position `4`: `_5__e___`.
+
+You almost choke on your popcorn as the final character falls into place, producing the password `05ace8e3`.
+
+Given the actual Door ID and this new method, **what is the password?** Be extra proud of your solution if it uses a cinematic "decrypting" animation.
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2016/day/5/input).
+
+Your puzzle input is still `uqwqemis`.
 
 ## Input
 
@@ -75,36 +88,42 @@ input = input |> Kino.Input.read()
 
 ```elixir
 defmodule Day05 do
-  defdelegate parse(input), to: __MODULE__.Input
-
   def part1(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    make_pw(input, 0, [])
+  end
+
+  defp make_pw(_, _, pw) when length(pw) >= 8,
+    do: pw |> Enum.reverse() |> List.to_string()
+
+  defp make_pw(key, int, pw) do
+    :crypto.hash(:md5, "#{key}#{int}")
+    |> Base.encode16(case: :lower)
+    |> then(fn
+      <<"00000", n, _::binary>> ->
+        make_pw(key, int + 1, [n | pw])
+
+      _ ->
+        make_pw(key, int + 1, pw)
+    end)
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    make_pw2(input, 0, %{})
   end
 
-  defmodule Input do
-    def parse(input) when is_binary(input) do
-      input
-      |> String.split("\n")
-      |> parse()
-    end
+  defp make_pw2(_, _, pw) when map_size(pw) >= 8,
+    do: pw |> Enum.sort() |> Enum.map(&elem(&1, 1)) |> List.to_string()
 
-    def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
-    end
+  defp make_pw2(key, int, pw) do
+    :crypto.hash(:md5, "#{key}#{int}")
+    |> Base.encode16(case: :lower)
+    |> then(fn
+      <<"00000", i, n, _::binary>> when i in ?0..?7 ->
+        make_pw2(key, int + 1, Map.put_new(pw, i - ?0, n))
 
-    def parse_line(line) do
-      line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
-    end
+      _ ->
+        make_pw2(key, int + 1, pw)
+    end)
   end
 end
 ```
@@ -112,13 +131,12 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day05, <<70, 79, 82, 49, 0, 0, 8, ...>>,
- {:module, Day05.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day05, <<70, 79, 82, 49, 0, 0, 14, ...>>, {:make_pw2, 3}}
 ```
 
 **Given the actual Door ID, what is the password?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `1a3099aa`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -129,12 +147,12 @@ Day05.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+"1a3099aa"
 ```
 
-**QUESTION TWO?**
+**Given the actual Door ID and this new method, what is the password?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `694190cd`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -145,7 +163,7 @@ Day05.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+"694190cd"
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -153,102 +171,3 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 At this point, you should [return to your Advent calendar](https://adventofcode.com/2016) and try another puzzle.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2016/day/5/input).
-
-## Tests
-
-<!-- livebook:{"reevaluate_automatically":true} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Day05Test do
-  use ExUnit.Case, async: false
-
-  setup_all do
-    [
-      input: ""
-    ]
-  end
-
-  describe "part1/1" do
-    test "returns expected value", %{input: input} do
-      assert Day05.part1(input) == [""]
-    end
-  end
-
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day05.part2(input) == [""]
-    end
-  end
-end
-
-ExUnit.run()
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-..
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
-
-Randomized with seed 162351
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
-```
-
-## Benchmarking
-
-```elixir
-defmodule Benchmark do
-  def fun1(input) do
-    Day05.part1(input)
-  end
-
-  def fun2(input) do
-    Day05.part2(input)
-  end
-end
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
-```
-
-```elixir
-# https://github.com/bencheeorg/benchee
-input = Day05.Input.parse(input) |> Enum.to_list()
-
-Benchee.run(
-  %{
-    "fun1" => fn _ -> Benchmark.fun1(input) end,
-    "fun2" => fn _ -> Benchmark.fun2(input) end
-  },
-  inputs: %{
-    "Part 1" => 1
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
-
-nil
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-nil
-```
