@@ -41,9 +41,18 @@ To begin, [get your puzzle input](https://adventofcode.com/2016/day/7/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+You would also like to know which IPs support **SSL** (super-secret listening).
 
-**QUESTION TWO?**
+An IP supports SSL if it has an Area-Broadcast Accessor, or **ABA**, anywhere in the supernet sequences (outside any square bracketed sections), and a corresponding Byte Allocation Block, or **BAB**, anywhere in the hypernet sequences. An ABA is any three-character sequence which consists of the same character twice with a different character between them, such as `xyx` or `aba`. A corresponding BAB is the same characters but in reversed positions: `yxy` and `bab`, respectively.
+
+For example:
+
+* `aba[bab]xyz` supports SSL (`aba` outside square brackets with corresponding `bab` within square brackets).
+* `xyx[xyx]xyx` does not support SSL (`xyx`, but no corresponding `yxy`).
+* `aaa[kek]eke` supports SSL (`eke` in supernet with corresponding `kek` in hypernet; the `aaa` sequence is not related, because the interior character must be different).
+* `zazbz[bzb]cdb` supports SSL (`zaz` has no corresponding `aza`, but `zbz` has a corresponding `bzb`, even though `zaz` and `zbz` overlap).
+
+**How many IPs in your puzzle input support SSL?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2016/day/7/input).
 
@@ -74,11 +83,11 @@ defmodule Day07 do
   def part1(input) do
     input
     |> parse()
-    |> Enum.reject(fn ip ->
-      Regex.match?(~r/\[[a-z]*([a-z])(?!\1)([a-z])\2\1[a-z]*\]/, ip)
+    |> Enum.reject(fn {_, hypernets} ->
+      Enum.any?(hypernets, &abba_match?/1)
     end)
-    |> Enum.filter(fn ip ->
-      Regex.match?(~r/([a-z])(?!\1)([a-z])\2\1/, ip)
+    |> Enum.filter(fn {supernets, _} ->
+      Enum.any?(supernets, &abba_match?/1)
     end)
     |> Enum.count()
   end
@@ -86,7 +95,25 @@ defmodule Day07 do
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Enum.count(fn {supernets, hypernets} ->
+      super_abas = get_abas(supernets)
+      hyper_abas = get_abas(hypernets)
+      Enum.any?(super_abas, fn <<a, b, a>> -> <<b, a, b>> in hyper_abas end)
+    end)
+  end
+
+  defp abba_match?(s) do
+    Regex.match?(~r/([a-z])(?!\1)([a-z])\2\1/, s)
+  end
+
+  def get_abas(list) when is_list(list) do
+    Enum.flat_map(list, &get_abas/1) |> Enum.uniq()
+  end
+
+  def get_abas(s) when is_binary(s) do
+    ~r/(?=(?<aba>([a-z])(?!\2)[a-z]\2))/
+    |> Regex.scan(s, capture: :all_names)
+    |> List.flatten()
   end
 
   defmodule Input do
@@ -97,13 +124,17 @@ defmodule Day07 do
     end
 
     def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
+      Enum.map(input, &parse_line/1)
     end
 
     def parse_line(line) do
       line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+      |> String.split(["[", "]"])
+      |> Enum.with_index()
+      |> Enum.split_with(fn {_, i} -> rem(i, 2) == 0 end)
+      |> then(fn {a, b} ->
+        {Enum.unzip(a) |> elem(0), Enum.unzip(b) |> elem(0)}
+      end)
     end
   end
 end
@@ -112,7 +143,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day07, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+{:module, Day07, <<70, 79, 82, 49, 0, 0, 16, ...>>,
  {:module, Day07.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -132,9 +163,9 @@ Day07.part1(input)
 110
 ```
 
-**QUESTION TWO?**
+**How many IPs in your puzzle input support SSL?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `242`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -145,7 +176,7 @@ Day07.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+242
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -154,67 +185,15 @@ At this point, you should [return to your Advent calendar](https://adventofcode.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2016/day/7/input).
 
-## Tests
-
-<!-- livebook:{"reevaluate_automatically":true} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Day07Test do
-  use ExUnit.Case, async: false
-
-  setup_all do
-    [
-      input: ""
-    ]
-  end
-
-  describe "part1/1" do
-    test "returns expected value", %{input: input} do
-      assert Day07.part1(input) == [""]
-    end
-  end
-
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day07.part2(input) == [""]
-    end
-  end
-end
-
-ExUnit.run()
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-..
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
-
-Randomized with seed 162351
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
-```
-
 ## Benchmarking
 
 ```elixir
 # https://github.com/bencheeorg/benchee
 
-Benchee.run(
-  %{
-    "Part 1" => fn -> Day07.part1(input) end,
-    "Part 2" => fn -> Day07.part2(input) end
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+Benchee.run(%{
+  "Part 1" => fn -> Day07.part1(input) end,
+  "Part 2" => fn -> Day07.part2(input) end
+})
 
 nil
 ```
@@ -222,7 +201,32 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1         57.46       17.40 ms     ±1.92%       17.33 ms       18.90 ms
+Part 2         29.78       33.58 ms     ±0.84%       33.57 ms       34.79 ms
+
+Comparison: 
+Part 1         57.46
+Part 2         29.78 - 1.93x slower +16.17 ms
 ```
 
 <!-- livebook:{"output":true} -->
