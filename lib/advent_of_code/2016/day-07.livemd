@@ -1,0 +1,232 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 7 - Advent of Code 2016
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2016/day/7)
+* [AoC Puzzle Input](https://adventofcode.com/2016/day/7/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2016/day-07.livemd)
+
+## Prompt
+
+### --- Day 7: Internet Protocol Version 7 ---
+
+While snooping around the local network of EBHQ, you compile a list of [IP addresses](https://en.wikipedia.org/wiki/IP_address) (they're IPv7, of course; [IPv6](https://en.wikipedia.org/wiki/IPv6) is much too limited). You'd like to figure out which IPs support **TLS** (transport-layer snooping).
+
+An IP supports TLS if it has an Autonomous Bridge Bypass Annotation, or **ABBA**. An ABBA is any four-character sequence which consists of a pair of two different characters followed by the reverse of that pair, such as xyyx or abba. However, the IP also must not have an ABBA within any hypernet sequences, which are contained by **square brackets**.
+
+For example:
+
+* `abba[mnop]qrst` supports TLS (abba outside square brackets).
+* `abcd[bddb]xyyx` does **not** support TLS (bddb is within square brackets, even though xyyx is outside square brackets).
+* `aaaa[qwer]tyui` does **not** support TLS (aaaa is invalid; the interior characters must be different).
+* `ioxxoj[asdfgh]zxcvbn` supports TLS (oxxo is outside square brackets, even though it's within a larger string).
+
+**How many IPs in your puzzle input support TLS?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2016/day/7/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2016/day/7/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"rhamaeovmbheijj[hkwbkqzlcscwjkyjulk]ajsxfuemamuqcjccbc\ngdlrknrmexvaypu[crqappbbcaplkkzb]vhvkjyadjsryysvj[nbvypeadikilcwg]jwxlimrgakadpxu[dgoanojvdvwfabtt]yqsalmulblolkgsheo\ndqpthtgufgzjojuvzvm[eejdhpcqyiydwod]iingwezvcbtowwzc[uzlxaqenhgsebqskn]wcucfmnlarrvdceuxqc[dkwcsxeitcobaylhbvc]klxammurpqgmpsxsr\ngmmfbtpprishiujnpdi[wedykxqyntvrkfdzom]uidgvubnregvorgnhm\ntxxplravpgztjqcw[txgmmtlhmqpmmwp]bmhfgpmafxqwtrpr[inntmjmgqothdzfqgxq]cvtwvembpvdmcvk\ngkxjhpayoyrrpcr[mwyoahlkqyhtznyzrm]mvmurvsrgjunjjepn[mkoumuohilpcfgbmsmh]hpwggyvjkusjxcyojyr[wqxyuzbewpjzlyqmkhw]nniczueulxtdsmkniex\nvuzyoofrvaanszwndyt[mzcbhmabgnetrpje]tqnygwhmwrbyosbke[gehqzyhlnyufknqmueo]ngendggbjcvazwol\nvdnploylmxnipfudw[pbkxlaozhqhlbzz]kpxnzwjhybgcenyw[fpukiqrjraomftt]rosyxtsdltbsmhykxu[wrucjfwuyypmiic]ydnbgvicfnmwzuatudd\nlknaffpzamlkufgt[uvdgeatxkofgoyoi]ajtqcsfdarjrddrzo[bxrcozuxifgevmog]rlyfschtnrklzufjzm\nkajqeqlafxtmzirn[mkftybdukmghmyoclxd]plvjnikiozkikifpodt[cmufoktkndkhaeqbztz]drjixnnsdxqnrmn[cmzsnhlirtskunngcee]upgxlcjhmoethppx\njoibiixuzgtkjquor[xmnqotlqrhpvlglwaxe]kjmfrpihitjydwda\nkouyuiijgsmpzynmt[xvwuujrfkqjmtqdh]ukjscwcnwktrfvrmvew[quzbelbcfxknvqc]drtrmvnabjkslahadad\nhhlcltfpiwfjhguif[rpasuqltkbudhwjeew]mkcmvbxqukjczex\nxxqceycviwyzqxekn[tiidftrsnlgpesxlf]obtbqfgogpwkoqow[dabhpdntfvbhgtmupy]hbvtghnycgyywavqbtg\nzlqdqmuxebccmndzbl[ykefimjzdqdmfvlflj]ptlphteflzxmolkof\nbabzuaikmedruqsuuv[emlhynmvfhsigdryo]iyblsqlpplrlahtwr\nbyddropvzudnjciymyh[jcebyxyvikkshpn]ggmrxgkzsrfkfkzo\nektijwczwnlancuqfv[luqhtfgwmlilhwnk]gxgivxlnerdhbhetfz[bzczfdorrsptzikjmct]mfrsvxgxijtusmvjd[sbpnwycbrykuhsinudc]bmpikuskzlxcoidp\nigefoemugshofmibco[uhahihzaglmzdpzjvfp]tfbuuhoughgismec[inbtuzxnxekfkulodyk]fxykxfkfnjvswwc\nonmmhtsykubbpdiqvjm[kbfbiyjyuzmemaomkwa]prqwqocsihfnslooel[hysggeprqecalydywlk]taghiwhgnujsduhnffu[ibpvowghgttfsvt]wcajwcxhcriflxi\nevvhkvndeoxrrftqmih[ckxjgqvpdxjvmbwsor]odolgenlgaxujvqg[qyrnnrjgxskuxycoip]jvtjgwaaywdphxpy\nfffaewoawlzsmnqo[ubnpbqpxgenzjiytml]ztberlzwpzdvofcwo\nvhrwunprhbpclog[vqtnbjndcwpuyen]vzuudswovzmjviee\nyfeztpcfgazkijht[xqcjocbnjmvvrzg]maisokokpukpstgpj\nneudpatmnjayamydbrd[heckokdparzefxm]qulfvfivofznkyvkwq[owjrktbaejpffqef]oserqezusmubsertq\nykgyzyqlodjvgqzmzy[ewsxadkknhduejft]yysinlpnxpaqdai[hqagzwigkpvzsje]auibbpljfmkoxaskuh\nkntmgvoypnpibjtp[ispxkdofjsdufpivwrj]ndecwlfcbjtrnrzw\npvjsstffnygbjafe[ztrjbalsthujslnitl]xjsoqghvrjncejwww[khwjgywxyglvhgz]kaxctpvhleqfmlm\novbgzhzmenxocuvdhwk[mzfbtwpwnttyeykuwzo]qrmyqzvxetjbrhossb[tjvdprzdgjgdvjygpnp]bgkkrcsrmfrsrtahxus[owipixzcqisqapz]fsbkjqgxuimcbur\nmbweohfcgybqcqnl[yafsvfrduertfqze]hqaodhzkmhzmlrxuc[bytcgnvzvoovirqwn]njivpwgkkqvgowpenh[erodavzscuubhea]gizvzrqjzhkikhb\nazrzthfimarcdbk[usfjkmhedaqpfnisek]yqowqlqvlranjjvbauq[korlrbzcgrneashdrrq]fjicirnofvlrlnnkeqb[ktlfmzrqxcntvasev]urpuwoiogtcwskygxz\nhtuzgcmjixiaofnm[mbmrnxkedkrjqwff]srvmeadhvwftjmx[vqkaxjmugwdmwcqlg]qxzxczyoqnkcaoqmsd\nqywanrnotepsgufhr[hsmvibiybrxwabambm]tdwinkqnjvirhgx\ncfurhuhjrbxqoefybl[kdcazzlfacaurqguqkz]yufsmycojcxiiomwteo[zcnzchsersrsapze]bhkpjaybdyilwdomfr[ddbxqanevcpjuodnj]ttmxojmazfqzqxlz\nxfpeuaftjtjzzyrlw[vxklxjatlbpevalmb]klpxbsifaszxapsosjq[kjzdnfadnybfnfvm]kodbuiigbiqdbarr[vkgxvvccoyknqcg]yusyefeqfqjkcmnrfd\nwelumvdtzozzqkc[xunvcqdbwitokoerg]euvhbecekwaszsmxu[xrffdzabspotehwg]uqzwhrvygasatdaphac[xexwfcsgfyvciqdu]kioaakhmpgudcsrgnqh\nbvirojodecjwgsfr[xezdftvafflhsabc]dlsuqqzkekwsmgyz\nxxnrooghjqtrtkmhr[xhjrmkybtnsrdkp]krhveuyzhsnfrkxq\nfzgdyuackwckqwg[jcdyvdcmrqxizkqxhke]gkfhkoqwqvkfxgj[wfxghxhkbhxhfnscjy]tdpidwqwryxlubtg[ptldartinsqinuymsc]tglyhrzvexdqkkxrer\nqjmlxlnqzipdflotzl[mwewadvcvkoqjlvlruk]aciqxygnygyordpcvc[sirhqhrjopudmfub]kxexybjqhmqmukxmpug[bbvccqpfdebfmnvald]lgqcpzwrjzlhdcalvxh\ngytjulsxixxkwhtwts[bmwcdokbhvwmzvpths]amvwsotxkvsjszzk[rnbbbelvqlqxdckpgf]mfoelmolxsbibcyss[rhqarjczvrulkfd]smrmbwtejyrtbuxw\nyzlhtplfmpcelnlnfgo[czpwiwgzcuyingho]biwyfjhjxyaougycvdk\nnyqhnhedzzlbyucj[ahtgwmsprvxrhzkb]jutcnlfuavbirrvbe[oybwrlquyqzhlekfj]ngfnydtkqpdyusyk[ojxstfhzjmohguhnq]tupjbscsqbvxtrgah\npktcuxqmiitdhfgja[urxogoqmprdhdod]rynibylhjlnummesvrt\nyetjrczvtanwejhw[fzqzeqjxwqqvpuc]nxjwkjqetsqmfxvjyg[fvyucxjhkszsvzhg]pashbrmyrjwpsii\nwrc" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day07 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.reject(fn ip ->
+      Regex.match?(~r/\[[a-z]*([a-z])(?!\1)([a-z])\2\1[a-z]*\]/, ip)
+    end)
+    |> Enum.filter(fn ip ->
+      Regex.match?(~r/([a-z])(?!\1)([a-z])\2\1/, ip)
+    end)
+    |> Enum.count()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      # |> String.split(["-", ","])
+      # |> Enum.map(&String.to_integer/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day07, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+ {:module, Day07.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**How many IPs in your puzzle input support TLS?**
+
+Your puzzle answer was `110`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day07.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+110
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day07.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2016) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2016/day/7/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day07Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day07.part1(input) end,
+    "Part 2" => fn -> Day07.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
