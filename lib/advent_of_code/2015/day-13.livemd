@@ -1,0 +1,286 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 13 - Advent of Code 2015
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/13)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/13/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day_13.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day-13.livemd)
+
+## Prompt
+
+### --- Day 13: Knights of the Dinner Table ---
+
+In years past, the holiday feast with your family hasn't gone so well. Not everyone gets along! This year, you resolve, will be different. You're going to find the **optimal seating arrangement** and avoid all those awkward conversations.
+
+You start by writing up a list of everyone invited and the amount their happiness would increase or decrease if they were to find themselves sitting next to each other person. You have a circular table that will be just big enough to fit everyone comfortably, and so each person will have exactly two neighbors.
+
+For example, suppose you have only four attendees planned, and you calculate their potential happiness as follows:
+
+```
+Alice would gain 54 happiness units by sitting next to Bob.
+Alice would lose 79 happiness units by sitting next to Carol.
+Alice would lose 2 happiness units by sitting next to David.
+Bob would gain 83 happiness units by sitting next to Alice.
+Bob would lose 7 happiness units by sitting next to Carol.
+Bob would lose 63 happiness units by sitting next to David.
+Carol would lose 62 happiness units by sitting next to Alice.
+Carol would gain 60 happiness units by sitting next to Bob.
+Carol would gain 55 happiness units by sitting next to David.
+David would gain 46 happiness units by sitting next to Alice.
+David would lose 7 happiness units by sitting next to Bob.
+David would gain 41 happiness units by sitting next to Carol.
+```
+
+Then, if you seat Alice next to David, Alice would lose 2 happiness units (because David talks so much), but David would gain 46 happiness units (because Alice is such a good listener), for a total change of 44.
+
+If you continue around the table, you could then seat Bob next to Alice (Bob gains `83`, Alice gains `54`). Finally, seat Carol, who sits next to Bob (Carol gains `60`, Bob loses `7`) and David (Carol gains `55`, David gains `41`). The arrangement looks like this:
+
+```
+     +41 +46
++55   David    -2
+Carol       Alice
++60    Bob    +54
+     -7  +83
+```
+
+After trying every other seating arrangement in this hypothetical scenario, you find that this one is the most optimal, with a total change in happiness of `330`.
+
+What is the **total change in happiness** for the optimal seating arrangement of the actual guest list?
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/13/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/13/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"Alice would gain 2 happiness units by sitting next to Bob.\nAlice would gain 26 happiness units by sitting next to Carol.\nAlice would lose 82 happiness units by sitting next to David.\nAlice would lose 75 happiness units by sitting next to Eric.\nAlice would gain 42 happiness units by sitting next to Frank.\nAlice would gain 38 happiness units by sitting next to George.\nAlice would gain 39 happiness units by sitting next to Mallory.\nBob would gain 40 happiness units by sitting next to Alice.\nBob would lose 61 happiness units by sitting next to Carol.\nBob would lose 15 happiness units by sitting next to David.\nBob would gain 63 happiness units by sitting next to Eric.\nBob would gain 41 happiness units by sitting next to Frank.\nBob would gain 30 happiness units by sitting next to George.\nBob would gain 87 happiness units by sitting next to Mallory.\nCarol would lose 35 happiness units by sitting next to Alice.\nCarol would lose 99 happiness units by sitting next to Bob.\nCarol would lose 51 happiness units by sitting next to David.\nCarol would gain 95 happiness units by sitting next to Eric.\nCarol would gain 90 happiness units by sitting next to Frank.\nCarol would lose 16 happiness units by sitting next to George.\nCarol would gain 94 happiness units by sitting next to Mallory.\nDavid would gain 36 happiness units by sitting next to Alice.\nDavid would lose 18 happiness units by sitting next to Bob.\nDavid would lose 65 happiness units by sitting next to Carol.\nDavid would lose 18 happiness units by sitting next to Eric.\nDavid would lose 22 happiness units by sitting next to Frank.\nDavid would gain 2 happiness units by sitting next to George.\nDavid would gain 42 happiness units by sitting next to Mallory.\nEric would lose 65 happiness units by sitting next to Alice.\nEric would gain 24 happiness units by sitting next to Bob.\nEric would gain 100 happiness units by sitting next to Carol.\nEric would gain 51 happiness units by sitting next to David.\nEric would gain 21 happiness units by sitting next to Frank.\nEric would gain 55 happiness units by sitting next to George.\nEric would lose 44 happiness units by sitting next to Mallory.\nFrank would lose 48 happiness units by sitting next to Alice.\nFrank would gain 91 happiness units by sitting next to Bob.\nFrank would gain 8 happiness units by sitting next to Carol.\nFrank would lose 66 happiness units by sitting next to David.\nFrank would gain 97 happiness units by sitting next to Eric.\nFrank would lose 9 happiness units by sitting next to George.\nFrank would lose 92 happiness units by sitting next to Mallory.\nGeorge would lose 44 happiness units by sitting next to Alice.\nGeorge would lose 25 happiness units by sitting next to Bob.\nGeorge would gain 17 happiness units by sitting next to Carol.\nGeorge would gain 92 happiness units by sitting next to David.\nGeorge would lose 92 happiness units by sitting next to Eric.\nGeorge would gain 18 happiness units by sitting next to Frank.\nGeorge would gain 97 happiness units by sitting next to Mallory.\nMallory would gain 92 happiness units by sitting next to Alice.\nMallory would lose 96 happiness units by sitting next to Bob.\nMallory would lose 51 happiness units by sitting next to Carol.\nMallory would lose 81 happiness units by sitting next to David.\nMallory would gain 31 happiness units by sitting next to Eric.\nMallory would lose 73 happiness units by sitting next to Frank.\nMallory would lose 89 happiness units by sitting next to George."
+```
+
+## Solution
+
+```elixir
+defmodule Day13 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    map = parse(input)
+    available = map |> Map.keys() |> MapSet.new()
+    first_name = map |> Map.keys() |> List.first()
+
+    next_person(
+      first_name,
+      0,
+      MapSet.delete(available, first_name),
+      map,
+      first_name
+    )
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defp next_person(name, happiness, %MapSet{map: a}, map, k1) when map_size(a) == 0 do
+    happiness + get_in(map, [name, k1]) + get_in(map, [k1, name])
+  end
+
+  defp next_person(name, happiness, available, map, k1) do
+    available
+    |> Enum.map(fn next_name ->
+      next_person(
+        next_name,
+        happiness + get_in(map, [name, next_name]) + get_in(map, [next_name, name]),
+        MapSet.delete(available, next_name),
+        map,
+        k1
+      )
+    end)
+    |> Enum.max()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Enum.reduce(input, %{}, &parse_line/2)
+    end
+
+    def parse_line(line, map) do
+      words = String.split(line, [" ", "."], trim: true)
+      k1 = Enum.at(words, 0)
+      k2 = Enum.at(words, 10)
+      v = Enum.at(words, 3) |> String.to_integer()
+
+      v =
+        case Enum.at(words, 2) do
+          "lose" -> -v
+          "gain" -> v
+        end
+
+      Map.update(map, k1, %{k2 => v}, fn m -> Map.put(m, k2, v) end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day13, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+ {:module, Day13.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
+```
+
+What is the **total change in happiness** for the optimal seating arrangement of the actual guest list?
+
+Your puzzle answer was `733`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day13.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+733
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day13.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/13/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day13Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day13.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day13.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day13.part1(input) end,
+    "Part 2" => fn -> Day13.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
