@@ -1,0 +1,248 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 14 - Advent of Code 2015
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/14)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/14/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day_14.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day-14.livemd)
+
+## Prompt
+
+### --- Day 14: Reindeer Olympics ---
+
+This year is the Reindeer Olympics! Reindeer can fly at high speeds, but must rest occasionally to recover their energy. Santa would like to know which of his reindeer is fastest, and so he has them race.
+
+Reindeer can only either be **flying** (always at their top speed) or **resting** (not moving at all), and always spend whole seconds in either state.
+
+For example, suppose you have the following Reindeer:
+
+* Comet can fly **14 km/s for 10 seconds**, but then must rest for **127 seconds**.
+* Dancer can fly **16 km/s for 11 seconds**, but then must rest for **162 seconds**.
+
+After one second, Comet has gone 14 km, while Dancer has gone 16 km. After ten seconds, Comet has gone 140 km, while Dancer has gone 160 km. On the eleventh second, Comet begins resting (staying at 140 km), and Dancer continues on for a total distance of 176 km. On the 12th second, both reindeer are resting. They continue to rest until the 138th second, when Comet flies for another ten seconds. On the 174th second, Dancer flies for another 11 seconds.
+
+In this example, after the 1000th second, both reindeer are resting, and Comet is in the lead at `1120` km (poor Dancer has only gotten 1056 km by that point). So, in this situation, Comet would win (if the race ended at 1000 seconds).
+
+Given the descriptions of each reindeer (in your puzzle input), after exactly `2503` seconds, **what distance has the winning reindeer traveled?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/14/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/14/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"Rudolph can fly 22 km/s for 8 seconds, but then must rest for 165 seconds.\nCupid can fly 8 km/s for 17 seconds, but then must rest for 114 seconds.\nPrancer can fly 18 km/s for 6 seconds, but then must rest for 103 seconds.\nDonner can fly 25 km/s for 6 seconds, but then must rest for 145 seconds.\nDasher can fly 11 km/s for 12 seconds, but then must rest for 125 seconds.\nComet can fly 21 km/s for 6 seconds, but then must rest for 121 seconds.\nBlitzen can fly 18 km/s for 3 seconds, but then must rest for 50 seconds.\nVixen can fly 20 km/s for 4 seconds, but then must rest for 75 seconds.\nDancer can fly 7 km/s for 20 seconds, but then must rest for 119 seconds."
+```
+
+## Solution
+
+```elixir
+defmodule Day14 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  @part1_time 2503
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.map(&calc_distance(&1, 0, @part1_time))
+    |> Enum.max_by(&elem(&1, 1))
+    |> elem(1)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defp calc_distance({name, _, _, _}, distance, seconds) when seconds <= 0,
+    do: {name, distance}
+
+  defp calc_distance({n, s, t, r}, d, seconds) do
+    calc_distance(
+      {n, s, t, r},
+      d + s * min(t, seconds),
+      seconds - t - r
+    )
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      speeds =
+        Regex.scan(~r{\d+}, line, capture: :first)
+        |> List.flatten()
+        |> Enum.map(&String.to_integer/1)
+
+      name = String.split(line) |> List.first()
+
+      List.to_tuple([name | speeds])
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day14, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+ {:module, Day14.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Given the descriptions of each reindeer (in your puzzle input), after exactly `2503` seconds, **what distance has the winning reindeer traveled?**
+
+Your puzzle answer was `2696`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day14.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+2696
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day14.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/14/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day14Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day14.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day14.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day14.part1(input) end,
+    "Part 2" => fn -> Day14.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
