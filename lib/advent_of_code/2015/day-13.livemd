@@ -16,7 +16,6 @@ Mix.install([:kino, :benchee])
 
 * [Advent of Code (AoC)](https://adventofcode.com/2015/day/13)
 * [AoC Puzzle Input](https://adventofcode.com/2015/day/13/input)
-* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day_13.ex)
 * [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day-13.livemd)
 
 ## Prompt
@@ -66,9 +65,11 @@ To begin, [get your puzzle input](https://adventofcode.com/2015/day/13/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+In all the commotion, you realize that you forgot to seat yourself. At this point, you're pretty apathetic toward the whole thing, and your happiness wouldn't really go up or down regardless of who you sit next to. You assume everyone else would be just as ambivalent about sitting next to you, too.
 
-**QUESTION TWO?**
+So, add yourself to the list, and give all happiness relationships that involve you a score of 0.
+
+What is the **total change in happiness** for the optimal seating arrangement that actually includes yourself?
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/13/input).
 
@@ -111,13 +112,21 @@ defmodule Day13 do
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    map = parse(input)
+    available = map |> Map.keys() |> MapSet.new()
+    first_name = "Me"
+
+    next_person(
+      first_name,
+      0,
+      available,
+      map,
+      first_name
+    )
   end
 
   defp next_person(name, happiness, %MapSet{map: a}, map, k1) when map_size(a) == 0 do
-    happiness + get_in(map, [name, k1]) + get_in(map, [k1, name])
+    happiness + change_in_happiness(map, name, k1)
   end
 
   defp next_person(name, happiness, available, map, k1) do
@@ -125,13 +134,17 @@ defmodule Day13 do
     |> Enum.map(fn next_name ->
       next_person(
         next_name,
-        happiness + get_in(map, [name, next_name]) + get_in(map, [next_name, name]),
+        happiness + change_in_happiness(map, name, next_name),
         MapSet.delete(available, next_name),
         map,
         k1
       )
     end)
     |> Enum.max()
+  end
+
+  defp change_in_happiness(map, a, b) do
+    (get_in(map, [a, b]) || 0) + (get_in(map, [b, a]) || 0)
   end
 
   defmodule Input do
@@ -166,7 +179,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day13, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+{:module, Day13, <<70, 79, 82, 49, 0, 0, 14, ...>>,
  {:module, Day13.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
 ```
 
@@ -186,9 +199,9 @@ Day13.part1(input)
 733
 ```
 
-**QUESTION TWO?**
+What is the **total change in happiness** for the optimal seating arrangement that actually includes yourself?
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `725`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -199,7 +212,7 @@ Day13.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+725
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -207,54 +220,6 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/13/input).
-
-## Tests
-
-<!-- livebook:{"reevaluate_automatically":true} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Day13Test do
-  use ExUnit.Case, async: false
-
-  setup_all do
-    [
-      input: ""
-    ]
-  end
-
-  describe "part1/1" do
-    test "returns expected value", %{input: input} do
-      assert Day13.part1(input) == [""]
-    end
-  end
-
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day13.part2(input) == [""]
-    end
-  end
-end
-
-ExUnit.run()
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-..
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
-
-Randomized with seed 162351
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
-```
 
 ## Benchmarking
 
@@ -276,7 +241,48 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        230.11        4.35 ms     ±1.41%        4.32 ms        4.54 ms
+Part 2         29.31       34.11 ms     ±1.30%       33.95 ms       35.27 ms
+
+Comparison: 
+Part 1        230.11
+Part 2         29.31 - 7.85x slower +29.77 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         4.92 MB
+Part 2        39.04 MB - 7.94x memory usage +34.13 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1          0.65 M
+Part 2          5.10 M - 7.80x reduction count +4.44 M
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
