@@ -80,20 +80,55 @@ input = input |> Kino.Input.read()
 defmodule Day14 do
   defdelegate parse(input), to: __MODULE__.Input
 
-  @part1_time 2503
+  @total_time 2503
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(&calc_distance(&1, 0, @part1_time))
+    |> Enum.map(&calc_distance(&1, 0, @total_time))
     |> Enum.max_by(&elem(&1, 1))
     |> elem(1)
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    normalized_input =
+      input
+      |> parse()
+      |> Enum.map(fn {n, s, t, r} ->
+        {0, 0, n, s, t, r, t, r}
+      end)
+
+    Enum.reduce(
+      1..@total_time,
+      normalized_input,
+      fn _, i -> move_one_second(i) end
+    )
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.max()
   end
+
+  defp move_one_second(list) when is_list(list) do
+    new_list = Enum.map(list, &move_one_second/1)
+    lead_distance = new_list |> Enum.map(&elem(&1, 1)) |> Enum.max()
+    Enum.map(new_list, &add_point_if_leader(&1, lead_distance))
+  end
+
+  # start flying again
+  defp move_one_second({p, d, n, s, t, r, 0, 0}),
+    do: {p, d + s, n, s, t, r, t - 1, r}
+
+  # rest
+  defp move_one_second({p, d, n, s, t, r, 0, rr}),
+    do: {p, d, n, s, t, r, 0, rr - 1}
+
+  # fly
+  defp move_one_second({p, d, n, s, t, r, tr, rr}),
+    do: {p, d + s, n, s, t, r, tr - 1, rr}
+
+  defp add_point_if_leader({p, d, n, s, t, r, tr, rr}, d),
+    do: {p + 1, d, n, s, t, r, tr, rr}
+
+  defp add_point_if_leader(reindeer_tuple, _),
+    do: reindeer_tuple
 
   defp calc_distance({name, _, _, _}, distance, seconds) when seconds <= 0,
     do: {name, distance}
@@ -134,7 +169,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day14, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+{:module, Day14, <<70, 79, 82, 49, 0, 0, 18, ...>>,
  {:module, Day14.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -154,9 +189,9 @@ Day14.part1(input)
 2696
 ```
 
-**QUESTION TWO?**
+Again given the descriptions of each reindeer (in your puzzle input), after exactly 2503 seconds, **how many points does the winning reindeer have?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `1084`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -167,7 +202,7 @@ Day14.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+1084
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -175,54 +210,6 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/14/input).
-
-## Tests
-
-<!-- livebook:{"reevaluate_automatically":true} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Day14Test do
-  use ExUnit.Case, async: false
-
-  setup_all do
-    [
-      input: ""
-    ]
-  end
-
-  describe "part1/1" do
-    test "returns expected value", %{input: input} do
-      assert Day14.part1(input) == [""]
-    end
-  end
-
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day14.part2(input) == [""]
-    end
-  end
-end
-
-ExUnit.run()
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-..
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
-
-Randomized with seed 162351
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
-```
 
 ## Benchmarking
 
@@ -244,7 +231,48 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1       13.28 K       75.30 μs     ±3.54%       74.75 μs       83.67 μs
+Part 2        1.68 K      594.57 μs     ±3.46%      590.12 μs      669.58 μs
+
+Comparison: 
+Part 1       13.28 K
+Part 2        1.68 K - 7.90x slower +519.27 μs
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1       0.0176 MB
+Part 2         3.08 MB - 174.38x memory usage +3.06 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1          2.22 K
+Part 2        356.84 K - 160.96x reduction count +354.63 K
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
