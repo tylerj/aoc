@@ -58,9 +58,29 @@ To begin, [get your puzzle input](https://adventofcode.com/2015/day/19/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+Now that the machine is calibrated, you're ready to begin molecule fabrication.
 
-**QUESTION TWO?**
+Molecule fabrication always begins with just a single electron, `e`, and applying replacements one at a time, just like the ones during calibration.
+
+For example, suppose you have the following replacements:
+
+```
+e => H
+e => O
+H => HO
+H => OH
+O => HH
+```
+
+If you'd like to make `HOH`, you start with `e`, and then make the following replacements:
+
+* `e => O` to get `O`
+* `O => HH` to get `HH`
+* `H => OH` (on the second H) to get `HOH`
+
+So, you could make `HOH` after **3 steps**. Santa's favorite molecule, `HOHOHO`, can be made in **6 steps**.
+
+How long will it take to make the medicine? Given the available **replacements** and the **medicine molecule** in your puzzle input, what is the **fewest number of steps** to go from e to the medicine molecule?
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/19/input).
 
@@ -91,6 +111,33 @@ defmodule Day19 do
   def part1(input) do
     {s, replacements} = parse(input)
 
+    new_strings(s, replacements) |> length()
+  end
+
+  def part2(input) do
+    {s, replacements} = parse(input)
+
+    make_molecule(["e"], s, replacements, 1)
+  end
+
+  defp make_molecule(strings, goal_s, replacements, steps) do
+    IO.inspect(steps, label: "step #")
+    IO.inspect(Enum.at(strings, 0), label: "sample string")
+    IO.inspect(length(strings), label: "num strings")
+
+    strings
+    |> Enum.flat_map(&new_strings(&1, replacements))
+    |> Enum.uniq()
+    |> then(fn new_list ->
+      if Enum.member?(new_list, goal_s) do
+        steps
+      else
+        make_molecule(new_list, goal_s, replacements, steps + 1)
+      end
+    end)
+  end
+
+  defp new_strings(s, replacements) do
     replacements
     |> Enum.flat_map(fn {find, replace} ->
       Regex.scan(~r/#{find}/, s, return: :index)
@@ -101,12 +148,6 @@ defmodule Day19 do
       end)
     end)
     |> Enum.uniq()
-    |> length()
-  end
-
-  def part2(input) do
-    input
-    |> parse()
   end
 
   defmodule Input do
@@ -130,13 +171,13 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day19, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+{:module, Day19, <<70, 79, 82, 49, 0, 0, 17, ...>>,
  {:module, Day19.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
 Your puzzle input describes all of the possible replacements and, at the bottom, the medicine molecule for which you need to calibrate the machine. **How many distinct molecules can be created** after all the different ways you can do one replacement on the medicine molecule?
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `576`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -150,7 +191,7 @@ Day19.part1(input)
 576
 ```
 
-**QUESTION TWO?**
+How long will it take to make the medicine? Given the available **replacements** and the **medicine molecule** in your puzzle input, what is the **fewest number of steps** to go from e to the medicine molecule?
 
 Your puzzle answer was `answer two`.
 
@@ -163,52 +204,30 @@ Day19.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-{"ORnPBPMgArCaCaCaSiThCaCaSiThCaCaPBSiRnFArRnFArCaCaSiThCaCaSiThCaCaCaCaCaCaSiRnFYFArSiRnMgArCaSiRnPTiTiBFYPBFArSiRnCaSiRnTiRnFArSiAlArPTiBPTiRnCaSiAlArCaPTiTiBPMgYFArPTiRnFArSiRnCaCaFArRnCaFArCaSiRnSiRnMgArFYCaSiRnMgArCaCaSiThPRnFArPBCaSiRnMgArCaCaSiThCaSiRnTiMgArFArSiThSiThCaCaSiRnMgArCaCaSiRnFArTiBPTiRnCaSiAlArCaPTiRnFArPBPBCaCaSiThCaPBSiThPRnFArSiThCaSiThCaSiThCaPTiBSiRnFYFArCaCaPRnFArPBCaCaPBSiRnTiRnFArCaPRnFArSiRnCaCaCaSiThCaRnCaFArYCaSiRnFArBCaCaCaSiThFArPBFArCaSiRnFArRnCaCaCaFArSiRnFArTiRnPMgArF",
- [
-   {"Al", "ThF"},
-   {"Al", "ThRnFAr"},
-   {"B", "BCa"},
-   {"B", "TiB"},
-   {"B", "TiRnFAr"},
-   {"Ca", "CaCa"},
-   {"Ca", "PB"},
-   {"Ca", "PRnFAr"},
-   {"Ca", "SiRnFYFAr"},
-   {"Ca", "SiRnMgAr"},
-   {"Ca", "SiTh"},
-   {"F", "CaF"},
-   {"F", "PMg"},
-   {"F", "SiAl"},
-   {"H", "CRnAlAr"},
-   {"H", "CRnFYFYFAr"},
-   {"H", "CRnFYMgAr"},
-   {"H", "CRnMgYFAr"},
-   {"H", "HCa"},
-   {"H", "NRnFYFAr"},
-   {"H", "NRnMgAr"},
-   {"H", "NTh"},
-   {"H", "OB"},
-   {"H", "ORnFAr"},
-   {"Mg", "BF"},
-   {"Mg", "TiMg"},
-   {"N", "CRnFAr"},
-   {"N", "HSi"},
-   {"O", "CRnFYFAr"},
-   {"O", "CRnMgAr"},
-   {"O", "HP"},
-   {"O", "NRnFAr"},
-   {"O", "OTi"},
-   {"P", "CaP"},
-   {"P", "PTi"},
-   {"P", "SiRnFAr"},
-   {"Si", "CaSi"},
-   {"Th", "ThCa"},
-   {"Ti", "BP"},
-   {"Ti", "TiTi"},
-   {"e", "HF"},
-   {"e", "NAl"},
-   {"e", "OMg"}
- ]}
+step #: 1
+sample string: "e"
+num strings: 1
+step #: 2
+sample string: "HF"
+num strings: 3
+step #: 3
+sample string: "HCaF"
+num strings: 18
+step #: 4
+sample string: "HCaCaF"
+num strings: 105
+step #: 5
+sample string: "HCaCaCaF"
+num strings: 607
+step #: 6
+sample string: "HCaCaCaCaF"
+num strings: 3566
+step #: 7
+sample string: "HCaCaCaCaCaF"
+num strings: 21287
+step #: 8
+sample string: "HCaCaCaCaCaCaF"
+num strings: 129071
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -229,8 +248,8 @@ defmodule Day19Test do
 
   setup_all do
     [
-      input1: "H => HO\nH => OH\nO => HH\n\nHOH",
-      input2: "H => HO\nH => OH\nO => HH\n\nHOHOHO"
+      input1: "e => H\ne => O\nH => HO\nH => OH\nO => HH\n\nHOH",
+      input2: "e => H\ne => O\nH => HO\nH => OH\nO => HH\n\nHOHOHO"
     ]
   end
 
@@ -241,11 +260,12 @@ defmodule Day19Test do
     end
   end
 
-  # describe "part2/1" do
-  #   test "returns expected value", %{input: input} do
-  #     assert Day19.part2(input) == [""]
-  #   end
-  # end
+  describe "part2/1" do
+    test "returns expected value", inputs do
+      assert Day19.part2(inputs.input1) == 3
+      assert Day19.part2(inputs.input2) == 6
+    end
+  end
 end
 
 ExUnit.run()
@@ -254,17 +274,17 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-.
+..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-1 test, 0 failures
+2 tests, 0 failures
 
-Randomized with seed 528514
+Randomized with seed 597974
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 1}
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
 ```
 
 ## Benchmarking
