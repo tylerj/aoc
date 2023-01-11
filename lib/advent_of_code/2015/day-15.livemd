@@ -80,7 +80,7 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-""
+"Sprinkles: capacity 2, durability 0, flavor -2, texture 0, calories 3\nButterscotch: capacity 0, durability 5, flavor -3, texture 0, calories 3\nChocolate: capacity 0, durability 0, flavor 5, texture -1, calories 8\nCandy: capacity 0, durability -1, flavor 0, texture 5, calories 8"
 ```
 
 ## Solution
@@ -90,15 +90,46 @@ defmodule Day15 do
   defdelegate parse(input), to: __MODULE__.Input
 
   def part1(input) do
+    input = parse(input)
+
     input
-    |> parse()
-    |> Enum.map(& &1)
+    |> Map.get(:name)
+    |> Enum.map(fn {k, v} -> {k, v[:max]} end)
+    |> calc_max_score([], 0, input.prop)
   end
 
   def part2(input) do
     input
     |> parse()
     |> Enum.map(& &1)
+  end
+
+  defp calc_max_score([], counts, 100, props) do
+    count_map = Enum.into(counts, %{})
+
+    props
+    |> Map.delete(:calories)
+    |> Enum.map(fn {_, map} ->
+      map
+      |> Enum.map(fn {name, v} ->
+        count_map[name] * v
+      end)
+      |> Enum.sum()
+      |> then(fn sum -> Enum.max([0, sum]) end)
+    end)
+    |> Enum.product()
+  end
+
+  defp calc_max_score([{name, _} | []], counts, total, props) do
+    calc_max_score([], [{name, 100 - total} | counts], 100, props)
+  end
+
+  defp calc_max_score([{name, max} | t], counts, total, props) do
+    0..Enum.min([max, 100 - total])
+    |> Enum.map(fn x ->
+      calc_max_score(t, [{name, x} | counts], total + x, props)
+    end)
+    |> Enum.max()
   end
 
   defmodule Input do
@@ -109,13 +140,58 @@ defmodule Day15 do
     end
 
     def parse(input) when is_list(input) do
-      Stream.map(input, &parse_line/1)
+      by_name = Enum.map(input, &parse_line/1)
+      by_prop = by_prop(by_name)
+
+      by_name =
+        by_name
+        |> Enum.map(&add_max(&1, by_prop))
+        |> Enum.into(%{})
+
+      %{name: Enum.into(by_name, %{}), prop: by_prop}
+    end
+
+    defp by_prop([{_name, props} | _] = list) do
+      for {k, _} <- props, into: %{} do
+        {
+          k,
+          for({name, ip} <- list, into: %{}, do: {name, ip[k]})
+        }
+      end
+    end
+
+    defp add_max({k, ing_props}, prop_map) do
+      max =
+        ing_props
+        |> Enum.map(fn
+          {k, v} -> determine_max(v, prop_map[k])
+        end)
+        |> Enum.min()
+
+      {k, Map.put(ing_props, :max, max)}
+    end
+
+    defp determine_max(negative_value, prop_map) do
+      max_value = prop_map |> Map.values() |> Enum.max()
+
+      100..0//-1
+      |> Enum.find(fn x ->
+        x * negative_value + (100 - x) * max_value > 0
+      end)
     end
 
     def parse_line(line) do
-      line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
+      [name | props] = String.split(line, [": ", ", ", " "])
+
+      {
+        name,
+        props
+        |> Enum.chunk_every(2)
+        |> Enum.map(fn
+          [k, v] -> {String.to_atom(k), String.to_integer(v)}
+        end)
+        |> Enum.into(%{})
+      }
     end
   end
 end
@@ -124,13 +200,37 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day15, <<70, 79, 82, 49, 0, 0, 8, ...>>,
+{:module, Day15, <<70, 79, 82, 49, 0, 0, 16, ...>>,
  {:module, Day15.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+```elixir
+Day15.parse(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  name: %{
+    "Butterscotch" => %{calories: 3, capacity: 0, durability: 5, flavor: -3, max: 62, texture: 0},
+    "Candy" => %{calories: 8, capacity: 0, durability: -1, flavor: 0, max: 83, texture: 5},
+    "Chocolate" => %{calories: 8, capacity: 0, durability: 0, flavor: 5, max: 83, texture: -1},
+    "Sprinkles" => %{calories: 3, capacity: 2, durability: 0, flavor: -2, max: 71, texture: 0}
+  },
+  prop: %{
+    calories: %{"Butterscotch" => 3, "Candy" => 8, "Chocolate" => 8, "Sprinkles" => 3},
+    capacity: %{"Butterscotch" => 0, "Candy" => 0, "Chocolate" => 0, "Sprinkles" => 2},
+    durability: %{"Butterscotch" => 5, "Candy" => -1, "Chocolate" => 0, "Sprinkles" => 0},
+    flavor: %{"Butterscotch" => -3, "Candy" => 0, "Chocolate" => 5, "Sprinkles" => -2},
+    texture: %{"Butterscotch" => 0, "Candy" => 5, "Chocolate" => -1, "Sprinkles" => 0}
+  }
+}
 ```
 
 Given the ingredients in your kitchen and their properties, **what is the total score of the highest-scoring cookie you can make?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `21367368`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -141,7 +241,7 @@ Day15.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+21367368
 ```
 
 **QUESTION TWO?**
