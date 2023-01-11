@@ -1,0 +1,297 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 19 - Advent of Code 2015
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/19)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/19/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day-19.livemd)
+
+## Prompt
+
+### --- Day 19: Medicine for Rudolph ---
+
+Rudolph the Red-Nosed Reindeer is sick! His nose isn't shining very brightly, and he needs medicine.
+
+Red-Nosed Reindeer biology isn't similar to regular reindeer biology; Rudolph is going to need custom-made medicine. Unfortunately, Red-Nosed Reindeer chemistry isn't similar to regular reindeer chemistry, either.
+
+The North Pole is equipped with a Red-Nosed Reindeer nuclear fusion/fission plant, capable of constructing any Red-Nosed Reindeer molecule you need. It works by starting with some input molecule and then doing a series of **replacements**, one per step, until it has the right molecule.
+
+However, the machine has to be calibrated before it can be used. Calibration involves determining the number of molecules that can be generated in one step from a given starting point.
+
+For example, imagine a simpler machine that supports only the following replacements:
+
+```
+H => HO
+H => OH
+O => HH
+```
+
+Given the replacements above and starting with HOH, the following molecules could be generated:
+
+* `HOOH` (via `H => HO` on the first `H`).
+* `HOHO` (via `H => HO` on the second `H`).
+* `OHOH` (via `H => OH` on the first `H`).
+* `HOOH` (via `H => OH` on the second `H`).
+* `HHHH` (via `O => HH`).
+
+So, in the example above, there are `4` **distinct** molecules (not five, because `HOOH` appears twice) after one replacement from `HOH`. Santa's favorite molecule, `HOHOHO`, can become `7` **distinct** molecules (over nine replacements: six from `H`, and three from `O`).
+
+The machine replaces without regard for the surrounding characters. For example, given the string `H2O`, the transition `H => OO` would result in `OO2O`.
+
+Your puzzle input describes all of the possible replacements and, at the bottom, the medicine molecule for which you need to calibrate the machine. **How many distinct molecules can be created** after all the different ways you can do one replacement on the medicine molecule?
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/19/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/19/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"Al => ThF\nAl => ThRnFAr\nB => BCa\nB => TiB\nB => TiRnFAr\nCa => CaCa\nCa => PB\nCa => PRnFAr\nCa => SiRnFYFAr\nCa => SiRnMgAr\nCa => SiTh\nF => CaF\nF => PMg\nF => SiAl\nH => CRnAlAr\nH => CRnFYFYFAr\nH => CRnFYMgAr\nH => CRnMgYFAr\nH => HCa\nH => NRnFYFAr\nH => NRnMgAr\nH => NTh\nH => OB\nH => ORnFAr\nMg => BF\nMg => TiMg\nN => CRnFAr\nN => HSi\nO => CRnFYFAr\nO => CRnMgAr\nO => HP\nO => NRnFAr\nO => OTi\nP => CaP\nP => PTi\nP => SiRnFAr\nSi => CaSi\nTh => ThCa\nTi => BP\nTi => TiTi\ne => HF\ne => NAl\ne => OMg\n\nORnPBPMgArCaCaCaSiThCaCaSiThCaCaPBSiRnFArRnFArCaCaSiThCaCaSiThCaCaCaCaCaCaSiRnFYFArSiRnMgArCaSiRnPTiTiBFYPBFArSiRnCaSiRnTiRnFArSiAlArPTiBPTiRnCaSiAlArCaPTiTiBPMgYFArPTiRnFArSiRnCaCaFArRnCaFArCaSiRnSiRnMgArFYCaSiRnMgArCaCaSiThPRnFArPBCaSiRnMgArCaCaSiThCaSiRnTiMgArFArSiThSiThCaCaSiRnMgArCaCaSiRnFArTiBPTiRnCaSiAlArCaPTiRnFArPBPBCaCaSiThCaPBSiThPRnFArSiThCaSiThCaSiThCaPTiBSiRnFYFArCaCaPRnFArPBCaCaPBSiRnTiRnFArCaPRnFArSiRnCaCaCaSiThCaRnCaFArYCaSiRnFArBCaCaCaSiThFArPBFArCaSiRnFArRnCaCaCaFArSiRnFArTiRnPMgArF"
+```
+
+## Solution
+
+```elixir
+defmodule Day19 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    {s, replacements} = parse(input)
+
+    replacements
+    |> Enum.flat_map(fn {find, replace} ->
+      Regex.scan(~r/#{find}/, s, return: :index)
+      |> List.flatten()
+      |> Enum.map(fn
+        {0, l} -> replace <> String.slice(s, l..-1)
+        {i, l} -> String.slice(s, 0..(i - 1)) <> replace <> String.slice(s, (i + l)..-1)
+      end)
+    end)
+    |> Enum.uniq()
+    |> length()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      [replacements, start] = String.split(input, "\n\n")
+
+      {start, replacements |> String.split("\n") |> Enum.map(&parse_line/1)}
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.split(line, " => ") |> List.to_tuple()
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day19, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+ {:module, Day19.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Your puzzle input describes all of the possible replacements and, at the bottom, the medicine molecule for which you need to calibrate the machine. **How many distinct molecules can be created** after all the different ways you can do one replacement on the medicine molecule?
+
+Your puzzle answer was `answer one`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day19.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+576
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day19.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{"ORnPBPMgArCaCaCaSiThCaCaSiThCaCaPBSiRnFArRnFArCaCaSiThCaCaSiThCaCaCaCaCaCaSiRnFYFArSiRnMgArCaSiRnPTiTiBFYPBFArSiRnCaSiRnTiRnFArSiAlArPTiBPTiRnCaSiAlArCaPTiTiBPMgYFArPTiRnFArSiRnCaCaFArRnCaFArCaSiRnSiRnMgArFYCaSiRnMgArCaCaSiThPRnFArPBCaSiRnMgArCaCaSiThCaSiRnTiMgArFArSiThSiThCaCaSiRnMgArCaCaSiRnFArTiBPTiRnCaSiAlArCaPTiRnFArPBPBCaCaSiThCaPBSiThPRnFArSiThCaSiThCaSiThCaPTiBSiRnFYFArCaCaPRnFArPBCaCaPBSiRnTiRnFArCaPRnFArSiRnCaCaCaSiThCaRnCaFArYCaSiRnFArBCaCaCaSiThFArPBFArCaSiRnFArRnCaCaCaFArSiRnFArTiRnPMgArF",
+ [
+   {"Al", "ThF"},
+   {"Al", "ThRnFAr"},
+   {"B", "BCa"},
+   {"B", "TiB"},
+   {"B", "TiRnFAr"},
+   {"Ca", "CaCa"},
+   {"Ca", "PB"},
+   {"Ca", "PRnFAr"},
+   {"Ca", "SiRnFYFAr"},
+   {"Ca", "SiRnMgAr"},
+   {"Ca", "SiTh"},
+   {"F", "CaF"},
+   {"F", "PMg"},
+   {"F", "SiAl"},
+   {"H", "CRnAlAr"},
+   {"H", "CRnFYFYFAr"},
+   {"H", "CRnFYMgAr"},
+   {"H", "CRnMgYFAr"},
+   {"H", "HCa"},
+   {"H", "NRnFYFAr"},
+   {"H", "NRnMgAr"},
+   {"H", "NTh"},
+   {"H", "OB"},
+   {"H", "ORnFAr"},
+   {"Mg", "BF"},
+   {"Mg", "TiMg"},
+   {"N", "CRnFAr"},
+   {"N", "HSi"},
+   {"O", "CRnFYFAr"},
+   {"O", "CRnMgAr"},
+   {"O", "HP"},
+   {"O", "NRnFAr"},
+   {"O", "OTi"},
+   {"P", "CaP"},
+   {"P", "PTi"},
+   {"P", "SiRnFAr"},
+   {"Si", "CaSi"},
+   {"Th", "ThCa"},
+   {"Ti", "BP"},
+   {"Ti", "TiTi"},
+   {"e", "HF"},
+   {"e", "NAl"},
+   {"e", "OMg"}
+ ]}
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/19/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day19Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input1: "H => HO\nH => OH\nO => HH\n\nHOH",
+      input2: "H => HO\nH => OH\nO => HH\n\nHOHOHO"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", inputs do
+      assert Day19.part1(inputs.input1) == 4
+      assert Day19.part1(inputs.input2) == 7
+    end
+  end
+
+  # describe "part2/1" do
+  #   test "returns expected value", %{input: input} do
+  #     assert Day19.part2(input) == [""]
+  #   end
+  # end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+.
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+1 test, 0 failures
+
+Randomized with seed 528514
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 1}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day19.part1(input) end,
+    "Part 2" => fn -> Day19.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
