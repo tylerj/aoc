@@ -59,9 +59,11 @@ To begin, [get your puzzle input](https://adventofcode.com/2015/day/15/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+Your cookie recipe becomes wildly popular! Someone asks if you can make another recipe that has exactly 500 calories per cookie (so they can use it as a meal replacement). Keep the rest of your award-winning process the same (100 teaspoons, same ingredients, same scoring system).
 
-**QUESTION TWO?**
+For example, given the ingredients above, if you had instead selected 40 teaspoons of butterscotch and 60 teaspoons of cinnamon (which still adds to 100), the total calorie count would be `40*8 + 60*3 = 500`. The total score would go down, though: only `57600000`, the best you can do in such trying circumstances.
+
+Given the ingredients in your kitchen and their properties, **what is the total score of the highest-scoring cookie you can make with a calorie total of 500?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/15/input).
 
@@ -90,44 +92,60 @@ defmodule Day15 do
   defdelegate parse(input), to: __MODULE__.Input
 
   def part1(input) do
-    input = parse(input)
+    %{name: input_by_name, prop: input_by_prop} = parse(input)
 
-    input
-    |> Map.get(:name)
+    input_by_name
     |> Enum.map(fn {k, v} -> {k, v[:max]} end)
-    |> calc_max_score([], 0, input.prop)
+    |> calc_max_score([], 0, input_by_prop, &calc_max_score_part1/3)
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    %{name: input_by_name, prop: input_by_prop} = parse(input)
+
+    input_by_name
+    |> Enum.map(fn {k, v} -> {k, v[:max]} end)
+    |> calc_max_score([], 0, input_by_prop, &calc_max_score_part2/3)
   end
 
-  defp calc_max_score([], counts, 100, props) do
+  defp calc_max_score_part1(counts, 100, props) do
+    count_map = Enum.into(counts, %{})
+    cookie_score(props, count_map)
+  end
+
+  defp calc_max_score_part2(counts, 100, props) do
     count_map = Enum.into(counts, %{})
 
+    case sum_prop(props.calories, count_map) do
+      500 -> cookie_score(props, count_map)
+      _ -> 0
+    end
+  end
+
+  defp sum_prop(per_ingredient, ingredient_count_map) do
+    per_ingredient
+    |> Enum.map(fn {name, v} ->
+      ingredient_count_map[name] * v
+    end)
+    |> Enum.sum()
+  end
+
+  defp cookie_score(props, ingredient_count_map) do
     props
     |> Map.delete(:calories)
     |> Enum.map(fn {_, map} ->
-      map
-      |> Enum.map(fn {name, v} ->
-        count_map[name] * v
-      end)
-      |> Enum.sum()
-      |> then(fn sum -> Enum.max([0, sum]) end)
+      Enum.max([0, sum_prop(map, ingredient_count_map)])
     end)
     |> Enum.product()
   end
 
-  defp calc_max_score([{name, _} | []], counts, total, props) do
-    calc_max_score([], [{name, 100 - total} | counts], 100, props)
+  defp calc_max_score([{name, _} | []], counts, total, props, fun) do
+    fun.([{name, 100 - total} | counts], 100, props)
   end
 
-  defp calc_max_score([{name, max} | t], counts, total, props) do
+  defp calc_max_score([{name, max} | t], counts, total, props, fun) do
     0..Enum.min([max, 100 - total])
     |> Enum.map(fn x ->
-      calc_max_score(t, [{name, x} | counts], total + x, props)
+      calc_max_score(t, [{name, x} | counts], total + x, props, fun)
     end)
     |> Enum.max()
   end
@@ -200,7 +218,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day15, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+{:module, Day15, <<70, 79, 82, 49, 0, 0, 19, ...>>,
  {:module, Day15.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -244,9 +262,9 @@ Day15.part1(input)
 21367368
 ```
 
-**QUESTION TWO?**
+Given the ingredients in your kitchen and their properties, **what is the total score of the highest-scoring cookie you can make with a calorie total of 500?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `1766400`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -257,7 +275,7 @@ Day15.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+1766400
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -278,19 +296,20 @@ defmodule Day15Test do
 
   setup_all do
     [
-      input: ""
+      input:
+        "Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8\nCinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3"
     ]
   end
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day15.part1(input) == [""]
+      assert Day15.part1(input) == 62_842_880
     end
   end
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day15.part2(input) == [""]
+      assert Day15.part2(input) == 57_600_000
     end
   end
 end
@@ -305,7 +324,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 975531
 ```
 
 <!-- livebook:{"output":true} -->
@@ -334,7 +353,50 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 2         18.47       54.15 ms     ±0.97%       54.04 ms       56.64 ms
+Part 1          4.15      241.15 ms     ±0.98%      241.03 ms      250.08 ms
+
+Comparison: 
+Part 2         18.47
+Part 1          4.15 - 4.45x slower +187.01 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 2       120.98 MB     ±0.00%      120.98 MB      120.98 MB
+Part 1       470.52 MB     ±0.00%      470.51 MB      470.55 MB
+
+Comparison: 
+Part 2       120.98 MB
+Part 1       470.52 MB - 3.89x memory usage +349.55 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 2         13.55 M
+Part 1         55.92 M - 4.13x reduction count +42.37 M
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
