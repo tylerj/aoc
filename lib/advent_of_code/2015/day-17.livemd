@@ -1,0 +1,244 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 17 - Advent of Code 2015
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2015/day/17)
+* [AoC Puzzle Input](https://adventofcode.com/2015/day/17/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day_17.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2015/day-17.livemd)
+
+## Prompt
+
+### --- Day 17: No Such Thing as Too Much ---
+
+The elves bought too much eggnog again - `150` liters this time. To fit it all into your refrigerator, you'll need to move it into smaller containers. You take an inventory of the capacities of the available containers.
+
+For example, suppose you have containers of size `20`, `15`, `10`, `5`, and `5` liters. If you need to store `25` liters, there are four ways to do it:
+
+* `15` and `10`
+* `20` and `5` (the first `5`)
+* `20` and `5` (the second `5`)
+* `15`, `5`, and `5`
+
+Filling all containers entirely, **how many different combinations of containers can exactly fit all `150` liters of eggnog?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2015/day/17/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/17/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"50\n44\n11\n49\n42\n46\n18\n32\n26\n40\n21\n7\n18\n43\n10\n47\n36\n24\n22\n40"
+```
+
+## Solution
+
+```elixir
+defmodule Day17 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input, goal \\ 150) do
+    input
+    |> parse()
+    |> Enum.with_index()
+    |> find_all(goal)
+    |> List.flatten()
+    |> length()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  def find_all(remaining, list \\ [], goal, sum \\ 0)
+  def find_all(_, list, goal, goal), do: List.to_tuple(list)
+  def find_all(_, _, goal, sum) when sum > goal, do: nil
+
+  def find_all(remaining, list, goal, sum) do
+    remaining
+    |> Enum.with_index()
+    |> Enum.map(fn {{n, x}, i} ->
+      find_all(
+        Enum.slice(remaining, (i + 1)..-1),
+        [{n, x} | list],
+        goal,
+        sum + n
+      )
+    end)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Enum.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.to_integer(line)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day17, <<70, 79, 82, 49, 0, 0, 15, ...>>,
+ {:module, Day17.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Filling all containers entirely, **how many different combinations of containers can exactly fit all `150` liters of eggnog?**
+
+Your puzzle answer was `654`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day17.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+654
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day17.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[50, 44, 11, 49, 42, 46, 18, 32, 26, 40, 21, 7, 18, 43, 10, 47, 36, 24, 22, 40]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2015) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/17/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day17Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "20\n15\n10\n5\n5"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day17.part1(input, 25) == 4
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day17.part2(input) == [20, 15, 10, 5, 5]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 948125
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day17.part1(input) end,
+    "Part 2" => fn -> Day17.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
