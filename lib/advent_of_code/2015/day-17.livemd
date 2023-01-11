@@ -40,9 +40,11 @@ To begin, [get your puzzle input](https://adventofcode.com/2015/day/17/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+While playing with all the containers in the kitchen, another load of eggnog arrives! The shipping and receiving department is requesting as many containers as you can spare.
 
-**QUESTION TWO?**
+Find the minimum number of containers that can exactly fit all `150` liters of eggnog. **How many different ways can you fill that number of containers and still hold exactly `150` litres?**
+
+In the example above, the minimum number of containers was two. There were three ways to use that many containers, and so the answer there would be `3`.
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/17/input).
 
@@ -79,10 +81,16 @@ defmodule Day17 do
     |> length()
   end
 
-  def part2(input) do
+  def part2(input, goal \\ 150) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Enum.with_index()
+    |> find_all(goal)
+    |> List.flatten()
+    |> Enum.group_by(&tuple_size/1)
+    |> Enum.min_by(&elem(&1, 0))
+    |> elem(1)
+    |> length()
   end
 
   def find_all(remaining, list \\ [], goal, sum \\ 0)
@@ -124,7 +132,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day17, <<70, 79, 82, 49, 0, 0, 15, ...>>,
+{:module, Day17, <<70, 79, 82, 49, 0, 0, 16, ...>>,
  {:module, Day17.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -144,9 +152,9 @@ Day17.part1(input)
 654
 ```
 
-**QUESTION TWO?**
+Find the minimum number of containers that can exactly fit all `150` liters of eggnog. **How many different ways can you fill that number of containers and still hold exactly `150` litres?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `57`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -157,7 +165,7 @@ Day17.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[50, 44, 11, 49, 42, 46, 18, 32, 26, 40, 21, 7, 18, 43, 10, 47, 36, 24, 22, 40]
+57
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -190,7 +198,7 @@ defmodule Day17Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day17.part2(input) == [20, 15, 10, 5, 5]
+      assert Day17.part2(input, 25) == 3
     end
   end
 end
@@ -219,14 +227,10 @@ Randomized with seed 948125
 ```elixir
 # https://github.com/bencheeorg/benchee
 
-Benchee.run(
-  %{
-    "Part 1" => fn -> Day17.part1(input) end,
-    "Part 2" => fn -> Day17.part2(input) end
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+Benchee.run(%{
+  "Part 1" => fn -> Day17.part1(input) end,
+  "Part 2" => fn -> Day17.part2(input) end
+})
 
 nil
 ```
@@ -234,7 +238,32 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        366.70        2.73 ms     ±3.91%        2.68 ms        2.97 ms
+Part 2        364.07        2.75 ms     ±3.80%        2.70 ms        2.98 ms
+
+Comparison: 
+Part 1        366.70
+Part 2        364.07 - 1.01x slower +0.0197 ms
 ```
 
 <!-- livebook:{"output":true} -->
