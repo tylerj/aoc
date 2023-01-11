@@ -64,9 +64,11 @@ To begin, [get your puzzle input](https://adventofcode.com/2015/day/16/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+As you're about to send the thank you note, something in the MFCSAM's instructions catches your eye. Apparently, it has an outdated [retroencabulator](https://www.youtube.com/watch?v=RXJKdh1KZ0w), and so the output from the machine isn't exact values - some of them indicate ranges.
 
-**QUESTION TWO?**
+In particular, the `cats` and `trees` readings indicates that there are **greater than** that many (due to the unpredictable nuclear decay of cat dander and tree pollen), while the `pomeranians` and `goldfish` readings indicate that there are **fewer than** that many (due to the modial interaction of magnetoreluctance).
+
+**What is the number of the real Aunt Sue?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/16/input).
 
@@ -113,7 +115,7 @@ defmodule Day16 do
       parse(input),
       fn {name, count}, sue_list ->
         Enum.reject(sue_list, fn {_sue_n, sue_map} ->
-          Map.has_key?(sue_map, name) and sue_map[name] != count
+          Map.has_key?(sue_map, name) && sue_map[name] != count
         end)
       end
     )
@@ -121,9 +123,24 @@ defmodule Day16 do
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    Enum.reduce(
+      @ticker_tape,
+      parse(input),
+      fn {name, count}, sue_list ->
+        Enum.filter(sue_list, fn {_sue_n, sue_map} ->
+          if Map.has_key?(sue_map, name) do
+            case name do
+              n when n in ~w(cats trees) -> sue_map[name] > count
+              n when n in ~w(pomeranians goldfish) -> sue_map[name] < count
+              _ -> sue_map[name] == count
+            end
+          else
+            true
+          end
+        end)
+      end
+    )
+    |> then(fn [{sue_n, _}] -> sue_n end)
   end
 
   defmodule Input do
@@ -157,70 +174,8 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day16, <<70, 79, 82, 49, 0, 0, 12, ...>>,
+{:module, Day16, <<70, 79, 82, 49, 0, 0, 15, ...>>,
  {:module, Day16.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
-```
-
-```elixir
-Day16.parse(input)
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-[
-  {1, %{"cars" => 8, "children" => 1, "vizslas" => 7}},
-  {2, %{"akitas" => 10, "children" => 5, "perfumes" => 10}},
-  {3, %{"cars" => 5, "pomeranians" => 4, "vizslas" => 1}},
-  {4, %{"children" => 8, "goldfish" => 5, "perfumes" => 3}},
-  {5, %{"akitas" => 7, "perfumes" => 6, "vizslas" => 2}},
-  {6, %{"akitas" => 1, "perfumes" => 2, "vizslas" => 0}},
-  {7, %{"cars" => 4, "goldfish" => 10, "perfumes" => 8}},
-  {8, %{"cats" => 1, "children" => 2, "perfumes" => 7}},
-  {9, %{"goldfish" => 10, "pomeranians" => 3, "trees" => 10}},
-  {10, %{"akitas" => 7, "pomeranians" => 4, "trees" => 8}},
-  {11, %{"cars" => 6, "goldfish" => 1, "perfumes" => 4}},
-  {12, %{"perfumes" => 2, "samoyeds" => 6, "trees" => 6}},
-  {13, %{"akitas" => 10, "pomeranians" => 0, "vizslas" => 2}},
-  {14, %{"cars" => 2, "children" => 4, "perfumes" => 3}},
-  {15, %{"cars" => 5, "children" => 8, "goldfish" => 2}},
-  {16, %{"cars" => 0, "goldfish" => 9, "vizslas" => 5}},
-  {17, %{"cats" => 5, "perfumes" => 6, "trees" => 6}},
-  {18, %{"cars" => 0, "perfumes" => 8, "pomeranians" => 7}},
-  {19, %{"goldfish" => 5, "perfumes" => 4, "trees" => 2}},
-  {20, %{"akitas" => 4, "trees" => 0, "vizslas" => 4}},
-  {21, %{"goldfish" => 10, "pomeranians" => 7, "trees" => 0}},
-  {22, %{"cars" => 4, "perfumes" => 3, "vizslas" => 0}},
-  {23, %{"akitas" => 2, "trees" => 1, "vizslas" => 8}},
-  {24, %{"akitas" => 1, "children" => 7, "trees" => 0}},
-  {25, %{"akitas" => 2, "goldfish" => 3, "trees" => 2}},
-  {26, %{"pomeranians" => 4, "samoyeds" => 2, "vizslas" => 4}},
-  {27, %{"akitas" => 5, "cars" => 0, "trees" => 8}},
-  {28, %{"cars" => 2, "cats" => 0, "perfumes" => 6}},
-  {29, %{"akitas" => 1, "trees" => 7, "vizslas" => 1}},
-  {30, %{"cars" => 9, "perfumes" => 9, "trees" => 10}},
-  {31, %{"akitas" => 9, "pomeranians" => 5, "samoyeds" => 1}},
-  {32, %{"goldfish" => 5, "pomeranians" => 10, "vizslas" => 5}},
-  {33, %{"akitas" => 3, "trees" => 7, "vizslas" => 2}},
-  {34, %{"goldfish" => 10, "perfumes" => 0, "samoyeds" => 7}},
-  {35, %{"akitas" => 6, "cats" => 7, "perfumes" => 10}},
-  {36, %{"akitas" => 6, "pomeranians" => 8, "vizslas" => 7}},
-  {37, %{"cars" => 10, "children" => 7, "goldfish" => 2}},
-  {38, %{"cars" => 7, "goldfish" => 2, "perfumes" => 3}},
-  {39, %{"cars" => 5, "trees" => 9, "vizslas" => 10}},
-  {40, %{"goldfish" => 1, "pomeranians" => 0, "trees" => 2}},
-  {41, %{"goldfish" => 6, "trees" => 2, "vizslas" => 3}},
-  {42, %{"akitas" => 1, "cars" => 3, "vizslas" => 3}},
-  {43, %{"akitas" => 1, "pomeranians" => 1, "vizslas" => 3}},
-  {44, %{"akitas" => 3, "goldfish" => 7, "vizslas" => 10}},
-  {45, %{"akitas" => 8, "goldfish" => 2, "samoyeds" => 8}},
-  {46, %{"cars" => 9, "trees" => 0, ...}},
-  {47, %{"cars" => 9, ...}},
-  {48, %{...}},
-  {49, ...},
-  {...},
-  ...
-]
 ```
 
 **What is the number of the Sue that got you the gift?**
@@ -239,9 +194,9 @@ Day16.part1(input)
 213
 ```
 
-**QUESTION TWO?**
+**What is the number of the real Aunt Sue?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `323`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -252,7 +207,7 @@ Day16.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+323
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -261,67 +216,15 @@ At this point, you should [return to your Advent calendar](https://adventofcode.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2015/day/16/input).
 
-## Tests
-
-<!-- livebook:{"reevaluate_automatically":true} -->
-
-```elixir
-ExUnit.start(auto_run: false)
-
-defmodule Day16Test do
-  use ExUnit.Case, async: false
-
-  setup_all do
-    [
-      input: ""
-    ]
-  end
-
-  describe "part1/1" do
-    test "returns expected value", %{input: input} do
-      assert Day16.part1(input) == [""]
-    end
-  end
-
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day16.part2(input) == [""]
-    end
-  end
-end
-
-ExUnit.run()
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-..
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 0 failures
-
-Randomized with seed 162351
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
-```
-
 ## Benchmarking
 
 ```elixir
 # https://github.com/bencheeorg/benchee
 
-Benchee.run(
-  %{
-    "Part 1" => fn -> Day16.part1(input) end,
-    "Part 2" => fn -> Day16.part2(input) end
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+Benchee.run(%{
+  "Part 1" => fn -> Day16.part1(input) end,
+  "Part 2" => fn -> Day16.part2(input) end
+})
 
 nil
 ```
@@ -329,7 +232,32 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 0 ns
+reduction time: 0 ns
+parallel: 1
+inputs: none specified
+Estimated total run time: 14 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        1.04 K      962.19 μs     ±3.17%      949.88 μs     1061.49 μs
+Part 2        1.02 K      982.69 μs     ±3.20%      970.34 μs     1084.19 μs
+
+Comparison: 
+Part 1        1.04 K
+Part 2        1.02 K - 1.02x slower +20.50 μs
 ```
 
 <!-- livebook:{"output":true} -->
