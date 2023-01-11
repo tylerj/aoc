@@ -102,9 +102,61 @@ To begin, [get your puzzle input](https://adventofcode.com/2015/day/18/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+You flip the instructions over; Santa goes on to point out that this is all just an implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway's_Game_of_Life). At least, it was, until you notice that something's wrong with the grid of lights you bought: four lights, one in each corner, are **stuck on** and can't be turned off. The example above will actually run like this:
 
-**QUESTION TWO?**
+```
+Initial state:
+##.#.#
+...##.
+#....#
+..#...
+#.#..#
+####.#
+
+After 1 step:
+#.##.#
+####.#
+...##.
+......
+#...#.
+#.####
+
+After 2 steps:
+#..#.#
+#....#
+.#.##.
+...##.
+.#..##
+##.###
+
+After 3 steps:
+#...##
+####.#
+..##.#
+......
+##....
+####.#
+
+After 4 steps:
+#.####
+#....#
+...#..
+.##...
+#.....
+#.#..#
+
+After 5 steps:
+##.###
+.##..#
+.##...
+.##...
+#.#...
+##...#
+```
+
+After `5` steps, this example now has `17` lights on.
+
+In your grid of 100x100 lights, given your initial configuration, but with the four corners always in the **on** state, **how many lights are on after 100 steps?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2015/day/18/input).
 
@@ -138,20 +190,30 @@ defmodule Day18 do
     |> Enum.count(fn {_, v} -> v == "#" end)
   end
 
-  def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+  def part2(input, steps \\ 100) do
+    grid = parse(input)
+    max_x = grid |> Map.keys() |> Enum.map(&elem(&1, 0)) |> Enum.max()
+    max_y = grid |> Map.keys() |> Enum.map(&elem(&1, 1)) |> Enum.max()
+    always_on = [{0, 0}, {0, max_y}, {max_x, 0}, {max_x, max_y}]
+    grid = Enum.reduce(always_on, grid, fn xy, acc -> Map.put(acc, xy, "#") end)
+
+    1..steps
+    |> Enum.reduce(grid, fn _, acc -> next_step(acc, always_on) end)
+    |> Enum.count(fn {_, v} -> v == "#" end)
   end
 
-  defp next_step(grid) do
+  defp next_step(grid, always_on \\ []) do
     grid
     |> Enum.reduce(grid, fn
       {xy, "#"}, acc ->
-        case neighbors_on_count(grid, xy) do
-          2 -> acc
-          3 -> acc
-          _ -> Map.put(acc, xy, ".")
+        if xy in always_on do
+          acc
+        else
+          case neighbors_on_count(grid, xy) do
+            2 -> acc
+            3 -> acc
+            _ -> Map.put(acc, xy, ".")
+          end
         end
 
       {xy, "."}, acc ->
@@ -209,7 +271,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day18, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+{:module, Day18, <<70, 79, 82, 49, 0, 0, 21, ...>>,
  {:module, Day18.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
 ```
 
@@ -229,9 +291,9 @@ Day18.part1(input)
 814
 ```
 
-**QUESTION TWO?**
+In your grid of 100x100 lights, given your initial configuration, but with the four corners always in the **on** state, **how many lights are on after 100 steps?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `924`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -242,7 +304,7 @@ Day18.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+924
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -263,19 +325,19 @@ defmodule Day18Test do
 
   setup_all do
     [
-      input: ""
+      input: ".#.#.#\n...##.\n#....#\n..#...\n#.#..#\n####.."
     ]
   end
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day18.part1(input) == [""]
+      assert Day18.part1(input, 4) == 4
     end
   end
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day18.part2(input) == [""]
+      assert Day18.part2(input, 5) == 17
     end
   end
 end
@@ -290,7 +352,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 137484
 ```
 
 <!-- livebook:{"output":true} -->
@@ -319,7 +381,52 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 16 GB
+Elixir 1.14.2
+Erlang 25.1.2
 
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1          1.27      788.09 ms     ±1.24%      786.32 ms      809.75 ms
+Part 2          1.24      805.25 ms     ±2.62%      794.44 ms      849.43 ms
+
+Comparison: 
+Part 1          1.27
+Part 2          1.24 - 1.02x slower +17.16 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1       697.86 MB     ±0.00%      697.86 MB      697.86 MB
+Part 2       700.59 MB     ±0.00%      700.58 MB      700.61 MB
+
+Comparison: 
+Part 1       697.86 MB
+Part 2       700.59 MB - 1.00x memory usage +2.73 MB
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1        108.09 M     ±0.00%       108.09 M       108.09 M
+Part 2        108.20 M     ±0.00%       108.20 M       108.20 M
+
+Comparison: 
+Part 1        108.09 M
+Part 2        108.20 M - 1.00x reduction count +0.114 M
 ```
 
 <!-- livebook:{"output":true} -->
