@@ -1,0 +1,361 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 7 - Advent of Code 2020
+
+```elixir
+# Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/7)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/7/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day_07.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-07.livemd)
+
+## Prompt
+
+### --- Day 7: Handy Haversacks ---
+
+You land at the regional airport in time for your next flight. In fact, it looks like you'll even have time to grab some food: all flights are currently delayed due to **issues in luggage processing.**
+
+Due to recent aviation regulations, many rules (your puzzle input) are being enforced about bags and their contents; bags must be color-coded and must contain specific quantities of other color-coded bags. Apparently, nobody responsible for these regulations considered how long they would take to enforce!
+
+For example, consider the following rules:
+
+```
+light red bags contain 1 bright white bag, 2 muted yellow bags.
+dark orange bags contain 3 bright white bags, 4 muted yellow bags.
+bright white bags contain 1 shiny gold bag.
+muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.
+shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.
+dark olive bags contain 3 faded blue bags, 4 dotted black bags.
+vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
+faded blue bags contain no other bags.
+dotted black bags contain no other bags.
+```
+
+These rules specify the required contents for 9 bag types. In this example, every `faded blue` bag is empty, every `vibrant plum` bag contains 11 bags (5 `faded blue` and 6 `dotted black`), and so on.
+
+You have a **shiny gold** bag. If you wanted to carry it in at least one other bag, how many different bag colors would be valid for the outermost bag? (In other words: how many colors can, eventually, contain at least one shiny gold bag?)
+
+In the above rules, the following options would be available to you:
+
+* A `bright white` bag, which can hold your `shiny gold` bag directly.
+* A `muted yellow` bag, which can hold your `shiny gold` bag directly, plus some other bags.
+* A `dark orange` bag, which can hold `bright white` and `muted yellow` bags, either of which could then hold your `shiny gold` bag.
+* A `light red` bag, which can hold `bright white` and `muted yellow` bags, either of which could then hold your `shiny gold` bag.
+
+So, in this example, the number of bag colors that can eventually contain at least one shiny gold bag is **4**.
+
+**How many bag colors can eventually contain at least one shiny gold bag?** (The list of rules is quite long; make sure you get all of it.)
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/7/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+It's getting pretty expensive to fly these days - not because of ticket prices, but because of the ridiculous number of bags you need to buy!
+
+Consider again your `shiny gold` bag and the rules from the above example:
+
+* `faded blue` bags contain `0` other bags.
+* `dotted black` bags contain `0` other bags.
+* `vibrant plum` bags contain `11` other bags: 5 `faded blue` bags and 6 `dotted black` bags.
+* `dark olive` bags contain `7` other bags: 3 `faded blue` bags and 4 `dotted black` bags.
+
+So, a single `shiny gold` bag must contain 1 `dark olive` bag (and the 7 bags within it) plus 2 vibrant plum bags (and the 11 bags within each of those): `1 + 1*7 + 2 + 2*11 = 32` bags!
+
+Of course, the actual rules have a small chance of going several levels deeper than this example; be sure to count all of the bags, even if the nesting becomes topologically impractical!
+
+Here's another example:
+
+```
+shiny gold bags contain 2 dark red bags.
+dark red bags contain 2 dark orange bags.
+dark orange bags contain 2 dark yellow bags.
+dark yellow bags contain 2 dark green bags.
+dark green bags contain 2 dark blue bags.
+dark blue bags contain 2 dark violet bags.
+dark violet bags contain no other bags.
+```
+
+In this example, a single shiny gold bag must contain **126** other bags.
+
+**How many individual bags are required inside your single shiny gold bag?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/7/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+input = AdventOfCode.Input.get!("7", "2020")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"muted lime bags contain 1 wavy lime bag, 1 vibrant green bag, 3 light yellow bags.\nlight red bags contain 2 clear indigo bags, 3 light lime bags.\nwavy beige bags contain 4 faded chartreuse bags.\nmuted blue bags contain 3 mirrored tan bags.\nvibrant cyan bags contain 4 drab beige bags, 4 vibrant maroon bags, 2 dull coral bags.\nposh indigo bags contain 1 dim cyan bag, 4 striped violet bags, 2 posh olive bags.\ndark black bags contain 5 dotted purple bags, 3 dotted orange bags, 5 shiny gold bags, 3 wavy brown bags.\ndull teal bags contain 1 posh aqua bag.\ndim aqua bags contain 3 muted indigo bags, 5 vibrant green bags, 3 dotted teal bags.\nclear bronze bags contain 1 plaid gold bag, 4 pale tan bags, 1 light teal bag, 5 dim lavender bags.\nshiny fuchsia bags contain 5 striped orange bags, 2 faded plum bags.\ndim bronze bags contain 2 plaid tan bags, 4 muted green bags.\nmuted white bags contain 1 wavy black bag, 2 striped olive bags.\nwavy maroon bags contain 3 striped magenta bags, 3 bright teal bags, 2 dark crimson bags.\nmuted beige bags contain 4 dull plum bags, 2 plaid fuchsia bags, 3 clear coral bags, 1 clear red bag.\ndrab chartreuse bags contain 2 dull gray bags, 2 striped olive bags, 2 dark aqua bags.\nplaid turquoise bags contain 1 muted teal bag.\nmuted maroon bags contain 1 faded chartreuse bag, 1 wavy gray bag, 5 faded black bags, 2 posh tan bags.\nmuted bronze bags contain 1 muted white bag.\nmuted teal bags contain 1 striped beige bag.\nfaded indigo bags contain 5 mirrored green bags.\ndrab tan bags contain 4 dim lavender bags.\nbright turquoise bags contain 2 pale olive bags, 4 posh salmon bags.\ndull aqua bags contain 2 dark orange bags, 2 pale aqua bags, 1 faded plum bag.\nstriped coral bags contain 3 wavy purple bags, 2 dull gray bags.\nmuted chartreuse bags contain 3 dark purple bags, 2 posh gray bags.\nwavy plum bags contain 2 dark lavender bags, 2 shiny turquoise bags, 5 wavy beige bags, 5 pale maroon bags.\nvibrant maroon bags contain 1 light lime bag, 1 light silver bag, 5 bright orange bags, 2 shiny red bags.\nmirrored purple bags contain 3 bright olive bags, 3 bright yellow bags, 5 muted white bags.\nmuted magenta bags contain 5 plaid indigo bags.\ndrab lavender bags contain 1 faded beige bag, 2 muted gray bags, 2 dotted purple bags.\nplaid cyan bags contain 4 plaid violet bags, 5 posh chartreuse bags.\nplaid aqua bags contain 2 wavy gray bags, 4 light fuchsia bags, 4 muted white bags.\nwavy bronze bags contain 4 light bronze bags, 3 light tomato bags, 5 shiny tomato bags.\nwavy aqua bags contain 4 plaid crimson bags, 3 muted brown bags, 1 pale tan bag.\nbright violet bags contain 1 wavy tan bag, 4 light coral bags, 1 vibrant plum bag.\npale yellow bags contain 4 light lime bags, 2 striped violet bags, 1 plaid orange bag, 3 dull lavender bags.\nplaid olive bags contain 1 mirrored magenta bag, 3 posh silver bags, 1 plaid brown bag.\nwavy brown bags contain 4 shiny black bags, 3 wavy plum bags.\nclear turquoise bags contain 5 dotted beige bags.\nstriped fuchsia bags contain 2 dim tan bags.\npale coral bags contain 1 plaid coral bag, 5 striped salmon bags.\nplaid magenta bags contain 4 plaid aqua bags, 2 dim cyan bags, 2 vibrant teal bags.\ndim beige bags contain 5 shiny gold bags, 2 wavy brown bags.\nclear violet bags contain 2 striped silver bags.\nlight lime bags contain 5 muted teal bags.\npale plum bags contain 2 vibrant lavender bags.\ndrab black bags contain 3 light white bags, 2 dim tomato bags, 3 dull yellow bags, 2 plaid coral bags.\nvibrant lime bags contain 5 wavy gray bags, 5 striped green bags, 5 striped black bags.\nfaded fuchsia bags contain 3 shiny aqua bags.\nvibrant olive bags contain 2 striped olive bags.\ndark indigo bags contain 5 pale maroon bags, 2 striped turquoise bags.\ndark cyan bags contain 3 light gold bags, 1 plaid lime bag, 1 dim indigo bag.\nclear tomato bags contain 3 plaid tan bags, 2 vibrant blue bags.\nmuted yellow bags contain 2 dotted coral bags.\nmuted brown bags contain 1 vibrant green bag, 3 bright green bags, 2 plaid fuchsia bags.\ndark bronze bags contain 2 clear orange bags.\ndotted turquoise bags contain 4 f" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day07 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    graph = parse(input)
+
+    graph
+    |> Enum.count(fn {_, contains} ->
+      contains_color?(graph, contains, "shiny gold")
+    end)
+  end
+
+  def part2(input) do
+    graph = parse(input)
+
+    count_bags(graph, graph["shiny gold"])
+  end
+
+  defp contains_color?(_, nil, _), do: false
+
+  defp contains_color?(graph, contains, find_color) do
+    Enum.any?(contains, fn
+      {^find_color, _} -> true
+      {color, _} -> contains_color?(graph, graph[color], find_color)
+    end)
+  end
+
+  defp count_bags(graph, contains, count \\ 0)
+  defp count_bags(_, nil, count), do: count
+
+  defp count_bags(graph, contains, count) do
+    Enum.reduce(contains, count, fn {color, num}, acc ->
+      acc + num * (count_bags(graph, graph[color]) + 1)
+    end)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      input
+      |> Stream.map(&parse_line/1)
+      |> Enum.into(%{})
+    end
+
+    def parse_line(line) do
+      case String.split(line, " bags contain ") do
+        [color, "no other bags."] ->
+          {color, nil}
+
+        [color, contains] ->
+          {color, parse_contains(contains)}
+      end
+    end
+
+    defp parse_contains(contains) do
+      contains
+      |> String.split(", ", trim: true)
+      |> Enum.map(fn
+        "no other bags." ->
+          nil
+
+        item ->
+          [n, a, b, _] = String.split(item, " ", trim: true)
+          {"#{a} #{b}", String.to_integer(n)}
+      end)
+      |> Enum.into(%{})
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day07, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+ {:module, Day07.Input, <<70, 79, 82, ...>>, {:parse_contains, 1}}}
+```
+
+**How many bag colors can eventually contain at least one shiny gold bag?**
+
+Your puzzle answer was `139`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day07.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+139
+```
+
+**How many individual bags are required inside your single shiny gold bag?**
+
+Your puzzle answer was `58175`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day07.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+58175
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/7/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day07Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "light red bags contain 1 bright white bag, 2 muted yellow bags.\ndark orange bags contain 3 bright white bags, 4 muted yellow bags.\nbright white bags contain 1 shiny gold bag.\nmuted yellow bags contain 2 shiny gold bags, 9 faded blue bags.\nshiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.\ndark olive bags contain 3 faded blue bags, 4 dotted black bags.\nvibrant plum bags contain 5 faded blue bags, 6 dotted black bags.\nfaded blue bags contain no other bags.\ndotted black bags contain no other bags."
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.part1(input) == 4
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.part2(input) == 32
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 831415
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day07.part1(input) end,
+    "Part 2" => fn -> Day07.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 2        600.68        1.66 ms    ±10.92%        1.61 ms        2.15 ms
+Part 1         18.72       53.42 ms     ±2.29%       53.60 ms       57.82 ms
+
+Comparison: 
+Part 2        600.68
+Part 1         18.72 - 32.09x slower +51.76 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 2         0.93 MB     ±0.00%        0.93 MB        0.93 MB
+Part 1        41.09 MB     ±0.00%       41.09 MB       41.09 MB
+
+Comparison: 
+Part 2         0.93 MB
+Part 1        41.09 MB - 44.32x memory usage +40.16 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 2        0.0586 M
+Part 1          6.97 M - 119.05x reduction count +6.91 M
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
