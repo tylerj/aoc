@@ -1,0 +1,356 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 6 - Advent of Code 2020
+
+```elixir
+# Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/6)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/6/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-01.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-06.livemd)
+
+## Prompt
+
+### --- Day 6: Custom Customs ---
+
+As your flight approaches the regional airport where you'll switch to a much larger plane, [customs declaration forms](https://en.wikipedia.org/wiki/Customs_declaration) are distributed to the passengers.
+
+The form asks a series of 26 yes-or-no questions marked `a` through `z`. All you need to do is identify the questions for which **anyone in your group** answers "yes". Since your group is just you, this doesn't take very long.
+
+However, the person sitting next to you seems to be experiencing a language barrier and asks if you can help. For each of the people in their group, you write down the questions for which they answer "yes", one per line. For example:
+
+```
+abcx
+abcy
+abcz
+```
+
+In this group, there are **6** questions to which anyone answered "yes": `a`, `b`, `c`, `x`, `y`, and `z`. (Duplicate answers to the same question don't count extra; each question counts at most once.)
+
+Another group asks for your help, then another, and eventually you've collected answers from every group on the plane (your puzzle input). Each group's answers are separated by a blank line, and within each group, each person's answers are on a single line. For example:
+
+```
+abc
+
+a
+b
+c
+
+ab
+ac
+
+a
+a
+a
+a
+
+b
+```
+
+This list represents answers from five groups:
+
+* The first group contains one person who answered "yes" to **3** questions: `a`, `b`, and `c`.
+* The second group contains three people; combined, they answered "yes" to **3** questions: `a`, `b`, and `c`.
+* The third group contains two people; combined, they answered "yes" to **3** questions: `a`, `b`, and `c`.
+* The fourth group contains four people; combined, they answered "yes" to only **1** question, `a`.
+* The last group contains one person who answered "yes" to only **1** question, `b`.
+
+In this example, the sum of these counts is `3 + 3 + 3 + 1 + 1 = 11`.
+
+For each group, count the number of questions to which anyone answered "yes". **What is the sum of those counts?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/6/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+As you finish the last group's customs declaration, you notice that you misread one word in the instructions:
+
+You don't need to identify the questions to which **anyone** answered "yes"; you need to identify the questions to which **everyone** answered "yes"!
+
+Using the same example as above:
+
+```
+abc
+
+a
+b
+c
+
+ab
+ac
+
+a
+a
+a
+a
+
+b
+```
+
+This list represents answers from five groups:
+
+* In the first group, everyone (all 1 person) answered "yes" to **3** questions: `a`, `b`, and `c`.
+* In the second group, there is **no** question to which everyone answered "yes".
+* In the third group, everyone answered yes to only **1** question, `a`. Since some people did not answer "yes" to `b` or `c`, they don't count.
+* In the fourth group, everyone answered yes to only **1** question, `a`.
+* In the fifth group, everyone (all 1 person) answered "yes" to **1** question, `b`.
+
+In this example, the sum of these counts is `3 + 0 + 1 + 1 + 1 = 6`.
+
+For each group, count the number of questions to which **everyone** answered "yes". **What is the sum of those counts?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/6/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+input = AdventOfCode.Input.get!("6", "2020")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"heqznia\ncipkn\ngvsitwynrxb\n\nauz\nzaeu\nuaz\nzau\nzua\n\nctqaibd\ntbqlzaywvd\nbqdtcazls\nqtrdvab\nhpbtadq\n\ne\ne\nje\ne\ne\n\nilzuqnjhrceay\njakzylrnuqcih\nuhyqijldrzwnac\n\nlxtwyiuqerd\nsfdmpjawvolkbzqnih\nldtiewgq\n\nabsdepjhctyfzxnivom\nfdvbjnsolpztgywmaihx\ntkashzxmjbydivfnrop\nptnsojahvxmbdzfiy\n\nhd\ndh\nhd\ndh\n\nbup\nktul\n\nrjfzdhowqnystc\nubfkxhagiqmvplw\n\ncvknztpwls\ncvxtwlq\ntcvwxl\n\ngnusktbacrxodwiyjmzpfhv\ndipokyjubnhfsmzxtwga\n\nlcitb\nctli\ncilt\nictl\nilct\n\ngwpctaiv\nfgqvptawch\npglictavw\n\nolsamdbycu\nyhbdascjuo\nosaytbi\n\npwhboyvqnf\nbwfqvnymipodch\nfjpoywbxvlqhn\nnqwfybpohv\n\nghwyxuedk\nrjnf\nvstzqpbila\n\ntgrhwndx\nrwgtdxhn\n\nspzuibywxmgtcaefhd\ntsaumexhwfyigbpcdz\n\nfagpleck\nuhm\n\ndgfxejy\nvxdjg\nwjdxg\n\nsnwlrgahefdvpimqzukbty\nawkpifsbutnqlegvmzrdy\nebgklrmtxdqaynizupwsfv\njswycqitzupnbavgofkdmlre\nkqprveytwzlmidfabunsg\n\nespgyfqvwctjxl\nnwselxvyjfcgqpta\nljytpvqxgsewfc\nsfgwpctyjeqxvl\nxpwfztvryqujgcesl\n\nfak\nfa\nfa\n\nci\nic\nic\nic\nic\n\nsdrecilmpta\nnyfuvjgt\n\nrjqtkb\nnrxdcigm\n\nlqxan\naxqnl\nlqxan\nxcnlaq\n\nmiawyqxujdnobkts\njumbid\ngimpdjbu\n\nctbdnkajfrqwm\nqjadfnrck\nrndejhqckl\n\nqtnkxgwszufcdoje\nxwqufndojckegtzs\nokgwzcqxtsfuenjd\ntfksdqncoeuxwgzj\ngqkdzjtsnofcuexw\n\ny\nnmyh\nyh\njty\n\nnosbgtm\nfitwzkryumnv\n\nxujltc\nuljbxt\n\nphwgolsikcumx\nluihpkgomwsr\nijsglkwuhpom\nohwkzupslmig\nphwimvsbulokcg\n\nqtko\nqotk\nqgokte\noqkt\n\nnqhyfivrjes\nlewsrvpnijgcdyqtuaok\n\nilsvdkqntza\nqlzvkfnidt\nlmtivdkqzun\n\njitegscxbvkap\nbazxeirqcwkvsjg\n\nhztimlueapq\nhtquipaezml\nemqhitlzapu\nmztlhqpuaei\nmeizlupqhta\n\nqmhdij\nqdw\nwxqs\nyuagpvct\n\nnjkbs\niknbjs\njndsbkr\nsmgnkjbovwext\nbsnjk\n\nxzuajegmtvbfqcs\ngftvzmjscbaxqoeu\nveafutszgmibxqjc\nbstujmzvexqcagf\n\nzqwxeofgy\nvnysixbfwzdg\nmyegxfzwtch\nwzrahfyuplkxgj\n\nb\nb\nb\nb\n\noleycqk\nzexbflycq\n\nqkvaephtyjz\nqjazpteykv\nmybspqdavjkwz\nyjqzvpkat\n\niex\nieo\ni\nji\n\nlzhjktifnavmsdpeqxwryg\ngprmilyhwnvjfxdztkasq\njqzyaglmdtirfhxvskponw\n\nqthdgyc\ndqciylgth\ntqhyscgd\ndcyqghti\nqgczhydt\n\ntsngcywhrek\nwfvzlhpmsry\n\nsdawpinot\nnpiwtzoda\nndtwsaoixp\nnopaiwzst\nitflopwmnca\n\ndvpyhcuqwfxergbosl\npxdhfqlewuvroygc\nxohlgwvceurdqfpy\nepcywvorhxuglfdq\n\nupcxrendiozjw\nedzrjoxcinpwu\ndoucrjmeiwnpxz\nwxdpuzrjoneic\n\ngvfwrpudylze\ntrmxawjqifz\nkudrzsvopgwhfn\n\ntc\nct\nmct\ntc\ntc\n\nazfkv\nafvz\nfvztas\nafvz\n\nxwotv\ntvk\npvt\nthv\n\nx\nix\n\nn\nf\nn\nn\nn\n\nup\nup\nwpu\npum\nudpr\n\nyftn\nk\n\ntluherb\ntjsgwcfympo\n\nnzlhtjicvwmqr\nljngqvtmcz\n\nyet\nyte\ntye\n\nbwmfduzpi\nqzoa\nxceznyjo\nznetgq\naoezny\n\npzh\nhzp\nphuz\n\nzcgflrjb\nwequkjro\n\negiqjdmruhb\nbtyjzhukgoepvqr\nabehxcqrwsudjg\n\nm\nm\nm\nm\nm\n\nmkbqhjf\nysxoweitglpudz\nrafmvnc\n\nhfaniqydo\nfyioq\nilypofq\nfiolyq\nqifyot\n\nisklme\nisxelmk\nkeimls\nsmlike\n\nlusw\nswulc\nulkzswti\n\njlwkngbhoytrfzva\nthqfkgonjszlbvr\nrtqlfvoxghznkb\niorbnmvetzplkfhg\ngfzlantkobrhcv\n\na\na\na\na\na\n\ne\no\nnx\ng\n\nwfahbinsdylmuqjg\nmdynhwasqjcgbuilf\nqagsbwdjifhymun\nbgsfnxcdlwquiyhmaj\nqzfagjrnmksdiuyhbwv\n\nbpjutscwgzqfaihn\nqapucwjtnszikgbf\nfcntgzhsiapjubwq\ngcqhijwsfuzptnba\nnicarpmztbqyxgfjwus\n\nlo\noucynr\nzeo\ntoxjd\noq\n\nwsgkpblczumxatyefniqjdrovh\ndxngufpsbltmickjrohewaqzv\nzbvplfugitknxchaoqdwjmser\n\nrxl\nrx\nxr\n\njre\nje\n\nenbyurosfwa\nabyrwsnfeo\nsaywbonfer\nwrkseoafnzy\n\nbwzkdgjryteq\nsmlhuefcnapoixv\n\ngvyspfxwk\npxyksgvwf\nvfdpxsgwky\npksygvxfw\ngyixskpvwf\n\ntbdok\nbotkd\n\nhmi\nmih\nmhi\nsimh\n\nnkahxedcorsvtz\nknrhzesodctaxv\ntxdnezcvkahors\nortdavxsznehkc\n\nzmgpf\nzfpm\npfzmig\nzlkexfpa\npztf\n\nxkru\nhurkx\nrypkxu\nukrxh\n\nbk\nkbn\nbke\nkgba\nbk\n\nlmtnxdhvgowyzajqsric\nzwmhnvqaxjtordisyglc\nhotanmwvdsgljzcqiryx\njymwvtzsrqgildcahxno\nhjrdlamgztwsviqncyox\n\nbewovp\nwoveip\noevp\nbziepov\nvjcpoex\n\nhwcjaflktixuys\nyfithlajvxdw\nfejthailwyx\n\nekrshnlmyp\nnplurhzb\ndhsnrlg\nilhtqrn\n\nbpkxsqmwljyacvdhi\nlsvmypxiwjdaq\nxqpgvkyaijlsdbu\nqdrayzlvjxitps\n\nakrelujqczvgmypxoftd\ndqfroxvktejgumclpzay\nrtmcvgaulpdexkfjqyzo\naxvjludqcktyfgpomrze\nprcvdlftgmjyaozeqxuk\n\nqytchokzabsvxjd\nifgruvwndp\n\nlgedvcobj\nzivnmxkbp\nvtinhbry\nmqwsbv\nbpv\n\netcasrvjlounbzfy\nexzapqlkgsdnvwtcfjo\n\ngimwrkealszjuovbqdxnfp\nhxbftzedakvspqguolwn\naxsvzfqewpbkhnguloyd\n\naldgbhwosquzp\nnmtvykhfrelwi\n\nnqvmwaultx\nqvuaxmtnwl\nxuwlqnamvt\nalxwuqmtvn\nrvuamqlwtxn\n\nrgcvzjbpyqfsudomeilwat\neyuxfmdcjgkhzraotqwpsibl\n\njxszndrehyflgctubwoqvapk\nzpndwkgqcmbaelxvjthusroyf\nxojrdvbkayuqfcnhzipglewts\n\nybedivlpkhxnz\ndzxihvkebynl\nvheyxkzdnibl\n\ntdlga\ntdagl\nghatdl\ngldat\navtldgm\n\nmyqibrfdxcgjtnp\nufswrvkqbyj\nrjqlafby\nyalcejhfdzqnrb\n\nx\nxve\niwsbx\n\npsftnmux" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day06 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.map(fn group ->
+      group |> List.flatten() |> Enum.uniq() |> length()
+    end)
+    |> Enum.sum()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(fn group ->
+      group_size = length(group)
+
+      group
+      |> List.flatten()
+      |> Enum.group_by(& &1)
+      |> Enum.count(fn {_q, list} ->
+        length(list) == group_size
+      end)
+    end)
+    |> Enum.sum()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_group/1)
+    end
+
+    def parse_group(group) do
+      group
+      |> String.split("\n", trim: true)
+      |> Enum.map(&parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.graphemes(line)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day06, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+ {:module, Day06.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+For each group, count the number of questions to which anyone answered "yes". **What is the sum of those counts?**
+
+Your puzzle answer was `6249`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+6249
+```
+
+For each group, count the number of questions to which **everyone** answered "yes". **What is the sum of those counts?**
+
+Your puzzle answer was `3103`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+3103
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/6/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day06Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "abc\n\na\nb\nc\n\nab\nac\n\na\na\na\na\n\nb"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day06.part1(input) == 11
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day06.part2(input) == 6
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 831415
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day06.part1(input) end,
+    "Part 2" => fn -> Day06.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        467.25        2.14 ms     ±1.70%        2.13 ms        2.25 ms
+Part 2        321.74        3.11 ms     ±1.68%        3.10 ms        3.27 ms
+
+Comparison: 
+Part 1        467.25
+Part 2        321.74 - 1.45x slower +0.97 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         3.41 MB     ±0.04%        3.41 MB        3.41 MB
+Part 2         5.29 MB     ±0.00%        5.29 MB        5.29 MB
+
+Comparison: 
+Part 1         3.41 MB
+Part 2         5.29 MB - 1.55x memory usage +1.88 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1        180.40 K
+Part 2        291.13 K - 1.61x reduction count +110.72 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
