@@ -1,0 +1,301 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 1 - Advent of Code 2020
+
+```elixir
+# Mix.install([
+#   {:kino, "~> 0.11.3"},
+#   {:benchee, "~> 1.2"}
+# ])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/1)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/1/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day_01.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-01.livemd)
+
+## Prompt
+
+### --- Day 1: Report Repair ---
+
+Before you leave, the Elves in accounting just need you to fix your expense report (your puzzle input); apparently, something isn't quite adding up.
+
+Specifically, they need you to **find the two entries that sum to `2020`** and then multiply those two numbers together.
+
+For example, suppose your expense report contained the following:
+
+```
+1721
+979
+366
+299
+675
+1456
+```
+
+In this list, the two entries that sum to `2020` are `1721` and `299`. Multiplying them together produces `1721 * 299 = 514579`, so the correct answer is **`514579`**.
+
+Of course, your expense report is much larger. **Find the two entries that sum to `2020`; what do you get if you multiply them together?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/1/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+The Elves in accounting are thankful for your help; one of them even offers you a starfish coin they had left over from a past vacation. They offer you a second one if you can find **three** numbers in your expense report that meet the same criteria.
+
+Using the above example again, the three entries that sum to `2020` are `979`, `366`, and `675`. Multiplying them together produces the answer, `241861950`.
+
+In your expense report, **what is the product of the three entries that sum to 2020?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/1/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+input = AdventOfCode.Input.get!("1", "2020")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"1939\n1585\n1712\n1600\n1370\n1447\n1247\n1446\n1323\n1713\n1277\n1946\n1677\n1428\n1231\n1481\n1976\n1709\n1508\n1668\n1302\n77\n1351\n1605\n1999\n1982\n1583\n1756\n1957\n1624\n1745\n1938\n1784\n1403\n1642\n1691\n569\n1762\n1555\n1937\n1383\n1897\n1334\n1965\n1683\n1475\n1776\n1791\n1707\n1987\n1233\n1416\n1769\n1345\n1874\n1255\n1744\n1944\n1404\n1360\n1304\n1417\n1977\n1656\n790\n1788\n1353\n1296\n1673\n1810\n1684\n1742\n1425\n1887\n1444\n1352\n1229\n1414\n1493\n1402\n1947\n1669\n1412\n1531\n1474\n1637\n1314\n1607\n1829\n1923\n1949\n1757\n1307\n1714\n1748\n1550\n1372\n1615\n1235\n1272\n1408\n1749\n1687\n1613\n1528\n1561\n341\n1308\n1660\n1667\n1313\n1991\n1675\n1394\n1704\n1303\n1440\n1592\n1857\n1752\n1839\n1397\n1699\n1426\n1878\n1759\n1814\n1096\n372\n1596\n1500\n1774\n1627\n1696\n1851\n1020\n1819\n1292\n1616\n1672\n1279\n1543\n1526\n1682\n1568\n1582\n1921\n922\n1773\n1482\n1238\n1973\n1517\n1909\n409\n1634\n1468\n1445\n1801\n1631\n1407\n1820\n1603\n1495\n1333\n1241\n1849\n82\n1339\n1413\n90\n1662\n1291\n1740\n1340\n1365\n2003\n1546\n1621\n1650\n1518\n1807\n1382\n1433\n1968\n1940\n1986\n1437\n1651\n1237\n1862\n1409\n1200\n2002\n2009\n1735\n1487\n1706\n1643\n1505\n"
+```
+
+## Solution
+
+```elixir
+defmodule Day01 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> find_match_p1()
+    |> Tuple.product()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> find_match_p2()
+    |> Tuple.product()
+  end
+
+  defp find_match_p1([a | t]) do
+    case Enum.find(t, &(&1 + a == 2020)) do
+      nil -> find_match_p1(t)
+      b -> {a, b}
+    end
+  end
+
+  defp find_match_p2([a | t]) do
+    find_match_p2(a, t) || find_match_p2(t)
+  end
+
+  defp find_match_p2(_a, []), do: nil
+
+  defp find_match_p2(a, [b | t]) do
+    case Enum.find(t, &(a + b + &1 == 2020)) do
+      nil -> find_match_p2(a, t)
+      c -> {a, b, c}
+    end
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Enum.map(input, &parse_line/1)
+    end
+
+    def parse_line(line), do: String.to_integer(line)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+ {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**Find the two entries that sum to 2020; what do you get if you multiply them together?**
+
+Your puzzle answer was `158916`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+158916
+```
+
+**In your expense report, what is the product of the three entries that sum to 2020?**
+
+Your puzzle answer was `165795564`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+165795564
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/1/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day01Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "1721\n979\n366\n299\n675\n1456"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day01.part1(input) == 514_579
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day01.part2(input) == 241_861_950
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 831415
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day01.part1(input) end,
+    "Part 2" => fn -> Day01.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1       19.27 K      0.0519 ms     ±7.08%      0.0514 ms      0.0610 ms
+Part 2       0.127 K        7.85 ms     ±0.92%        7.83 ms        8.12 ms
+
+Comparison: 
+Part 1       19.27 K
+Part 2       0.127 K - 151.23x slower +7.80 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1        52.16 KB
+Part 2       823.73 KB - 15.79x memory usage +771.57 KB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1        0.0205 M
+Part 2          3.41 M - 166.18x reduction count +3.39 M
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```

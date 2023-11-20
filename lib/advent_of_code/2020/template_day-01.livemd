@@ -1,0 +1,240 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day X - Advent of Code 2020
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/1)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/1/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day_01.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-01.livemd)
+
+## Prompt
+
+### --- Day X: TBD ---
+
+Part One prompt
+
+**QUESTION ONE?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/1/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/1/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+""
+```
+
+## Solution
+
+```elixir
+defmodule Day01 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n")
+      |> parse()
+    end
+
+    def parse(input) when is_list(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      # |> String.split(["-", ","])
+      # |> Enum.map(&String.to_integer/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 8, ...>>,
+ {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**QUESTION ONE?**
+
+Your puzzle answer was `answer one`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day01.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/1/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day01Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day01.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day01.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmark do
+  def fun1(input) do
+    Day01.part1(input)
+  end
+
+  def fun2(input) do
+    Day01.part2(input)
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmark, <<70, 79, 82, 49, 0, 0, 6, ...>>, {:fun2, 1}}
+```
+
+```elixir
+# https://github.com/bencheeorg/benchee
+input = Day01.Input.parse(input) |> Enum.to_list()
+
+Benchee.run(
+  %{
+    "fun1" => fn _ -> Benchmark.fun1(input) end,
+    "fun2" => fn _ -> Benchmark.fun2(input) end
+  },
+  inputs: %{
+    "Part 1" => 1
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
