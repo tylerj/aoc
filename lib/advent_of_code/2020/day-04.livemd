@@ -1,0 +1,294 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 4 - Advent of Code 2020
+
+```elixir
+# Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/4)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/4/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day_04.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-04.livemd)
+
+## Prompt
+
+### --- Day 4: Passport Processing ---
+
+You arrive at the airport only to realize that you grabbed your North Pole Credentials instead of your passport. While these documents are extremely similar, North Pole Credentials aren't issued by a country and therefore aren't actually valid documentation for travel in most of the world.
+
+It seems like you're not the only one having problems, though; a very long line has formed for the automatic passport scanners, and the delay could upset your travel itinerary.
+
+Due to some questionable network security, you realize you might be able to solve both of these problems at the same time.
+
+The automatic passport scanners are slow because they're having trouble **detecting which passports have all required fields**. The expected fields are as follows:
+
+* byr (Birth Year)
+* iyr (Issue Year)
+* eyr (Expiration Year)
+* hgt (Height)
+* hcl (Hair Color)
+* ecl (Eye Color)
+* pid (Passport ID)
+* cid (Country ID)
+
+Passport data is validated in batch files (your puzzle input). Each passport is represented as a sequence of key:value pairs separated by spaces or newlines. Passports are separated by blank lines.
+
+Here is an example batch file containing four passports:
+
+```
+ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
+byr:1937 iyr:2017 cid:147 hgt:183cm
+
+iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
+hcl:#cfa07d byr:1929
+
+hcl:#ae17e1 iyr:2013
+eyr:2024
+ecl:brn pid:760753108 byr:1931
+hgt:179cm
+
+hcl:#cfa07d eyr:2025 pid:166559648
+iyr:2011 ecl:brn hgt:59in
+```
+
+The first passport is **valid** - all eight fields are present. The second passport is **invalid** - it is missing hgt (the Height field).
+
+The third passport is interesting; the **only missing field** is cid, so it looks like data from North Pole Credentials, not a passport at all! Surely, nobody would mind if you made the system temporarily ignore missing cid fields. Treat this "passport" as **valid**.
+
+The fourth passport is missing two fields, cid and byr. Missing cid is fine, but missing any other field is not, so this passport is **invalid**.
+
+According to the above rules, your improved system would report `2` valid passports.
+
+Count the number of **valid** passports - those that have all required fields. Treat cid as optional. **In your batch file, how many passports are valid?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/4/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+The line is moving more quickly now, but you overhear airport security talking about how passports with invalid data are getting through. Better add some data validation, quick!
+
+You can continue to ignore the cid field, but each other field has strict rules about what values are valid for automatic validation:
+
+* byr (Birth Year) - four digits; at least 1920 and at most 2002.
+* iyr (Issue Year) - four digits; at least 2010 and at most 2020.
+* eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
+* hgt (Height) - a number followed by either cm or in:
+* If cm, the number must be at least 150 and at most 193.
+* If in, the number must be at least 59 and at most 76.
+* hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
+* ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
+* pid (Passport ID) - a nine-digit number, including leading zeroes.
+* cid (Country ID) - ignored, missing or not.
+
+Your job is to count the passports where all required fields are both present and valid according to the above rules. Here are some example values:
+
+```
+byr valid:   2002
+byr invalid: 2003
+
+hgt valid:   60in
+hgt valid:   190cm
+hgt invalid: 190in
+hgt invalid: 190
+
+hcl valid:   #123abc
+hcl invalid: #123abz
+hcl invalid: 123abc
+
+ecl valid:   brn
+ecl invalid: wat
+
+pid valid:   000000001
+pid invalid: 0123456789
+```
+
+Here are some invalid passports:
+
+```
+eyr:1972 cid:100
+hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
+
+iyr:2019
+hcl:#602927 eyr:1967 hgt:170cm
+ecl:grn pid:012533040 byr:1946
+
+hcl:dab227 iyr:2012
+ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277
+
+hgt:59cm ecl:zzz
+eyr:2038 hcl:74454a iyr:2023
+pid:3556412378 byr:2007
+```
+
+Here are some valid passports:
+
+```
+pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
+hcl:#623a2f
+
+eyr:2029 ecl:blu cid:129 byr:1989
+iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm
+
+hcl:#888785
+hgt:164cm byr:2001 iyr:2015 cid:88
+pid:545766238 ecl:hzl
+eyr:2022
+
+iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
+```
+
+Count the number of **valid** passports - those that have all required fields **and valid values**. Continue to treat cid as optional. **In your batch file, how many passports are valid?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/4/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+input = AdventOfCode.Input.get!("4", "2020")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"byr:1971\neyr:2039\nhgt:172in pid:170cm hcl:17106b iyr:2012 ecl:gry\ncid:339\n\nhgt:161cm eyr:2027\necl:grn iyr:2011 hcl:#a97842 byr:1977 pid:910468396\n\ncid:257\necl:gry hgt:186cm iyr:2012\nbyr:1941\neyr:2029\npid:108935675\nhcl:#cfa07d\n\nhgt:165in\nhcl:#cfa07d eyr:2035 pid:82570731\nbyr:1973\ncid:74 ecl:xry\n\neyr:2020 cid:105 iyr:2012 pid:947726115\nhcl:#ceb3a1 ecl:grn byr:1966 hgt:151cm\n\nhcl:#888785 eyr:2027 ecl:hzl byr:1966\npid:853607760\niyr:2012\nhgt:155cm\n\nhgt:61cm\niyr:2019\nbyr:1952 pid:#1468e6 eyr:2033 ecl:#7d39d5 hcl:z\n\npid:2306523501\neyr:2032 hcl:z ecl:brn\ncid:266 hgt:151in iyr:2024\nbyr:2008\n\nhcl:#a97842 hgt:191cm eyr:2025 ecl:gry byr:1923 pid:574171850 iyr:2019\n\nhgt:140\niyr:1987 byr:2003\neyr:2013 cid:242 hcl:z\necl:#19177c pid:150cm\n\nbyr:1959\nhgt:169cm hcl:#7d3b0c ecl:gry eyr:2028 cid:107 pid:584790749\n\nbyr:1955\ncid:309\nhcl:#a97842\npid:740105085 iyr:2020\nhgt:188cm ecl:oth eyr:2029\n\niyr:2016 hcl:#cfa07d eyr:2026\nhgt:151cm\npid:394185014 ecl:grn byr:1974\n\npid:226566060 ecl:blu cid:272 hgt:188cm hcl:#efcc98\neyr:2029 iyr:2014\nbyr:1956\n\npid:#7c7a9d ecl:#8fa327\neyr:2006 iyr:2022\nhcl:#7d3b0c hgt:169\nbyr:2025\n\nhgt:188in byr:2015 ecl:xry\niyr:1975\neyr:1928\npid:8939875193 hcl:7bbcce\n\nhgt:193cm\neyr:2029\npid:141707808 byr:1997\ncid:83 iyr:2019\necl:hzl hcl:#cfa07d\n\niyr:2019\npid:681586971\nhcl:#6b5442 hgt:165cm\neyr:2022 ecl:brn byr:1985\n\nbyr:1970\niyr:2016 hgt:156in pid:#e32394 eyr:2024\nhcl:#efcc98 ecl:grt\n\niyr:2013\necl:grn pid:341584587 eyr:2027 hgt:185cm hcl:#18171d\nbyr:1935\ncid:113\n\nhcl:#fffffd ecl:grn iyr:2010\npid:738986504 hgt:98 eyr:2024\nbyr:1968\n\npid:175337478 ecl:oth hgt:173cm hcl:#733820\neyr:2025 byr:1960\ncid:283 iyr:2018\n\nbyr:1959\nhcl:#341e13 eyr:2023\npid:566612260 hgt:176cm\niyr:2017 ecl:grn\n\ncid:321 pid:355095309 byr:1945\nhgt:161cm\neyr:2029 iyr:2017\necl:brn hcl:#733820\n\nhcl:#c0946f pid:75316487 iyr:2013 cid:201 hgt:152cm ecl:lzr byr:1996 eyr:1928\n\nhgt:160cm iyr:2010 hcl:#a018b9\neyr:2024 ecl:amb\ncid:347\n\neyr:2021\npid:893047101 iyr:2016 ecl:hzl hcl:#866857 byr:1988\nhgt:166cm\n\nhcl:#7d3b0c\necl:blu pid:085336099 eyr:2024\niyr:2019 hgt:178cm byr:1999\n\necl:grt iyr:2022\nhcl:z\nhgt:192cm byr:2010\n\npid:677187953 eyr:2025 iyr:2020 hgt:163cm byr:1957 ecl:grn hcl:#cfa07d\n\ncid:213\nbyr:1987\npid:113078018 ecl:blu iyr:2013 eyr:2022\nhcl:#7d3b0c hgt:157cm\n\necl:blu hcl:#c0946f hgt:186cm\nbyr:1992 eyr:2028 iyr:2010\n\npid:#b01156 hgt:67\nbyr:2014 ecl:#35dca0 eyr:1922 hcl:790130\n\nhcl:#602927\necl:blu hgt:173cm byr:1974 pid:116377061 cid:294 eyr:2030 iyr:2010\n\nhgt:151cm eyr:2022 iyr:2011 ecl:blu byr:1987 hcl:#733820\npid:#b90d2e\n\ncid:188\nbyr:1990\nhcl:#602927 iyr:2026\npid:530373696\nhgt:154cm ecl:gry\neyr:2029\n\nhgt:178cm eyr:2027\nhcl:#733820\necl:grn iyr:2014 pid:575371227 byr:1965\n\nhcl:#fffffd iyr:2020\nhgt:185cm ecl:amb pid:692760311\nbyr:1961\n\nbyr:1967 pid:397518948 ecl:lzr iyr:2015 hcl:#cfa07d cid:328\nhgt:177cm eyr:2035\n\nhcl:#8e1608\npid:554618249 iyr:2010 hgt:176cm cid:220\necl:brn byr:1928 eyr:2029\n\neyr:2030\necl:oth cid:177 hcl:#602927\niyr:2010 hgt:66in\npid:915661465 byr:1992\n\necl:brn pid:558826437 hgt:151cm byr:1936 hcl:#fffffd\neyr:2021 iyr:2012\n\neyr:2033\niyr:2019 hgt:190cm byr:1953\nhcl:#6b5442\npid:584941735 ecl:hzl\n\nhgt:71cm\nbyr:2015 iyr:2025\necl:#663b65 eyr:2039 hcl:z pid:62548949\n\necl:hzl byr:1943\niyr:2020 hgt:175cm pid:830628564 hcl:#7d3b0c eyr:2021\n\nhgt:182cm byr:1951 cid:175 eyr:2021 pid:635966127 ecl:blu iyr:2014 hcl:#18171d\n\nhcl:#733820 iyr:2011 pid:581100835 eyr:2022 ecl:grn byr:1985 hgt:192cm\n\niyr:2013\necl:grn\nhgt:185cm hcl:#a97842 byr:1981 eyr:2029 pid:711625030\n\nbyr:1995\npid:326992839\niyr:2015\neyr:2028 hcl:#733820 ecl:hzl\n\nhgt:160\neyr:2037 ecl:#6b6b83\ncid:123 iyr:2028\npid:7692333345\nhcl:z byr:2029\n\nhcl:#6b5442 iyr:2030\nhgt:165cm byr:2028 ecl:#21516d\neyr:2039\npid:182cm\n\nhgt:159cm iyr:2018 pid:610521467 eyr:2028 ecl:amb byr:1934 hcl:#602927\n\necl:blu\nhcl:#09d9a5 hgt:162cm iyr:2020\neyr:2025 byr:1971 pid:406714780\n\nhgt:179cm eyr:2022 hcl:#18171d\necl:blu pid:314891131 iyr:2015\nbyr:2002\n\nhcl:#623a2f hgt:181cm pid:442693333 byr:1990 ecl:grn eyr:2027\niyr:2011\n\niyr:2022 eyr:1939\npid:557187110 hcl:#18171d hgt:60cm ecl:#d6ac04 byr:1984\n\necl:grn byr:1948 hgt:174cm pid:43" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day04 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  @required_fields ~w(byr iyr eyr hgt hcl ecl pid)
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.count(&all_fields_present?/1)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.count(fn pp ->
+      all_fields_present?(pp) && Enum.all?(pp, &field_valid?/1)
+    end)
+  end
+
+  defp all_fields_present?(passport) do
+    fields = Map.keys(passport)
+    Enum.all?(@required_fields, &(&1 in fields))
+  end
+
+  defp field_valid?({"byr", value}),
+    do: String.to_integer(value) in 1920..2002
+
+  defp field_valid?({"iyr", value}),
+    do: String.to_integer(value) in 2010..2020
+
+  defp field_valid?({"eyr", value}),
+    do: String.to_integer(value) in 2020..2030
+
+  defp field_valid?({"hgt", <<x::binary-size(3)>> <> "cm"}),
+    do: String.to_integer(x) in 150..193
+
+  defp field_valid?({"hgt", <<x::binary-size(2)>> <> "in"}),
+    do: String.to_integer(x) in 59..76
+
+  defp field_valid?({"hcl", "#" <> rest}),
+    do: Regex.match?(~r/^[0-9a-f]{6}$/, rest)
+
+  @eye_colors ~w(amb blu brn gry grn hzl oth)
+  defp field_valid?({"ecl", color}),
+    do: color in @eye_colors
+
+  defp field_valid?({"pid", pid}),
+    do: Regex.match?(~r/^[0-9]{9}$/, pid)
+
+  defp field_valid?({"cid", _}),
+    do: true
+
+  defp field_valid?({_, _}),
+    do: false
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_passport/1)
+    end
+
+    def parse_passport(passport) do
+      passport
+      |> String.split([" ", "\n"], trim: true)
+      |> Enum.map(fn item ->
+        item
+        |> String.split(":")
+        |> List.to_tuple()
+      end)
+      |> Enum.into(%{})
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day04, <<70, 79, 82, 49, 0, 0, 18, ...>>,
+ {:module, Day04.Input, <<70, 79, 82, ...>>, {:parse_passport, 1}}}
+```
+
+**In your batch file, how many passports are valid?**
+
+Your puzzle answer was `242`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+242
+```
+
+**In your batch file, how many passports are valid?**
+
+Your puzzle answer was `186`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+186
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/4/input).

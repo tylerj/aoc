@@ -3,7 +3,7 @@
 # Day 3 - Advent of Code 2020
 
 ```elixir
-Mix.install([:kino, :benchee])
+# Mix.install([:kino, :benchee])
 ```
 
 ## Links
