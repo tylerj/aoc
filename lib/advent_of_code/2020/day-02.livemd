@@ -1,0 +1,321 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 2 - Advent of Code 2020
+
+```elixir
+# Mix.install([
+#   {:kino, "~> 0.11.3"},
+#   {:benchee, "~> 1.2"}
+# ])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/2)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/2/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day_02.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-02.livemd)
+
+## Prompt
+
+### --- Day 2: Password Philosophy ---
+
+Your flight departs in a few days from the coastal airport; the easiest way down to the coast from here is via [toboggan](https://en.wikipedia.org/wiki/Toboggan).
+
+The shopkeeper at the North Pole Toboggan Rental Shop is having a bad day. "Something's wrong with our computers; we can't log in!" You ask if you can take a look.
+
+Their password database seems to be a little corrupted: some of the passwords wouldn't have been allowed by the Official Toboggan Corporate Policy that was in effect when they were chosen.
+
+To try to debug the problem, they have created a list (your puzzle input) of **passwords** (according to the corrupted database) and **the corporate policy when that password was set**.
+
+For example, suppose you have the following list:
+
+```
+1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc
+```
+
+Each line gives the password policy and then the password. The password policy indicates the lowest and highest number of times a given letter must appear for the password to be valid. For example, `1-3 a` means that the password must contain `a` at least `1` time and at most `3` times.
+
+In the above example, **2** passwords are valid. The middle password, `cdefg`, is not; it contains no instances of `b`, but needs at least `1`. The first and third passwords are valid: they contain one `a` or nine `c`, both within the limits of their respective policies.
+
+**How many passwords are valid according to their policies?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/2/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+While it appears you validated the passwords correctly, they don't seem to be what the Official Toboggan Corporate Authentication System is expecting.
+
+The shopkeeper suddenly realizes that he just accidentally explained the password policy rules from his old job at the sled rental place down the street! The Official Toboggan Corporate Policy actually works a little differently.
+
+Each policy actually describes two **positions in the password**, where `1` means the first character, `2` means the second character, and so on. (Be careful; Toboggan Corporate Policies have no concept of "index zero"!) **Exactly one of these positions** must contain the given letter. Other occurrences of the letter are irrelevant for the purposes of policy enforcement.
+
+Given the same example list from above:
+
+```
+- 1-3 a: abcde is valid: position 1 contains a and position 3 does not.
+- 1-3 b: cdefg is invalid: neither position 1 nor position 3 contains b.
+- 2-9 c: ccccccccc is invalid: both position 2 and position 9 contain c.
+```
+
+**How many passwords are valid** according to the new interpretation of the policies?
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/2/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+input = AdventOfCode.Input.get!("2", "2020")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"16-18 h: hhhhhhhhhhhhhhhhhh\n17-18 d: ddddddddddddddddzn\n15-18 c: cccccccccccccczcczc\n3-9 r: pplzctdrc\n4-14 d: lxdmddfddddddd\n8-14 v: pvxlknfvplgktv\n11-13 h: hphhhhhhhfhshhhhh\n1-4 l: hbljb\n1-2 x: wxqzlvt\n1-5 g: dxggdggb\n5-13 f: lfgdplfffxffswck\n6-7 z: zzzzgzzzz\n1-7 c: cccclcchrkctfhc\n3-7 c: ccjccqzcc\n15-16 x: rxxchpvgxxhxkxxw\n3-5 h: hbxjg\n3-7 q: sffnxxqvdfsnqlhqpq\n8-11 h: hhhhhhhlhhh\n7-8 w: bxwzdlwr\n4-5 x: xxxxp\n4-7 x: xxxxxxxx\n2-18 l: lllllllllllllllllrll\n6-10 n: nnnnnngnznn\n12-13 c: ccccccccccchc\n2-6 g: ggqngxgbggc\n4-5 k: xdztx\n4-9 m: txskmsnxvqjhlp\n9-11 w: wwtxmsjwjwlw\n12-16 g: cgggpkhggqkgrjcbx\n9-11 s: sxsssmssvszs\n17-18 c: cccccccccclccsccchcc\n7-8 z: stpgzwlqm\n9-19 q: qqqqqqqqqqqqqqqqqqqq\n4-5 p: hpvtpfgwp\n8-9 m: mmmmmmqmm\n11-12 s: ssswsssssspts\n2-4 j: jjdr\n17-18 k: kvkkmlkkkkkkfklkkkkk\n1-4 b: bbbwb\n2-12 c: cccccccccccccc\n14-15 l: llllllllllplllllllll\n7-10 c: czcccsvnrbccc\n11-12 d: nfmvdlxbfwzq\n8-10 t: tvtttttzts\n5-6 g: wggghg\n11-16 d: ztfdkggclvzmvsxd\n16-17 v: vvvvvvbvvpvxvvvhv\n3-7 w: vrswklnfnjzkm\n1-18 s: bsssssssssssssssshss\n8-10 g: vdzldttzgm\n19-20 n: nnnnnnnnnnnnnnnnnnrb\n1-4 x: xxxqxxxxx\n11-13 m: xmmxmmmmgmwmmm\n4-5 j: pzfjjsjjmcm\n1-7 j: jsjsmjj\n7-8 j: nqkkljhbj\n4-5 w: wmsbqhmwdjns\n4-7 j: jbjjcjcf\n2-7 f: jhsxldwf\n3-4 f: vmff\n5-7 z: fscmzjqs\n2-10 g: ggtfwzpbkgqqlzwmbm\n5-6 j: jjwbdjj\n13-15 b: bbbbbbbbkbbbvbbbb\n4-6 t: qdthtt\n1-8 m: kmmmmmmvmmmmm\n4-8 g: gbgqgtcglvgggcg\n3-4 h: ghjn\n3-8 b: mgbzbjvbkbpbd\n11-17 k: kkkktskgkkkfgzkkk\n1-6 f: ftnvfgtrlcs\n3-13 r: hrrzrfrfpvdlrnrcrcs\n3-8 l: gzljpllvl\n3-11 h: hchjhhnhhnhvhhhhx\n9-16 s: srssssssssskpldsqss\n4-10 n: nnbnnnwnnwnnnxnn\n3-4 n: nnnp\n11-19 z: nznpcdnxkwznzlpvcwzj\n4-7 w: wwwrwtwncwvwwwwx\n3-4 s: bkgs\n2-16 z: nzlcmlvqdcmmcnphb\n1-15 z: zzzzzzzzzzzzzzzzzz\n9-10 t: tmgttdtqtttttwbgttt\n1-2 h: hhhhhmhmkgxhnhw\n4-5 h: hlhhh\n9-15 h: xhhhhhchhhznphh\n5-8 w: jwphwwwj\n4-5 z: lztsz\n10-11 c: mhtdcdhggccgfck\n3-8 t: ccttgcktz\n1-12 m: smmmmxmmmgmx\n1-12 r: srrrrrrrrrrlrrrrr\n2-5 h: khhzhrqr\n3-4 m: mmztmm\n2-5 f: fbffqf\n1-11 p: zpppppppnphppx\n5-12 z: pqrzlwztvzjfzbt\n8-12 b: bbbbbbbdbbbcb\n3-4 g: ghqg\n7-10 m: mmmmmmmmmmmm\n5-14 q: jblkqbqpmqwsqt\n6-8 r: rrrtrlzltfrrrgrr\n9-14 r: rrrrrzrrjrrrgmr\n9-10 m: tmshdggksmv\n10-17 d: dddddddddcddddddf\n6-7 f: ffffffx\n9-19 j: jfjljzjcjjzjjjfjpjj\n2-6 h: jhxmhh\n1-7 g: wgggggzggxmggg\n5-6 n: nlgnlx\n4-7 t: thzttttt\n4-6 x: xhnxjx\n14-16 p: ppppppppppppppppp\n2-4 s: ssps\n7-15 k: bzfljhskslxlznwvphg\n6-7 j: dkjjsgk\n9-11 p: ppppppppkpmpp\n5-8 t: tzcttttttt\n8-11 d: dddddddgddld\n3-9 w: dwwhwbwwwwwzwtwxw\n2-3 x: xxwxmw\n1-5 g: gdlvg\n4-6 c: cccmcrccccccc\n1-11 f: ffffffffffnff\n10-11 l: lgqgnwlhgdlvdlv\n3-7 v: cjvvvvnvjvjvgvkx\n4-5 v: vvvsv\n13-15 t: tttttrtttttttth\n11-12 q: nccsqqhqqqqqlqqqqq\n2-7 p: pspppppppp\n4-6 g: gglggg\n17-18 p: hwpkcxvppzxxvpjzpp\n1-3 b: dlfz\n11-12 p: ppppppppppfpdppp\n1-2 s: ssszdss\n2-15 b: nbsblthmngvbqvbh\n1-6 q: sqqqqbqq\n4-11 q: tgmtqqrxfsvrzhc\n8-13 q: qqqqzqqqqqqmqqqjqq\n9-17 n: nnnnnnnnnnnnnnnnpnnn\n6-9 h: rmhrlkhskbhhq\n5-6 n: qnnjnn\n4-6 l: lxlllkvdltgcfl\n12-15 f: fflffffpfvftffwff\n13-16 t: fpwmwmvtqbvxtvtt\n7-8 w: kwwwjgwmwbw\n1-2 x: xxnvmbcmxhnkkgfrr\n3-7 f: rpcnzvjgh\n13-15 r: rrwrkrrrrrrrdrbr\n11-13 h: ghnzvhhhhwhchmh\n7-8 h: hhhhhhnv\n5-6 l: kgllll\n1-4 k: kqsjblck\n6-8 c: crxxccccgc\n2-13 g: fvmhpbqkgvbwqvbldb\n4-7 g: ggglggmgggkggg\n6-7 n: znnrnpnn\n12-15 j: jjqjzjjchjmjzsgppss\n4-5 k: kkkkk\n12-16 r: rrrrrrrrrrrcrrznrz\n10-12 w: hdwsvqpwzvtx\n9-11 b: brbtbwbbjbbbbbb\n6-8 q: nqkvkqdqrq\n3-5 n: pjcnd\n9-11 q: qqqqqqqqpqqqq\n6-7 b: zdbbfpqbvbbgbnq\n11-14 g: dxvgpggnpngpqgn\n8-11 z: zzzzzzzczzq\n8-18 z: nzczzlkcchpzdkrpvzrd\n2-4 d: fwdhl\n12-13 m: mmmqllmmmmhnf\n6-8 b: bmbbcbbbznnbd\n18-19 z: zkzzzzzzzzzzzzzzzzz\n4-10 m: smkkrpqznmnfdprq\n7-8 j: jjjjjjhsj\n10-15 t: trpttgcttttttbtt\n6-7 t: tttttltttttttt\n7-13 x: bxxcxxvxknqcxsx\n6-10 j: zjrrtjwxfjhhtcsktslf\n3-5 m: zjmms\n11-14 v: vvvvvvvkvvvvvvv\n1-2 c: ccch\n13-14 v: vvvsvvvvvvvvvv\n9-12 g: fgkgxgggcjdg\n4-6 t: ttpxtgntzwtx\n10-12 g: gggggggggkgbg\n1-3 l: llllw\n7-12 d: nddvldndjcdpdddz\n2-5 w: wwtlwwvdww\n6-11 c: fcccccccdcc\n12-19 s: sjsssssssssssshssss\n19-20 t: ttttttttttttttttttkf\n7-11 z: zpfgzczcxzmclzzz\n2-7 d: sddlpvdqzzlqfkjkbb\n2-7 k: dkmlkckm\n4" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day02 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.count(&valid_p1?/1)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.count(&valid_p2?/1)
+  end
+
+  defp valid_p1?({min, max, char, pw}) do
+    count =
+      pw
+      |> String.graphemes()
+      |> Enum.count(fn x -> x == char end)
+
+    count in min..max
+  end
+
+  defp valid_p2?({pos_a, pos_b, char, pw}) do
+    [pos_a, pos_b]
+    |> Enum.count(fn index ->
+      String.at(pw, index - 1) == char
+    end) == 1
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split(["-", " ", ": "])
+      |> then(fn [min, max, char, pw] ->
+        {
+          String.to_integer(min),
+          String.to_integer(max),
+          char,
+          pw
+        }
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day02, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+ {:module, Day02.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**How many passwords are valid according to their policies?**
+
+Your puzzle answer was `465`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day02.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+465
+```
+
+**How many passwords are valid according to the new interpretation of the policies?**
+
+Your puzzle answer was `294`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day02.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+294
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/2/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day02Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "1-3 a: abcde\n1-3 b: cdefg\n2-9 c: ccccccccc"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day02.part1(input) == 2
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day02.part2(input) == 1
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 831415
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day02.part1(input) end,
+    "Part 2" => fn -> Day02.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 2        619.08        1.62 ms     ±2.51%        1.60 ms        1.81 ms
+Part 1        581.85        1.72 ms     ±1.34%        1.71 ms        1.80 ms
+
+Comparison: 
+Part 2        619.08
+Part 1        581.85 - 1.06x slower +0.103 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 2         1.90 MB     ±0.00%        1.90 MB        1.90 MB
+Part 1         2.10 MB     ±0.00%        2.10 MB        2.10 MB
+
+Comparison: 
+Part 2         1.90 MB
+Part 1         2.10 MB - 1.11x memory usage +0.21 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 2        108.77 K
+Part 1        165.90 K - 1.53x reduction count +57.12 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```

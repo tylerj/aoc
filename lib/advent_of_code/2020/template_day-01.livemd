@@ -49,6 +49,7 @@ input = Kino.Input.textarea("Please paste your input file:")
 
 ```elixir
 input = input |> Kino.Input.read()
+# input = AdventOfCode.Input.get!("1", "2020")
 ```
 
 <!-- livebook:{"output":true} -->
@@ -78,11 +79,11 @@ defmodule Day01 do
   defmodule Input do
     def parse(input) when is_binary(input) do
       input
-      |> String.splitter("\n")
+      |> String.splitter("\n", trim: true)
       |> parse()
     end
 
-    def parse(input) when is_list(input) do
+    def parse(input) do
       Stream.map(input, &parse_line/1)
     end
 
