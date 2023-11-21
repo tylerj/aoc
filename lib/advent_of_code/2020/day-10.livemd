@@ -1,0 +1,420 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 10 - Advent of Code 2020
+
+```elixir
+# Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/10)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/10/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day_10.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-10.livemd)
+
+## Prompt
+
+### --- Day 10: Adapter Array ---
+
+Patched into the aircraft's data port, you discover weather forecasts of a massive tropical storm. Before you can figure out whether it will impact your vacation plans, however, your device suddenly turns off!
+
+Its battery is dead.
+
+You'll need to plug it in. There's only one problem: the charging outlet near your seat produces the wrong number of **jolts**. Always prepared, you make a list of all of the joltage adapters in your bag.
+
+Each of your joltage adapters is rated for a specific **output joltage** (your puzzle input). Any given adapter can take an input `1`, `2`, or `3` jolts **lower** than its rating and still produce its rated output joltage.
+
+In addition, your device has a built-in joltage adapter rated for **`3` jolts higher** than the highest-rated adapter in your bag. (If your adapter list were `3`, `9`, and `6`, your device's built-in adapter would be rated for `12` jolts.)
+
+Treat the charging outlet near your seat as having an effective joltage rating of `0`.
+
+Since you have some time to kill, you might as well test all of your adapters. Wouldn't want to get to your resort and realize you can't even charge your device!
+
+If you **use every adapter in your bag** at once, what is the distribution of joltage differences between the charging outlet, the adapters, and your device?
+
+For example, suppose that in your bag, you have adapters with the following joltage ratings:
+
+```
+16
+10
+15
+5
+1
+11
+7
+19
+6
+12
+4
+```
+
+With these adapters, your device's built-in joltage adapter would be rated for `19 + 3 = 22` jolts, 3 higher than the highest-rated adapter.
+
+Because adapters can only connect to a source 1-3 jolts lower than its rating, in order to use every adapter, you'd need to choose them like this:
+
+* The charging outlet has an effective rating of `0` jolts, so the only adapters that could connect to it directly would need to have a joltage rating of `1`, `2`, or `3` jolts. Of these, only one you have is an adapter rated `1` jolt (difference of 1).
+* From your `1`-jolt rated adapter, the only choice is your `4`-jolt rated adapter (difference of 3).
+* From the `4`-jolt rated adapter, the adapters rated `5`, `6`, or `7` are valid choices. However, in order to not skip any adapters, you have to pick the adapter rated `5` jolts (difference of 1).
+* Similarly, the next choices would need to be the adapter rated `6` and then the adapter rated `7` (with difference of 1 and 1).
+* The only adapter that works with the `7`-jolt rated adapter is the one rated `10` jolts (difference of 3).
+* From `10`, the choices are `11` or `12`; choose `11` (difference of 1) and then `12` (difference of 1).
+* After `12`, only valid adapter has a rating of `15` (difference of 3), then `16` (difference of 1), then `19` (difference of 3).
+* Finally, your device's built-in adapter is always 3 higher than the highest adapter, so its rating is `22` jolts (always a difference of 3).
+* In this example, when using every adapter, there are 7 differences of 1 jolt and 5 differences of 3 jolts.
+
+Here is a larger example:
+
+```
+28
+33
+18
+42
+31
+14
+46
+20
+48
+47
+24
+23
+49
+45
+19
+38
+39
+11
+1
+32
+25
+35
+8
+17
+7
+9
+4
+2
+34
+10
+3
+```
+
+In this larger example, in a chain that uses all of the adapters, there are `22` differences of `1` jolt and `10` differences of `3` jolts.
+
+Find a chain that uses all of your adapters to connect the charging outlet to your device's built-in adapter and count the joltage differences between the charging outlet, the adapters, and your device. **What is the number of 1-jolt differences multiplied by the number of 3-jolt differences?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/10/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+To completely determine whether you have enough adapters, you'll need to figure out how many different ways they can be arranged. Every arrangement needs to connect the charging outlet to your device. The previous rules about when adapters can successfully connect still apply.
+
+The first example above (the one that starts with 16, 10, 15) supports the following arrangements:
+
+```
+(0), 1, 4, 5, 6, 7, 10, 11, 12, 15, 16, 19, (22)
+(0), 1, 4, 5, 6, 7, 10, 12, 15, 16, 19, (22)
+(0), 1, 4, 5, 7, 10, 11, 12, 15, 16, 19, (22)
+(0), 1, 4, 5, 7, 10, 12, 15, 16, 19, (22)
+(0), 1, 4, 6, 7, 10, 11, 12, 15, 16, 19, (22)
+(0), 1, 4, 6, 7, 10, 12, 15, 16, 19, (22)
+(0), 1, 4, 7, 10, 11, 12, 15, 16, 19, (22)
+(0), 1, 4, 7, 10, 12, 15, 16, 19, (22)
+```
+
+(The charging outlet and your device's built-in adapter are shown in parentheses.) Given the adapters from the first example, the total number of arrangements that connect the charging outlet to your device is `8`.
+
+The second example above (the one that starts with 28, 33, 18) has many arrangements. Here are a few:
+
+```
+(0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+32, 33, 34, 35, 38, 39, 42, 45, 46, 47, 48, 49, (52)
+
+(0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+32, 33, 34, 35, 38, 39, 42, 45, 46, 47, 49, (52)
+
+(0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+32, 33, 34, 35, 38, 39, 42, 45, 46, 48, 49, (52)
+
+(0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+32, 33, 34, 35, 38, 39, 42, 45, 46, 49, (52)
+
+(0), 1, 2, 3, 4, 7, 8, 9, 10, 11, 14, 17, 18, 19, 20, 23, 24, 25, 28, 31,
+32, 33, 34, 35, 38, 39, 42, 45, 47, 48, 49, (52)
+
+(0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+46, 48, 49, (52)
+
+(0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+46, 49, (52)
+
+(0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+47, 48, 49, (52)
+
+(0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+47, 49, (52)
+
+(0), 3, 4, 7, 10, 11, 14, 17, 20, 23, 25, 28, 31, 34, 35, 38, 39, 42, 45,
+48, 49, (52)
+```
+
+In total, this set of adapters can connect the charging outlet to your device in `19208` distinct arrangements.
+
+You glance back down at your bag and try to remember why you brought so many adapters; there must be **more than a trillion** valid ways to arrange them! Surely, there must be an efficient way to count the arrangements.
+
+**What is the total number of distinct ways you can arrange the adapters to connect the charging outlet to your device?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/10/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+input = AdventOfCode.Input.get!(10, 2020)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"103\n131\n121\n151\n118\n12\n7\n2\n90\n74\n160\n58\n15\n83\n153\n140\n166\n1\n148\n33\n165\n39\n100\n135\n68\n77\n25\n9\n54\n94\n101\n55\n141\n22\n97\n35\n57\n117\n102\n64\n109\n114\n56\n51\n125\n82\n154\n142\n155\n45\n75\n158\n120\n5\n19\n61\n34\n128\n106\n88\n84\n137\n96\n136\n27\n6\n21\n89\n69\n162\n112\n127\n119\n161\n38\n42\n134\n20\n81\n48\n73\n87\n26\n95\n146\n113\n76\n32\n70\n8\n18\n67\n124\n80\n93\n29\n126\n147\n28\n152\n145\n159\n"
+```
+
+## Solution
+
+```elixir
+defmodule Day10 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.sort()
+    |> Enum.reduce({0, 0, 1}, fn b, {a, one, three} ->
+      cond do
+        a + 1 == b -> {b, one + 1, three}
+        a + 3 == b -> {b, one, three + 1}
+      end
+    end)
+    |> then(fn {_, one, three} -> one * three end)
+  end
+
+  def part2(input) do
+    {last, list} =
+      parse(input)
+      |> Enum.sort()
+      |> List.pop_at(-1)
+
+    [0 | list]
+    |> Enum.reverse()
+    |> Enum.reduce(%{last => 1}, fn x, map ->
+      value =
+        Enum.reduce(3..1, 0, fn y, sum ->
+          sum + Map.get(map, x + y, 0)
+        end)
+
+      Map.put(map, x, value)
+    end)
+    |> Map.fetch!(0)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.to_integer(line)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day10, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+ {:module, Day10.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**What is the number of 1-jolt differences multiplied by the number of 3-jolt differences?**
+
+Your puzzle answer was `2310`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day10.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+2310
+```
+
+**What is the total number of distinct ways you can arrange the adapters to connect the charging outlet to your device?**
+
+Your puzzle answer was `64793042714624`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day10.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+64793042714624
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/10/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day10Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input1: "16\n10\n15\n5\n1\n11\n7\n19\n6\n12\n4",
+      input2:
+        "28\n33\n18\n42\n31\n14\n46\n20\n48\n47\n24\n23\n49\n45\n19\n38\n39\n11\n1\n32\n25\n35\n8\n17\n7\n9\n4\n2\n34\n10\n3"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input1: input1, input2: input2} do
+      assert Day10.part1(input1) == 35
+      assert Day10.part1(input2) == 220
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input1: input1, input2: input2} do
+      assert Day10.part2(input1) == 8
+      assert Day10.part2(input2) == 19208
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 779649
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day10.part1(input) end,
+    "Part 2" => fn -> Day10.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1       62.70 K       15.95 μs    ±29.13%       14.88 μs       23.42 μs
+Part 2       38.89 K       25.71 μs     ±9.26%       24.88 μs       30.92 μs
+
+Comparison: 
+Part 1       62.70 K
+Part 2       38.89 K - 1.61x slower +9.76 μs
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1        46.77 KB
+Part 2        76.58 KB - 1.64x memory usage +29.80 KB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1          2.76 K
+Part 2          4.60 K - 1.67x reduction count +1.84 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```

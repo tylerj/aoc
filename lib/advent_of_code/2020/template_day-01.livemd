@@ -49,7 +49,7 @@ input = Kino.Input.textarea("Please paste your input file:")
 
 ```elixir
 input = input |> Kino.Input.read()
-# input = AdventOfCode.Input.get!("1", "2020")
+# input = AdventOfCode.Input.get!(1, 2020)
 ```
 
 <!-- livebook:{"output":true} -->
