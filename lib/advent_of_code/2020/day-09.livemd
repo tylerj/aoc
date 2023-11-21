@@ -1,0 +1,379 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 9 - Advent of Code 2020
+
+```elixir
+# Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/9)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/9/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day_09.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-09.livemd)
+
+## Prompt
+
+### --- Day 9: Encoding Error ---
+
+With your neighbor happily enjoying their video game, you turn your attention to an open data port on the little screen in the seat in front of you.
+
+Though the port is non-standard, you manage to connect it to your computer through the clever use of several paperclips. Upon connection, the port outputs a series of numbers (your puzzle input).
+
+The data appears to be encrypted with the eXchange-Masking Addition System (XMAS) which, conveniently for you, is an old cypher with an important weakness.
+
+XMAS starts by transmitting a **preamble** of 25 numbers. After that, each number you receive should be the sum of any two of the 25 immediately previous numbers. The two numbers will have different values, and there might be more than one such pair.
+
+For example, suppose your preamble consists of the numbers `1` through `25` in a random order. To be valid, the next number must be the sum of two of those numbers:
+
+* `26` would be a **valid** next number, as it could be `1` plus `25` (or many other pairs, like `2` and `24`).
+* `49` would be a **valid** next number, as it is the sum of `24` and `25`.
+* `100` would **not** be valid; no two of the previous 25 numbers sum to `100`.
+* `50` would also **not** be valid; although `25` appears in the previous 25 numbers, the two numbers in the pair must be different.
+
+Suppose the 26th number is `45`, and the first number (no longer an option, as it is more than 25 numbers ago) was `20`. Now, for the next number to be valid, there needs to be some pair of numbers among `1-19`, `21-25`, or `45` that add up to it:
+
+* `26` would still be a **valid** next number, as 1 and 25 are still within the previous 25 numbers.
+* `65` would **not** be valid, as no two of the available numbers sum to it.
+* `64` and `66` would both be **valid**, as they are the result of `19+45` and `21+45` respectively.
+
+Here is a larger example which only considers the previous 5 numbers (and has a preamble of length 5):
+
+```
+35
+20
+15
+25
+47
+40
+62
+55
+65
+95
+102
+117
+150
+182
+127
+219
+299
+277
+309
+576
+```
+
+In this example, after the 5-number preamble, almost every number is the sum of two of the previous 5 numbers; the only number that does not follow this rule is `127`.
+
+The first step of attacking the weakness in the XMAS data is to find the first number in the list (after the preamble) which is not the sum of two of the 25 numbers before it. **What is the first number that does not have this property?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/9/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+The final step in breaking the XMAS encryption relies on the invalid number you just found: you must **find a contiguous set of at least two numbers** in your list which sum to the invalid number from step 1.
+
+Again consider the above example:
+
+```
+35
+20
+15
+25
+47
+40
+62
+55
+65
+95
+102
+117
+150
+182
+127
+219
+299
+277
+309
+576
+```
+
+In this list, adding up all of the numbers from 15 through 40 produces the invalid number from step 1, `127`. (Of course, the contiguous set of numbers in your actual list might be much longer.)
+
+To find the encryption weakness, add together the smallest and largest number in this contiguous range; in this example, these are `15` and `47`, producing `62`.
+
+**What is the encryption weakness in your XMAS-encrypted list of numbers?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/9/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+input = AdventOfCode.Input.get!(9, 2020)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"9\n1\n39\n30\n43\n2\n41\n50\n36\n21\n8\n37\n16\n13\n18\n4\n40\n33\n25\n11\n47\n10\n38\n29\n14\n53\n3\n49\n6\n31\n5\n12\n15\n56\n43\n57\n7\n8\n26\n9\n13\n16\n19\n22\n17\n39\n11\n10\n21\n24\n20\n14\n18\n63\n23\n25\n27\n28\n30\n33\n15\n29\n45\n32\n26\n31\n34\n35\n36\n53\n62\n60\n37\n41\n38\n47\n39\n68\n40\n46\n42\n43\n44\n51\n48\n91\n71\n67\n57\n115\n75\n69\n72\n73\n76\n85\n77\n78\n79\n114\n95\n143\n82\n84\n120\n86\n92\n99\n105\n123\n124\n126\n142\n129\n145\n152\n159\n148\n149\n219\n361\n157\n161\n163\n166\n176\n206\n234\n178\n304\n410\n324\n204\n228\n247\n253\n330\n271\n423\n293\n297\n306\n481\n487\n434\n323\n391\n327\n329\n342\n354\n499\n382\n475\n432\n451\n457\n497\n550\n500\n774\n564\n568\n665\n590\n603\n1064\n650\n681\n677\n652\n656\n1149\n671\n696\n736\n932\n833\n883\n1140\n997\n954\n1047\n1678\n1068\n1342\n1132\n1662\n1240\n1584\n1253\n1302\n1306\n1329\n1323\n1308\n1327\n2631\n2287\n1432\n2044\n1765\n1716\n2561\n1951\n3259\n2734\n2115\n2200\n2308\n2459\n2372\n3612\n4036\n2555\n2559\n2637\n2614\n5328\n3995\n2635\n2759\n3148\n6151\n3383\n3481\n3667\n4066\n4259\n4315\n8711\n4487\n4423\n4508\n5907\n6454\n8682\n8767\n5114\n9013\n6864\n5251\n17695\n6950\n5394\n7143\n6142\n7642\n15631\n9759\n7796\n13026\n12893\n8802\n8738\n8910\n12857\n8931\n10365\n15910\n12596\n10508\n12064\n13190\n10645\n11536\n11393\n12344\n14880\n26216\n13285\n14944\n22023\n19103\n19439\n16534\n17648\n17540\n17669\n17841\n35510\n20467\n19296\n21010\n24408\n21153\n23737\n22038\n23930\n22181\n22929\n24678\n25629\n34182\n53478\n30825\n36836\n47607\n34203\n38572\n40449\n35188\n35209\n84443\n54755\n39763\n40306\n79433\n55335\n43191\n44967\n44219\n45110\n68897\n75408\n69412\n64441\n56454\n91591\n65028\n67661\n69391\n70397\n72775\n122996\n74951\n123652\n117742\n109247\n82954\n80069\n111789\n203721\n87410\n88158\n182186\n143864\n101564\n125351\n329072\n126851\n124115\n121482\n132689\n134419\n197811\n139788\n143172\n210811\n155020\n157905\n204436\n181633\n168227\n379038\n167479\n175568\n188974\n220099\n280371\n223046\n281871\n293578\n349897\n261270\n245597\n254171\n338855\n290594\n359456\n310651\n328762\n298192\n323247\n416290\n439776\n335706\n436838\n412020\n581303\n343047\n364542\n409073\n624918\n578563\n468643\n698311\n499768\n582933\n536191\n755067\n670461\n621439\n588786\n608843\n626954\n737968\n633898\n848849\n967965\n957145\n752120\n776562\n707589\n931833\n811690\n773615\n908841\n1047206\n968411\n1004834\n1757690\n1088554\n1119124\n1553272\n1482151\n1222684\n1937403\n1707910\n1858896\n1584099\n1341487\n1682456\n1459709\n2020387\n1588252\n1481204\n1484151\n1519279\n1585305\n3072403\n1913675\n2131525\n3772571\n1973245\n3068250\n2207678\n2311238\n3522708\n2703888\n2564171\n3227189\n2801196\n2822691\n2860766\n2825638\n2926792\n4846025\n2940913\n3003430\n4556554\n2965355\n3397826\n3104584\n3498980\n3886920\n4121353\n6813712\n5434867\n4875409\n4911566\n5033316\n5015126\n5365367\n5268059\n5386862\n5623887\n5965350\n6045497\n7620333\n5752430\n8008273\n7950609\n7086708\n8119710\n6502410\n6069939\n6603564\n10663996\n7385900\n9154979\n8996762\n9890535\n9786975\n12995119\n12010847\n15200476\n10380493\n12888392\n12115436\n11432359\n11376317\n11717780\n16382662\n11822369\n12254840\n19501336\n19535472\n12572349\n22778927\n32530591\n20271028\n17979881\n21219334\n30911789\n25110555\n29426007\n21812852\n20167468\n21756810\n22098273\n22202862\n37481217\n41924278\n23491753\n22808676\n41292282\n23540149\n24827189\n32073685\n30234721\n50053566\n30552230\n43090436\n54287401\n38147349\n42369301\n55461098\n44015714\n105514664\n41980320\n44565486\n42265741\n42370330\n43855083\n44301135\n81237785\n67346836\n46300429\n96656702\n85996034\n48367338\n53774870\n109748499\n72922560\n60786951\n68699579\n84739631\n86831227\n91922219\n80127669\n119222989\n84246061\n84350650\n85835403\n189876168\n84636071\n86120824\n97629953\n88156218\n90601564\n94667767\n100075299\n155530806\n102142208\n122474449\n109154289\n138125520\n151388515\n172666630\n145423022\n148827248\n164373730\n189281958\n174952214\n164478319\n186492858\n187977611\n229773672\n178757782\n170756895\n172792289\n174277042\n206784242\n185269331\n334288588\n194743066\n209229588\n296885274\n224616657\n231628738\n247279809\n289514035\n294250270\n316179917\n319700064\n313200978\n328852049\n335235214\n389094976\n337270608\n398893699\n343549184\n397408946\n379986483\n358061620\n359546373\n369020108\n380012397\n394498919\n419359723\n514130692\n478908547\n613950334\n471896466\n521142773\n563459726\n583764305\n607451248\n686913669\n654935278\n642053027\n872192312\n672505822\n973496707\n680819792\n701610804\n1034921761\n717607993\n727081728\n728566481\n1235965548\n749032505\n774511316\n915641692\n891256189\n1608864182\n1264584097\n1085846800\n993039239\n1262386526\n125627" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day09 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input, size) do
+    input
+    |> parse()
+    |> Stream.chunk_every(size + 1, 1, :discard)
+    |> Stream.map(&Enum.reverse/1)
+    |> Enum.find_value(fn [h | t] ->
+      if has_pair_sum?(h, t), do: nil, else: h
+    end)
+  end
+
+  defp has_pair_sum?(sum, list) do
+    Enum.any?(list, fn x ->
+      Enum.any?(list, fn y ->
+        y != x and x + y == sum
+      end)
+    end)
+  end
+
+  def part2(input, sum) do
+    input
+    |> parse()
+    |> Enum.to_list()
+    |> find_sum_list(sum)
+  end
+
+  defp find_sum_list([h | t], sum) do
+    case do_find(t, [h], h, sum) do
+      nil ->
+        find_sum_list(t, sum)
+
+      result ->
+        # IO.inspect(Enum.sum(result), label: "SUM")
+        # result
+        Enum.min(result) + Enum.max(result)
+    end
+  end
+
+  defp do_find(_, _, total, target) when total > target,
+    do: nil
+
+  defp do_find([h | t], list, total, target) when total < target,
+    do: do_find(t, [h | list], total + h, target)
+
+  defp do_find(_, [_], target, target),
+    do: nil
+
+  defp do_find(_, list, target, target), do: list
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.to_integer(line)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day09, <<70, 79, 82, 49, 0, 0, 14, ...>>,
+ {:module, Day09.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**What is the first number that does not have this property?**
+
+Your puzzle answer was `1492208709`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day09.part1(input, 25)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1492208709
+```
+
+**What is the encryption weakness in your XMAS-encrypted list of numbers?**
+
+Your puzzle answer was `238243506`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day09.part2(
+  input,
+  Day09.part1(input, 25)
+)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+238243506
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/9/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day09Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "35\n20\n15\n25\n47\n40\n62\n55\n65\n95\n102\n117\n150\n182\n127\n219\n299\n277\n309\n576"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day09.part1(input, 5) == 127
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day09.part2(
+               input,
+               Day09.part1(input, 5)
+             ) == 62
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 682414
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day09.part1(input, 25) end,
+    "Part 2" => fn -> Day09.part2(input, 1_492_208_709) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 2        2.39 K        0.42 ms     ±7.31%        0.41 ms        0.54 ms
+Part 1        0.45 K        2.24 ms     ±2.90%        2.23 ms        2.40 ms
+
+Comparison: 
+Part 2        2.39 K
+Part 1        0.45 K - 5.35x slower +1.82 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 2         2.44 MB
+Part 1         1.61 MB - 0.66x memory usage -0.82756 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 2        161.87 K
+Part 1        866.90 K - 5.36x reduction count +705.03 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
