@@ -1,0 +1,366 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 12 - Advent of Code 2020
+
+```elixir
+# Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2020/day/12)
+* [AoC Puzzle Input](https://adventofcode.com/2020/day/12/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day_12.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2020/day-12.livemd)
+
+## Prompt
+
+### --- Day 12: Rain Risk ---
+
+Your ferry made decent progress toward the island, but the storm came in faster than anyone expected. The ferry needs to take **evasive actions**!
+
+Unfortunately, the ship's navigation computer seems to be malfunctioning; rather than giving a route directly to safety, it produced extremely circuitous instructions. When the captain uses the [PA system](https://en.wikipedia.org/wiki/Public_address_system) to ask if anyone can help, you quickly volunteer.
+
+The navigation instructions (your puzzle input) consists of a sequence of single-character **actions** paired with integer input **values**. After staring at them for a few minutes, you work out what they probably mean:
+
+* Action `N` means to move **north** by the given value.
+* Action `S` means to move **south** by the given value.
+* Action `E` means to move **east** by the given value.
+* Action `W` means to move **west** by the given value.
+* Action `L` means to turn **left** the given number of degrees.
+* Action `R` means to turn **right** the given number of degrees.
+* Action `F` means to move **forward** by the given value in the direction the ship is currently facing.
+
+The ship starts by facing **east**. Only the `L` and `R` actions change the direction the ship is facing. (That is, if the ship is facing east and the next instruction is `N10`, the ship would move north 10 units, but would still move east if the following action were `F`.)
+
+For example:
+
+```
+F10
+N3
+F7
+R90
+F11
+```
+
+These instructions would be handled as follows:
+
+* `F10` would move the ship 10 units east (because the ship starts by facing east) to `east 10, north 0`.
+* `N3` would move the ship 3 units north to `east 10, north 3`.
+* `F7` would move the ship another 7 units east (because the ship is still facing east) to `east 17, north 3`.
+* `R90` would cause the ship to turn right by 90 degrees and face south; it remains at `east 17, north 3`.
+* `F11` would move the ship 11 units south to `east 17, south 8`.
+
+At the end of these instructions, the ship's Manhattan distance (sum of the absolute values of its east/west position and its north/south position) from its starting position is `17 + 8 = 25`.
+
+Figure out where the navigation instructions lead. **What is the Manhattan distance between that location and the ship's starting position?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2020/day/12/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Before you can give the destination to the captain, you realize that the actual action meanings were printed on the back of the instructions the whole time.
+
+Almost all of the actions indicate how to move a **waypoint** which is relative to the ship's position:
+
+* Action `N` means to move the waypoint **north** by the given value.
+* Action `S` means to move the waypoint **south** by the given value.
+* Action `E` means to move the waypoint **east** by the given value.
+* Action `W` means to move the waypoint **west** by the given value.
+* Action `L` means to rotate the waypoint around the ship **left (counter-clockwise)** the given number of degrees.
+* Action `R` means to rotate the waypoint around the ship **right (clockwise)** the given number of degrees.
+* Action `F` means to move **forward** to the waypoint a number of times equal to the given value.
+
+The waypoint starts `10 units east and 1 unit north` relative to the ship. The waypoint is relative to the ship; that is, if the ship moves, the waypoint moves with it.
+
+For example, using the same instructions as above:
+
+* `F10` moves the ship to the waypoint 10 times (a total of **100 units east and 10 units north**), leaving the ship at `east 100, north 10`. The waypoint stays 10 units east and 1 unit north of the ship.
+* `N3` moves the waypoint 3 units north to **10 units east and 4 units north** of the ship. The ship remains at `east 100, north 10`.
+* `F7` moves the ship to the waypoint 7 times (a total of **70 units east and 28 units north**), leaving the ship at `east 170, north 38`. The waypoint stays `10 units east and 4 units north` of the ship.
+* `R90` rotates the waypoint around the ship clockwise 90 degrees, moving it to **4 units east and 10 units south** of the ship. The ship remains at `east 170, north 38`.
+* `F11` moves the ship to the waypoint 11 times (a total of **44 units east and 110 units south**), leaving the ship at `east 214, south 72`. The waypoint stays **4 units east and 10 units south** of the ship.
+
+After these operations, the ship's Manhattan distance from its starting position is `214 + 72 = 286`.
+
+Figure out where the navigation instructions actually lead. **What is the Manhattan distance between that location and the ship's starting position?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/12/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+input = AdventOfCode.Input.get!(12, 2020)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"F37\nE1\nS5\nR180\nS1\nF37\nL180\nF38\nS1\nE2\nL90\nF48\nN1\nS5\nE2\nF53\nE3\nL90\nF37\nS3\nF65\nL90\nF78\nW3\nS4\nL90\nF54\nF61\nE5\nS1\nL90\nW2\nL90\nN3\nF63\nS3\nE3\nF83\nR90\nS2\nW2\nS5\nE1\nR90\nW1\nR90\nW3\nF52\nE1\nS4\nE1\nE4\nR90\nE4\nF94\nN5\nF56\nF17\nL180\nW2\nS2\nR90\nS3\nF49\nR90\nN4\nE1\nN3\nF49\nR90\nS2\nE3\nF29\nE2\nR270\nE5\nL90\nW3\nF24\nE2\nS2\nL90\nF46\nN1\nF65\nE1\nN4\nE5\nR90\nS4\nL90\nF51\nR90\nL180\nW3\nR90\nL270\nW4\nS1\nW1\nL180\nS1\nF20\nE5\nL180\nN2\nF11\nR180\nN5\nE2\nN3\nL90\nF64\nN3\nW5\nL90\nW5\nS2\nF51\nL90\nF78\nW1\nR180\nF84\nR90\nW3\nL90\nF59\nS3\nR90\nR90\nE2\nF29\nR90\nF70\nS1\nF52\nL90\nN4\nE1\nF81\nW3\nF81\nL90\nE2\nS1\nF13\nW2\nN4\nE1\nF76\nS2\nF28\nN4\nW2\nN1\nR90\nS5\nR90\nF81\nW5\nE1\nL90\nW3\nF12\nL90\nW3\nN5\nF35\nE4\nL90\nW4\nS1\nE1\nF86\nN2\nE3\nF29\nL90\nN2\nF24\nR90\nF76\nR90\nE1\nR90\nE2\nN1\nF85\nR90\nN4\nF62\nR270\nS3\nW2\nL90\nN3\nF36\nR180\nN5\nF12\nR90\nF39\nE3\nN2\nR90\nW5\nF5\nW4\nL90\nF45\nR180\nF88\nE3\nF70\nL90\nN2\nR90\nF21\nE3\nR90\nS4\nF92\nL90\nN4\nF87\nN2\nW5\nN3\nW1\nS2\nE2\nL90\nF26\nW5\nF96\nW2\nR180\nE3\nF71\nR180\nN1\nE5\nL90\nS5\nF73\nS2\nE3\nR90\nS5\nF23\nN5\nR90\nE4\nL90\nS5\nR90\nE1\nN5\nE4\nF79\nS1\nF22\nR90\nF16\nW4\nF23\nL180\nF6\nN5\nF51\nS3\nR90\nN1\nR90\nN2\nF6\nE4\nF17\nR90\nF89\nN3\nR180\nF42\nF64\nR180\nW2\nF88\nE3\nF54\nE3\nS3\nE4\nF66\nL180\nS5\nW3\nF47\nE3\nR90\nS2\nF41\nR180\nF83\nN1\nF8\nW5\nN5\nW5\nR180\nF71\nN5\nF46\nL90\nN1\nL90\nW5\nN4\nF22\nN2\nL90\nS4\nF65\nN3\nW4\nS5\nS3\nF93\nE4\nF78\nR90\nS5\nW5\nS1\nF20\nS1\nW3\nF14\nL90\nE5\nS1\nN2\nF48\nF38\nW4\nF61\nN3\nL270\nW4\nL180\nF7\nR180\nS2\nF3\nL180\nF10\nE1\nN2\nF45\nN1\nW1\nF48\nW2\nF53\nR90\nR90\nF23\nL180\nF24\nN4\nL90\nW1\nS5\nF5\nL90\nN1\nF45\nS4\nW5\nL180\nE4\nR90\nS1\nE4\nS4\nF16\nN3\nL90\nF94\nR90\nN1\nF4\nS3\nE4\nS3\nR270\nF35\nE4\nN1\nE4\nR90\nN5\nF4\nE4\nF28\nR90\nS1\nW4\nR90\nF36\nR90\nN2\nS4\nR90\nF94\nR270\nF98\nS2\nF66\nR90\nF43\nS4\nW5\nF1\nR90\nL90\nW1\nL90\nF82\nE4\nF82\nR90\nN5\nF49\nF82\nN5\nF92\nS2\nR180\nN1\nF54\nW2\nR90\nN4\nS1\nF3\nR180\nE1\nF45\nN4\nE1\nF67\nF46\nS1\nS1\nF5\nR180\nF78\nN1\nF22\nL180\nF37\nE1\nR90\nW3\nF59\nE4\nF16\nL90\nF90\nW4\nR90\nE4\nL180\nN4\nW5\nF88\nS2\nL90\nF58\nW1\nS1\nW3\nF75\nE5\nR90\nE2\nF73\nR90\nF1\nR90\nE5\nL90\nW2\nF20\nN1\nE3\nF98\nS4\nF95\nS4\nR90\nW5\nF65\nW2\nN4\nR90\nF57\nW1\nR90\nN2\nF65\nN1\nL90\nN3\nW2\nF81\nR90\nF18\nF48\nE2\nF56\nR180\nW2\nS1\nW1\nF34\nE2\nF17\nE4\nN2\nR90\nW3\nF63\nN3\nF74\nR90\nW1\nN1\nL90\nS5\nW5\nF79\nR270\nF65\nE1\nS1\nF8\nL180\nW2\nR90\nS5\nW5\nN4\nR180\nS5\nL90\nN1\nW5\nR90\nF8\nW3\nF4\nW2\nS2\nR90\nN2\nL90\nS4\nE5\nF32\nE2\nR90\nF52\nR90\nF85\nE2\nS1\nF34\nN5\nF94\nR90\nN2\nF81\nR90\nS3\nW3\nR90\nE4\nL90\nN2\nW5\nN1\nF98\nF67\nL90\nN5\nL180\nR180\nS1\nR180\nW4\nL90\nF56\nE5\nR90\nF74\nF18\nF62\nE4\nF80\nL180\nS1\nR90\nF29\nE1\nN3\nR270\nW2\nL90\nN1\nE5\nF41\nL90\nN5\nE5\nF100\nL180\nF93\nN2\nE3\nN5\nE5\nF81\nN3\nF6\nE1\nS2\nF34\nS5\nE2\nF50\nW2\nN3\nF37\nW1\nN4\nR180\nS1\nE3\nS3\nE5\nR90\nF29\nW5\nL90\nF20\nN5\nN4\nW2\nR90\nE5\nF32\nL90\nF16\nR180\nW1\nN4\nF68\nR180\nF75\nW1\nS3\nW4\nS5\nW2\nS3\nL270\nF17\nR180\nW5\nF84\nE1\nF38\nL90\nW4\nF77\nF7\nL90\nS1\nL90\nE2\nN1\nF36\nN1\nF91\nN3\nF38\nS5\nF58\nE1\nF83\nL90\nW1\nL180\nN4\nW1\nS2\nL180\nE1\nF1\nS2\nF27\nE3\nR90\nE1\nR90\nF17\nE2\nS4\nR90\nN5\nF98\nS2\nL90\nW3\nR90\nF19\nR90\nF66\nW3\nN1\nE2\nN1\nL180\nF33\nW1\nL90\nF51\nW3\nN2\nF48\nE4\nS4\nL90\nN3\nE3\nR90\nS3\nE4\nR180\nF97\nF15\nS1\nR180\nF81\nS5\nE2\nL90\nF49\nW1\nF30\nW5\nF30\nW2\nF40\nW5\nF55\nN3\nE4\nS1\nE3\nN4\nL90\nF20\nS5\nF33\nN4\nE1\nN5\nL90\nN4\nW1\nF7\nE1\nF85\nW5\nL180\nW5\nF40\n"
+```
+
+## Solution
+
+```elixir
+defmodule Day12 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.reduce({"E", {0, 0}}, &apply_line/2)
+    |> manhattan_distance()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.to_list()
+    |> Enum.reduce({{0, 0}, {10, 1}}, &apply_line/2)
+    |> manhattan_distance()
+  end
+
+  @dirs ~w(N S E W)
+
+  defp manhattan_distance({dir, {x, y}}) when dir in @dirs, do: abs(x) + abs(y)
+  defp manhattan_distance({{x, y}, {_wx, _wy}}), do: abs(x) + abs(y)
+
+  defp apply_line({"N", val}, {dir, {x, y}}), do: {dir, {x, y + val}}
+  defp apply_line({"S", val}, {dir, {x, y}}), do: {dir, {x, y - val}}
+  defp apply_line({"E", val}, {dir, {x, y}}), do: {dir, {x + val, y}}
+  defp apply_line({"W", val}, {dir, {x, y}}), do: {dir, {x - val, y}}
+
+  defp apply_line({"L", val}, {dir, {x, y}}) when dir in @dirs,
+    do: {turn_left_n_times(dir, div(val, 90)), {x, y}}
+
+  defp apply_line({"R", val}, {dir, {x, y}}) when dir in @dirs,
+    do: {turn_left_n_times(dir, div(360 - val, 90)), {x, y}}
+
+  defp apply_line({"F", val}, {dir, {x, y}}) when dir in @dirs,
+    do: apply_line({dir, val}, {dir, {x, y}})
+
+  defp apply_line({"L", val}, {{x, y}, {wx, wy}}),
+    do: {{x, y}, rotate_left_n_times({wx, wy}, div(val, 90))}
+
+  defp apply_line({"R", val}, {{x, y}, {wx, wy}}),
+    do: {{x, y}, rotate_left_n_times({wx, wy}, div(360 - val, 90))}
+
+  defp apply_line({"F", val}, {{_x, _y} = xy, {wx, wy}}) do
+    new_xy =
+      Enum.reduce(1..val, xy, fn _, {x, y} ->
+        {x + wx, y + wy}
+      end)
+
+    {new_xy, {wx, wy}}
+  end
+
+  defp turn_left_n_times(dir, n),
+    do: Enum.reduce(1..n, dir, fn _, acc -> turn_left(acc) end)
+
+  defp turn_left("N"), do: "W"
+  defp turn_left("W"), do: "S"
+  defp turn_left("S"), do: "E"
+  defp turn_left("E"), do: "N"
+
+  defp rotate_left_n_times(xy, n) do
+    Enum.reduce(1..n, xy, fn _, {x, y} -> {-y, x} end)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(<<action::binary-size(1), value::binary>>) do
+      {action, String.to_integer(value)}
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day12, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+ {:module, Day12.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Figure out where the navigation instructions lead. **What is the Manhattan distance between that location and the ship's starting position?**
+
+Your puzzle answer was `2228`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day12.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+2228
+```
+
+Figure out where the navigation instructions actually lead. **What is the Manhattan distance between that location and the ship's starting position?**
+
+Your puzzle answer was `42908`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day12.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+42908
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2020) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2020/day/12/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day12Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "F10\nN3\nF7\nR90\nF11"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day12.part1(input) == 25
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day12.part2(input) == 286
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 454901
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day12.part1(input) end,
+    "Part 2" => fn -> Day12.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        9.99 K      100.05 μs    ±12.09%       98.96 μs      113.33 μs
+Part 2        5.59 K      178.86 μs    ±16.16%      171.91 μs      319.06 μs
+
+Comparison: 
+Part 1        9.99 K
+Part 2        5.59 K - 1.79x slower +78.81 μs
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1       392.66 KB
+Part 2       661.63 KB - 1.68x memory usage +268.96 KB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1         16.26 K
+Part 2         47.93 K - 2.95x reduction count +31.67 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
