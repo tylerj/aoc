@@ -1,0 +1,41 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day X - Advent of Code - 2023
+
+```elixir
+Mix.install([:kino])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+""
+```
+
+## Solution
+
+```elixir
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
