@@ -3,7 +3,7 @@
 # Day 13 - Advent of Code 2020
 
 ```elixir
-Mix.install([:kino, :benchee])
+# Mix.install([:kino, :benchee])
 ```
 
 ## Links
@@ -73,9 +73,72 @@ To begin, [get your puzzle input](https://adventofcode.com/2020/day/13/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+The shuttle company is running a contest: one gold coin for anyone that can find the earliest timestamp such that the first bus ID departs at that time and each subsequent listed bus ID departs at that subsequent minute. (The first line in your input is no longer relevant.)
 
-**QUESTION TWO?**
+For example, suppose you have the same list of bus IDs as above:
+
+```
+7,13,x,x,59,x,31,19
+```
+
+An x in the schedule means there are no constraints on what bus IDs must depart at that time.
+
+This means you are looking for the earliest timestamp (called t) such that:
+
+* Bus ID `7` departs at timestamp `t`.
+* Bus ID `13` departs one minute after timestamp `t`.
+* There are no requirements or restrictions on departures at two or three minutes after timestamp `t`.
+* Bus ID `59` departs four minutes after timestamp `t`.
+  There are no requirements or restrictions on departures at five minutes after timestamp `t`.
+* Bus ID `31` departs six minutes after timestamp `t`.
+* Bus ID `19` departs seven minutes after timestamp `t`.
+
+The only bus departures that matter are the listed bus IDs at their specific offsets from `t`. Those bus IDs can depart at other times, and other bus IDs can depart at those times. For example, in the list above, because bus ID `19` must depart seven minutes after the timestamp at which bus ID `7` departs, bus ID `7` will always **also** be departing with bus ID `19` at seven minutes after timestamp t.
+
+In this example, the earliest timestamp at which this occurs is `1068781`:
+
+```
+time     bus 7   bus 13  bus 59  bus 31  bus 19
+1068773    .       .       .       .       .
+1068774    D       .       .       .       .
+1068775    .       .       .       .       .
+1068776    .       .       .       .       .
+1068777    .       .       .       .       .
+1068778    .       .       .       .       .
+1068779    .       .       .       .       .
+1068780    .       .       .       .       .
+1068781    D       .       .       .       .
+1068782    .       D       .       .       .
+1068783    .       .       .       .       .
+1068784    .       .       .       .       .
+1068785    .       .       D       .       .
+1068786    .       .       .       .       .
+1068787    .       .       .       D       .
+1068788    D       .       .       .       D
+1068789    .       .       .       .       .
+1068790    .       .       .       .       .
+1068791    .       .       .       .       .
+1068792    .       .       .       .       .
+1068793    .       .       .       .       .
+1068794    .       .       .       .       .
+1068795    D       D       .       .       .
+1068796    .       .       .       .       .
+1068797    .       .       .       .       .
+```
+
+In the above example, bus ID 7 departs at timestamp `1068788` (seven minutes after t). This is fine; the only requirement on that minute is that bus ID 19 departs then, and it does.
+
+Here are some other examples:
+
+* The earliest timestamp that matches the list `17,x,13,19` is `3417`.
+* `67,7,59,61` first occurs at timestamp `754018`.
+* `67,x,7,59,61` first occurs at timestamp `779210`.
+* `67,7,x,59,61` first occurs at timestamp `1261476`.
+* `1789,37,47,1889` first occurs at timestamp `1202161486`.
+
+However, with so many bus IDs in your list, surely the actual earliest timestamp will be larger than `100000000000000`!
+
+**What is the earliest timestamp such that all of the listed bus IDs depart at offsets matching their positions in the list?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2020/day/13/input).
 
@@ -121,6 +184,22 @@ defmodule Day13 do
   def part2(input) do
     input
     |> parse()
+    |> elem(1)
+    |> Enum.with_index()
+    |> Enum.filter(fn {x, _} -> x != "x" end)
+    |> then(fn [{bus_id, 0} | tail] ->
+      solve(bus_id, bus_id, tail)
+    end)
+  end
+
+  def solve(ts, _, []), do: ts
+
+  def solve(ts, jump, [{b, i} | tail]) when rem(ts + i, b) == 0 do
+    solve(ts, jump * b, tail)
+  end
+
+  def solve(ts, jump, list) do
+    solve(ts + jump, jump, list)
   end
 
   defmodule Input do
@@ -145,7 +224,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day13, <<70, 79, 82, 49, 0, 0, 10, ...>>,
+{:module, Day13, <<70, 79, 82, 49, 0, 0, 14, ...>>,
  {:module, Day13.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -165,9 +244,9 @@ Day13.part1(input)
 2305
 ```
 
-**QUESTION TWO?**
+**What is the earliest timestamp such that all of the listed bus IDs depart at offsets matching their positions in the list?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `552612234243498`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -178,7 +257,7 @@ Day13.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+552612234243498
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -205,13 +284,13 @@ defmodule Day13Test do
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day13.part1(input) == [""]
+      assert Day13.part1(input) == 295
     end
   end
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day13.part2(input) == [""]
+      assert Day13.part2(input) == 1_068_781
     end
   end
 end
@@ -226,13 +305,13 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 467860
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
 
 ## Benchmarking
@@ -254,7 +333,58 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
 
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1      263.15 K        3.80 μs   ±256.87%        3.67 μs        4.67 μs
+Part 2      175.96 K        5.68 μs   ±110.72%        5.54 μs        7.29 μs
+
+Comparison: 
+Part 1      263.15 K
+Part 2      175.96 K - 1.50x slower +1.88 μs
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         2.31 KB
+Part 2         4.42 KB - 1.91x memory usage +2.11 KB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1          0.76 K
+Part 2          1.31 K - 1.73x reduction count +0.56 K
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
