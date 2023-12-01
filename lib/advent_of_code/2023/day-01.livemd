@@ -6,12 +6,6 @@
 Mix.install([:kino, :benchee])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Links
 
 * [Advent of Code (AoC)](https://adventofcode.com/2023/day/1)
@@ -21,11 +15,32 @@ Mix.install([:kino, :benchee])
 
 ## Prompt
 
-### --- Day 1: TBD ---
+### --- Day 1: Trebuchet?! ---
 
-Part One prompt
+Something is wrong with global snow production, and you've been selected to take a look. The Elves have even given you a map; on it, they've used stars to mark the top fifty locations that are likely to be having problems.
 
-**QUESTION ONE?**
+You've been doing this long enough to know that to restore snow operations, you need to check all **fifty stars** by December 25th.
+
+Collect stars by solving puzzles. Two puzzles will be made available on each day in the Advent calendar; the second puzzle is unlocked when you complete the first. Each puzzle grants **one star**. Good luck!
+
+You try to ask why they can't just use a [weather machine](https://adventofcode.com/2015/day/1) ("not powerful enough") and where they're even sending you ("the sky") and why your map looks mostly blank ("you sure ask a lot of questions") and hang on did you just say the sky ("of course, where do you think snow comes from") when you realize that the Elves are already loading you into a [trebuchet](https://en.wikipedia.org/wiki/Trebuchet) ("please hold still, we need to strap you in").
+
+As they're making the final adjustments, they discover that their calibration document (your puzzle input) has been **amended** by a very young Elf who was apparently just excited to show off her art skills. Consequently, the Elves are having trouble reading the values on the document.
+
+The newly-improved calibration document consists of lines of text; each line originally contained a specific **calibration value** that the Elves now need to recover. On each line, the calibration value can be found by combining the **first digit** and the **last digit** (in that order) to form a single **two-digit number**.
+
+For example:
+
+```
+1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet
+```
+
+In this example, the calibration values of these four lines are 12, 38, 15, and 77. Adding these together produces `142`.
+
+Consider your entire calibration document. **What is the sum of all of the calibration values?**
 
 To begin, [get your puzzle input](https://adventofcode.com/2023/day/1/input).
 
@@ -33,9 +48,23 @@ To begin, [get your puzzle input](https://adventofcode.com/2023/day/1/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+Your calculation isn't quite right. It looks like some of the digits are actually **spelled out with letters**: `one`, `two`, `three`, `four`, `five`, `six`, `seven`, `eight`, and `nine` also count as valid "digits".
 
-**QUESTION TWO?**
+Equipped with this new information, you now need to find the real first and last digit on each line. For example:
+
+```
+two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen
+```
+
+In this example, the calibration values are 29, 83, 13, 24, 42, 14, and 76. Adding these together produces `281`.
+
+**What is the sum of all of the calibration values?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2023/day/1/input).
 
@@ -49,49 +78,55 @@ input = Kino.Input.textarea("Please paste your input file:")
 
 ```elixir
 input = input |> Kino.Input.read()
-# input = AdventOfCode.Input.get!(1, 2023)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-""
+"2xjzgsjzfhzhm1\nqhklfjd39rpjxhqtftwopfvrrj2eight\n95btwo\nlfsqldnf3onenplgfxdjzjjnpzfxnineseven\nfive7fouronesevenpfsrmszpc\nxcsfkjqvln2tpm\nncjtcdb625two9\n6srtj3gfghkdtmfzseven\nthree4fournineone\npcpsxmkhdgsix25six6ngzsqzdcrb\n1sixdzhbjvnvgcxmsrlkb9xbjk7t2\ndsxnfkjn2vtwofivethree2\nqfbp2tpgvsxm\nkvbhsseven2rkbllhrhvsevenfour2vf\nbqbtzbtt3\nninek6\n3fivebvqhvhlvz\ntwo68jxfnqlzfkninenine8\nvhckhhhb2sixtftjtdjf2nine\n4jc\n3sevenxlxfnpk\n5sjfive\nc8bvlkdq283rqfftj\n8eight1threehhvmnlft\n4sixmfcronelzcpnfourlgdbkgt\nhntcjmppp9fmntwokx2\n24mkgr6mx9n4\ncksfkrdmdcmnbmkgk3two4\ntwosixthreefivelq3nine\nnjmrtr6fmldninevcbtxr42\neightfrdrczdxrcrfxh6\n8sevenonefmfqhtx8lk\nlnoneight8twodg\ntszrcb7tvvhfive4\nnknphprtv67fivehqlfournine2jk\n9eightszgdhftggrktkzbsmnhtwonekh\n1onefzkgf2two417\n77fivepsmmpp\nbnine7vmttgmdskc\n6tnsixclbvkhmsp\nggreightwo1mnsbzmxsdcdrhhg5one\nninetwo6qtbklgb2\nfour8fmfxmr\nthreetxfrsevenvfdgrtsixtwofsq7\nhqxlseven53\nvxqq24eight6\n7psxpgxmkpzkzeight3\n9four7\nstwoone4eightwoj\none38\n9cjlrgrgpfjeighteightdcpjhzbjqcdthree\nrqfone2\ndvkxhvkgxcfivescjcnqqnnine2tthreecptkgxmzjsbzdrhk\n5lhprmg8two7two3\n5lvtg5sevennine2zrrmghf4seven\nfourfive97sevensevensixcsffnlcbtjk\nonesixoneninesixnbkf5xpsgsmpvdsdsqdvpjjzp\nnineb321mgkpqjqjqh\nseven2cstttkvkmpssflkxjmbnvthreefour\nsix1bmcjbhdgqm6kgzsxbgdqnjqf3four6\nzchkfjxsllkncz175\nvsveightwo8\nfourbtrnfdp2four5\n13dtf8769\n6qfvvdqdrtstwothree4seven8vszpseven\n7rgzpxfbczk1fivetwo4two9nine\n3sksmfxn\n16ninetwonqqmptq\n9five4fckzssxsvpzbvlktjzcninethree\n3threel889bvbcgvl\nthreetzzjntxlsd2klrjfnbg87\n3two3qrrdbkbk\n29oneightt\n7mkpfchstjt7mshqht4fivesix\ntvmqndvsix875nine8\nvg7477ninecpnrvnine7\nseveneightmknlqjlstx4zjjrpbhjhnnc8\n8qklthreetwo7tlmrfzvtwo7zvccc\n6one1dpstqpmfbhst\nsixfourfourseven6rzdkfour\n6eighttbltmntb8\nseven72cqslvzpgj\njpvrsgfhtwo5nfc1cgxdrdrbfnseven\nfour1ninezlhqxtsgfzsevenhspvmxrtztzgtmseven5\nfoursixzjvgjgsevensvkd5\nseven121fivefgxhdfive\ntwoh8\nghhtttxqgr95\nzkpklcjbjlr2\nnine2mtrdcbrbntrdqninevbkbfg35lnpx\nnineninesix68pcvsdnns\nrf16one7\nseven276\nsixseven1\nqjxseven9six\n7c9xvhgmpf41\ndlzpvdpxseven9nine\nmlmlqrpn4twofivesbmhdbcsixtwo\nld74txfzksr5qconenine\nsix7djcdrtk7chktrh88\n2seven7jtrbhznt\n1eighthnhchsevenfive\nqdhscpeight8\n12gnxzzm\nk7fourmhcfkggt8919np\n8zljspvnmlx6four\n36twofivethreeptbdrfqzbz7qbjm\nbxkbjbzgone3ldhlnhxfcf7btkktspxrtqkxqfdmlqgqvgclb\nsevenfourmdrxseven2z2fiveone\n8bbprzqrqn\ntwofivethree95mpqclhfkzlsix\ngpfjflrkc96tmsix6dxjnfive\nqzeight6\nfive5zlthgqjntwotqmnnsd\neight6nbpvfour4kzkvbzrxcmkh\nfdkrxdckqbpsklz64fourones8\n5qpldkhltl\n27xldkbqbnmrrbqkhmksvk\npjoneightknpcgkkv7cbknrhfdmtdm8\n432xsixvvktflzxone\n35fouronemzzszfqppllgchsjjnine\nqgcnzcbvsxbtn6lthreenineone\ntwo2fourkdgbfb\nfzkmbtvnvj5bzfgvxv3nineknpqzznzmf\n9mkqtmlnpzt282dgkmvlsonefourthree\nmcqhpkhonethreeninesevenfdsggqnlfcnrft3frqzkscft\n847\ngsxvvr6tghfbxxghgv6lplf\nfqzgkxkbmkpbhpvpdprmlhsngc5\nqeightwo2threecrjjtv9fourbthree\n2eightdcbgfdqzk\nfourtwothree5tdzpzfxkpjmlkzzrf\nseven633\n8mldn\neightmg7dvjzbngkxmnxdctjtdffive97zpjrjqvp\nsixfournineone38eighteight\n8mngs412\n3fivefourtwo7five\n7sevenjfkcf7rvone8xjdvsc\ntljcrzngfdsqctfour6hsnljsxrqdzd\ncsix7hnkhds4four67\n3cxrlqcnseven4twox3\nrtwonerxcnpqdnzksvzmmndcjlzq2nine6ntfzjdqnrjeight\nzbqgrvvvblggbghtfx98\nthree2zcpspgtq77vqtgpcxkvq8\n94zksixnvbxrllxln\n1eightrctknxkmv9jtwoeight\n2onenine5eight58\nfour2five\n6fourfiveeight\npbfourlzdl4\n4onejrltvhxprhlzctrqzbz5fourseven6\nhlsdjlleightdcmdj8jdg\neightbfkgvbxxm6\nsixseven9hmhchsmqhhtrdftcfivetz\nmq4five2fsdhzn\nceight3mncgnineeight8dkqrjjtmc\nonefour7eightsix\nseven4fqsjk38fhbmn9fgzzcc\n9cmb5ninenjsppthpnine5\nqghtvpsqpxptoneljvstwo8lpqcbgtqvjmpq\nonelq85dlqpx8\n1threetzsxqtndvhqn\nlqdvkonebqjqj9\n3six6\n9two9sixeight776\nscrrprfkblkplgqzzqb2\n18vcrhxb4b\nthree8nine\n1khkncj8fivefourthree2\nninetwo8tbbsfmkqtt51five\n66one88\nninempgbhpm6seven34\neightthreetwo4threetwo\nvvpqkdonesevendvfrgmhhlsix91threethree\nvbskcncpjxtdhqlcone6kgqpz\n54lmnnqsrm73\n5mqnmvcbqnz82ninethree\n47teightthreehrhtdndrk\nfft2foursrdhxkzfourv\ntbeight48759eight9twonenl\n3sfkvkmvbbm9four9cbjzgllfl\nsixqhxeightone7tlsd\n22zmllbhcptwo\ndqxdjrkmnvkbsxc3ztbseven\noneeight6dcphmnrfltfour\nmgxzcfsevenfour4six\nsixb8six34gqjtlcq\nfiveseventhreexfblvxgkplvbrgpfive1onesix" <> ...
 ```
 
 ## Solution
 
 ```elixir
 defmodule Day01 do
-  defdelegate parse(input), to: __MODULE__.Input
-
   def part1(input) do
     input
-    |> parse()
-    |> Enum.map(& &1)
+    |> String.splitter("\n", trim: true)
+    |> Stream.map(fn line ->
+      Regex.scan(~r/[0-9]/, line)
+      |> List.flatten()
+      |> first_and_last_digit_to_int()
+    end)
+    |> Enum.sum()
   end
 
   def part2(input) do
     input
-    |> parse()
-    |> Enum.map(& &1)
+    |> String.splitter("\n", trim: true)
+    |> Stream.map(fn line ->
+      ~r/(?=([0-9]|one|two|three|four|five|six|seven|eight|nine))/
+      |> Regex.scan(line, capture: :all_but_first)
+      |> List.flatten()
+      |> Enum.map(&to_int/1)
+      |> first_and_last_digit_to_int()
+    end)
+    |> Enum.sum()
   end
 
-  defmodule Input do
-    def parse(input) when is_binary(input) do
-      input
-      |> String.splitter("\n", trim: true)
-      |> parse()
-    end
+  def to_int("one"), do: 1
+  def to_int("two"), do: 2
+  def to_int("three"), do: 3
+  def to_int("four"), do: 4
+  def to_int("five"), do: 5
+  def to_int("six"), do: 6
+  def to_int("seven"), do: 7
+  def to_int("eight"), do: 8
+  def to_int("nine"), do: 9
+  def to_int(digit), do: String.to_integer(digit)
 
-    def parse(input) do
-      Stream.map(input, &parse_line/1)
-    end
-
-    def parse_line(line) do
-      line
-      # |> String.split(["-", ","])
-      # |> Enum.map(&String.to_integer/1)
-    end
+  def first_and_last_digit_to_int(list) do
+    "#{List.first(list)}#{List.last(list)}" |> String.to_integer()
   end
 end
 ```
@@ -99,13 +134,12 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day01, <<70, 79, 82, 49, 0, 0, 8, ...>>,
- {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 16, ...>>, {:first_and_last_digit_to_int, 1}}
 ```
 
-**QUESTION ONE?**
+Consider your entire calibration document. **What is the sum of all of the calibration values?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `54081`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -116,12 +150,12 @@ Day01.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+54081
 ```
 
-**QUESTION TWO?**
+**What is the sum of all of the calibration values?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `54649`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -132,7 +166,7 @@ Day01.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+54649
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -153,19 +187,21 @@ defmodule Day01Test do
 
   setup_all do
     [
-      input: ""
+      input1: "1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet",
+      input2:
+        "two1nine\neightwothree\nabcone2threexyz\nxtwone3four\n4nineeightseven2\nzoneight234\n7pqrstsixteen"
     ]
   end
 
   describe "part1/1" do
-    test "returns expected value", %{input: input} do
-      assert Day01.part1(input) == [""]
+    test "returns expected value", %{input1: input1} do
+      assert Day01.part1(input1) == 142
     end
   end
 
   describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day01.part2(input) == [""]
+    test "returns expected value", %{input2: input2} do
+      assert Day01.part2(input2) == 281
     end
   end
 end
@@ -180,39 +216,11 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 37118
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
-```
-
-## Benchmarking
-
-```elixir
-# https://github.com/bencheeorg/benchee
-Benchee.run(
-  %{
-    "Part 1" => fn -> Day01.part1(input) end,
-    "Part 2" => fn -> Day01.part2(input) end
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
-
-nil
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-nil
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
