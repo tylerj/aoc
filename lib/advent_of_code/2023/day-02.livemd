@@ -1,0 +1,128 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 2 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/2)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/2/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day_02.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-02.livemd)
+
+## Solution
+
+```elixir
+defmodule Day02 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Stream.reject(fn {_, reveals} ->
+      Enum.any?(reveals, fn
+        %{"red" => red} when red > 12 -> true
+        %{"green" => green} when green > 13 -> true
+        %{"blue" => blue} when blue > 14 -> true
+        _ -> false
+      end)
+    end)
+    |> Stream.map(&elem(&1, 0))
+    |> Enum.sum()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Stream.map(&game_power/1)
+    |> Enum.sum()
+  end
+
+  defp game_power({_game_id, reveals}) do
+    Enum.reduce(reveals, {1, 1, 1}, fn reveal, {red, green, blue} ->
+      {
+        max(red, Map.get(reveal, "red", 1)),
+        max(green, Map.get(reveal, "green", 1)),
+        max(blue, Map.get(reveal, "blue", 1))
+      }
+    end)
+    |> Tuple.product()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      ["Game " <> game, reveals] = String.split(line, ": ", trim: true)
+
+      {
+        String.to_integer(game),
+        reveals
+        |> String.split("; ", trim: true)
+        |> Enum.map(fn reveal ->
+          ~r/(\d+) ([^,]+)/
+          |> Regex.scan(reveal, capture: :all_but_first)
+          |> Enum.map(fn [x, color] -> {color, String.to_integer(x)} end)
+          |> Enum.into(%{})
+        end)
+      }
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day02, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+ {:module, Day02.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Determine which games would have been possible if the bag had been loaded with only 12 red cubes, 13 green cubes, and 14 blue cubes. **What is the sum of the IDs of those games?**
+
+Your puzzle answer was `2810`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day02.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+2810
+```
+
+For each game, find the minimum set of cubes that must have been present. **What is the sum of the power of these sets?**
+
+Your puzzle answer was `69110`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day02.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+69110
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/2/input).
