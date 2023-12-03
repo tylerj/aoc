@@ -1,0 +1,311 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 3 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/3)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/3/input)
+* [tylerj GitHub - Code](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day_03.ex)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-03.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+# input = AdventOfCode.Input.get!(3, 2023)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"........440...............418..643.....438......740.261......................................727...........................870..............\n...............338.............-........*.......*.......34&.$........@.....&742................................353..26.......*...188...238..\n..................*369.....334.......624..749....533........690...894...........466......../....&......294....................1.............\n..338....367............................................../...............565..@....456.357....873........#..=...916.#60....................\n........*...............*......402.......473..%400..+415.165....364........*.....$....*......*...............410...=..........#........#....\n..342....886....122..457..866........438....*.....................*........739...716...131....561..748.......................206......155...\n.................-.........../..........@.185..78.556........120..856..436............................*.....%730.307....382#................\n...................352...........................*....282.......$...........*......716......904*588....807.........*........................\n.590.......225....*......610...............&434......*...................805.878......*......................#539..412......452......993....\n....*407...................%............=..........489..............#..................390....621.708........................-..............\n..........542#...880...@.......*.....%...877..................264....3........750.............../.*.............-.......570.......&.........\n.....290...........@.540....167.873.970................669.....#.....................169...........718....&...240......*........764.400.....\n.......*......639.......................103.....@.......*..................................731.........413...........974...............*....\n......174........#..-331....&................465.............428...$118.....................*......714.......209*418........*....@......513.\n...........869.............120.....101................379...*..................488.579...344......*.......................94.802.105........\n...834.............254............=........657.........@...198..160....258........*.............449........972@.553%.................234....\n...*.....@...........*....................../.....273............*...................&......................................545.365.........\n.773......296.........85...256.......977.............*....203...216.....394......872.240.......406*.......&254...............*..*...........\n......-...............................................830.....%....................*..............................................615.608...\n...739..15*903....93.........714..442*...769.....838.......829.....741.....@469.......60...........181..376.......63.........172........*...\n.................=......306............@...*.......*...900.....309..*...............-.....428..333...*.....*921..*....673............499....\n.........599...........&........221....137..432....930....*.....*..216..........#..381...*.....*....767.................@..........=........\n.993......-..............243....$.......................150...456.............677......400..338.............................766.468.........\n........................*....................509....................815.............................................308.....*..........575..\n...................908.112........767....215..........400..220........*............962.825......46......30.....21-........875......453*.....\n....845........840............../....*.../........423*....*....929..76......682-...*.....&.........@.....*..........&196....................\n867.*.........+.........=671....429..278......46.......$...194../.................611.............401.....788....&.......201.........*38....\n....21...599........................................863..................946...23............*547.............244...........*.....963.......\n.........*...........65.............659......612..........497.......&705..................121.........................29....80..............\n......." <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day03 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    {numbers, grid} = parse(input)
+
+    numbers
+    |> Enum.filter(fn digits ->
+      Enum.any?(digits, fn {{row, col}, _} ->
+        [
+          {row - 1, col - 1},
+          {row - 1, col},
+          {row - 1, col + 1},
+          {row, col - 1},
+          {row, col + 1},
+          {row + 1, col - 1},
+          {row + 1, col},
+          {row + 1, col + 1}
+        ]
+        |> Enum.any?(fn xy ->
+          case grid[xy] do
+            ?. -> false
+            nil -> false
+            v when v in ?0..?9 -> false
+            _ -> true
+          end
+        end)
+      end)
+    end)
+    |> Enum.map(&digits_to_integer/1)
+    |> Enum.sum()
+  end
+
+  def part2(input) do
+    {numbers, grid} = parse(input)
+
+    grid
+    |> Enum.filter(fn {_, v} -> v == ?* end)
+    |> Enum.map(fn {{row, col}, _} ->
+      numbers
+      |> Enum.filter(fn number ->
+        Enum.any?(number, fn {{r, c}, _} ->
+          abs(row - r) <= 1 and abs(col - c) <= 1
+        end)
+      end)
+    end)
+    |> Enum.filter(&(length(&1) == 2))
+    |> Enum.map(fn gear ->
+      Enum.map(gear, &digits_to_integer/1)
+    end)
+    |> Enum.map(&Enum.product/1)
+    |> Enum.sum()
+  end
+
+  defp digits_to_integer(digits) do
+    digits
+    |> Enum.map(fn {_, digit} -> digit end)
+    |> to_string()
+    |> String.to_integer()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      rows =
+        input
+        |> Enum.with_index()
+        |> Enum.map(&parse_line/1)
+
+      is_digit? = fn {_, x} -> x in ?0..?9 end
+
+      numbers =
+        Enum.flat_map(rows, fn row ->
+          row
+          |> Enum.chunk_by(is_digit?)
+          |> Enum.filter(fn [h | _] -> is_digit?.(h) end)
+        end)
+
+      grid = rows |> List.flatten() |> Enum.into(%{})
+
+      {numbers, grid}
+    end
+
+    def parse_line({line, row}) do
+      line
+      |> String.to_charlist()
+      |> Enum.with_index()
+      |> Enum.map(fn {g, col} ->
+        {{row, col}, g}
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day03, <<70, 79, 82, 49, 0, 0, 19, ...>>,
+ {:module, Day03.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**What is the sum of all of the part numbers in the engine schematic?**
+
+Your puzzle answer was `532331`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day03.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+532331
+```
+
+**What is the sum of all of the gear ratios in your engine schematic?**
+
+Your puzzle answer was `82301120`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day03.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+82301120
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/3/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day03Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "467..114..\n...*......\n..35..633.\n......#...\n617*......\n.....+.58.\n..592.....\n......755.\n...$.*....\n.664.598.."
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day03.part1(input) == 4361
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day03.part2(input) == 467_835
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 458078
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day03.part1(input) end,
+    "Part 2" => fn -> Day03.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.15.7
+Erlang 26.1.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        191.67        5.22 ms     ±4.48%        5.14 ms        5.77 ms
+Part 2         47.29       21.15 ms     ±1.31%       21.05 ms       21.78 ms
+
+Comparison: 
+Part 1        191.67
+Part 2         47.29 - 4.05x slower +15.93 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         6.18 MB
+Part 2        30.61 MB - 4.96x memory usage +24.43 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1          0.51 M     ±0.02%         0.51 M         0.51 M
+Part 2          6.83 M     ±0.01%         6.83 M         6.84 M
+
+Comparison: 
+Part 1          0.51 M
+Part 2          6.83 M - 13.36x reduction count +6.32 M
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
