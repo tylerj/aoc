@@ -12,26 +12,6 @@ Mix.install([:kino, :benchee])
 * [AoC Puzzle Input](https://adventofcode.com/2023/day/6/input)
 * [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-06.livemd)
 
-## Prompt
-
-### --- Day 6: TBD ---
-
-Part One prompt
-
-**QUESTION ONE?**
-
-To begin, [get your puzzle input](https://adventofcode.com/2023/day/6/input).
-
-<!-- livebook:{"break_markdown":true} -->
-
-### --- Part Two ---
-
-Part Two prompt
-
-**QUESTION TWO?**
-
-Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2023/day/6/input).
-
 ## Input
 
 ```elixir
@@ -60,20 +40,24 @@ defmodule Day06 do
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(fn {b, c} ->
-      low = (b - :math.sqrt(b * b - 4 * c)) / 2
-      high = (b + :math.sqrt(b * b - 4 * c)) / 2
-
-      {low, high, ceil(high) - floor(low) - 1}
-      |> elem(2)
-    end)
+    |> Enum.map(&calc_num_ways/1)
     |> Enum.product()
   end
 
   def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    {b, c} = input |> parse() |> Enum.unzip()
+
+    calc_num_ways({
+      Enum.join(b) |> String.to_integer(),
+      Enum.join(c) |> String.to_integer()
+    })
+  end
+
+  def calc_num_ways({b, c}) do
+    low = (b - :math.sqrt(b * b - 4 * c)) / 2
+    high = (b + :math.sqrt(b * b - 4 * c)) / 2
+
+    {low, high, ceil(high) - floor(low) - 1} |> elem(2)
   end
 
   defmodule Input do
@@ -101,7 +85,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day06, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+{:module, Day06, <<70, 79, 82, 49, 0, 0, 12, ...>>,
  {:module, Day06.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -121,9 +105,9 @@ Day06.part1(input)
 252000
 ```
 
-**QUESTION TWO?**
+How many ways can you beat the record in this one much longer race?
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `36992486`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -134,7 +118,7 @@ Day06.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[{48, 255}, {87, 1288}, {69, 1117}, {81, 1623}]
+36992486
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -167,7 +151,7 @@ defmodule Day06Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day06.part2(input) == [""]
+      assert Day06.part2(input) == 71503
     end
   end
 end
@@ -178,20 +162,9 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-
-
-  1) test part2/1 returns expected value (Day06Test)
-     lib/advent_of_code/2023/day-06.livemd#cell:ipofceimctzu42fkipkp37sr3pdg5bsr:19
-     Assertion with == failed
-     code:  assert Day06.part2(input) == [""]
-     left:  [{7, 9}, {15, 40}, {30, 200}]
-     right: [""]
-     stacktrace:
-       lib/advent_of_code/2023/day-06.livemd#cell:ipofceimctzu42fkipkp37sr3pdg5bsr:20: (test)
-
-.
+..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 1 failure
+2 tests, 0 failures
 
 Randomized with seed 924235
 ```
@@ -199,7 +172,7 @@ Randomized with seed 924235
 <!-- livebook:{"output":true} -->
 
 ```
-%{total: 2, failures: 1, excluded: 0, skipped: 0}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
 
 ## Benchmarking
@@ -221,7 +194,58 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
 
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1      432.90 K        2.31 μs   ±519.91%        2.17 μs        2.58 μs
+Part 2      380.22 K        2.63 μs   ±449.47%        2.50 μs        2.92 μs
+
+Comparison: 
+Part 1      432.90 K
+Part 2      380.22 K - 1.14x slower +0.32 μs
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         2.62 KB
+Part 2         2.88 KB - 1.10x memory usage +0.26 KB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1             303
+Part 2             395 - 1.30x reduction count +92
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
