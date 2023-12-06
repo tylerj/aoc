@@ -40,24 +40,24 @@ defmodule Day06 do
   def part1(input) do
     input
     |> parse()
+    |> Enum.zip()
     |> Enum.map(&calc_num_ways/1)
     |> Enum.product()
   end
 
   def part2(input) do
-    {b, c} = input |> parse() |> Enum.unzip()
-
-    calc_num_ways({
-      Enum.join(b) |> String.to_integer(),
-      Enum.join(c) |> String.to_integer()
-    })
+    input
+    |> parse()
+    |> Enum.map(&(&1 |> Enum.join() |> String.to_integer()))
+    |> List.to_tuple()
+    |> calc_num_ways()
   end
 
   def calc_num_ways({b, c}) do
     low = (b - :math.sqrt(b * b - 4 * c)) / 2
     high = (b + :math.sqrt(b * b - 4 * c)) / 2
 
-    {low, high, ceil(high) - floor(low) - 1} |> elem(2)
+    ceil(high) - floor(low) - 1
   end
 
   defmodule Input do
@@ -70,7 +70,6 @@ defmodule Day06 do
     def parse(input) do
       input
       |> Enum.map(&parse_line/1)
-      |> Enum.zip()
     end
 
     def parse_line(line) do
