@@ -1,0 +1,231 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 6 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/6)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/6/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-06.livemd)
+
+## Prompt
+
+### --- Day 6: TBD ---
+
+Part One prompt
+
+**QUESTION ONE?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2023/day/6/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2023/day/6/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+# input = AdventOfCode.Input.get!(6, 2023)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"Time:        48     87     69     81\nDistance:   255   1288   1117   1623"
+```
+
+## Solution
+
+```elixir
+defmodule Day06 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.map(fn {b, c} ->
+      low = (b - :math.sqrt(b * b - 4 * c)) / 2
+      high = (b + :math.sqrt(b * b - 4 * c)) / 2
+
+      {low, high, ceil(high) - floor(low) - 1}
+      |> elem(2)
+    end)
+    |> Enum.product()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      ~r/Time:\s*([\d\s]+)\nDistance:\s*([\d\s]+)/
+      |> Regex.run(input, capture: :all_but_first)
+      |> parse()
+    end
+
+    def parse(input) do
+      input
+      |> Enum.map(&parse_line/1)
+      |> Enum.zip()
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split(" ", trim: true)
+      |> Enum.map(&String.to_integer/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day06, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+ {:module, Day06.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Determine the number of ways you could beat the record in each race. **What do you get if you multiply these numbers together?**
+
+Your puzzle answer was `252000`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+252000
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[{48, 255}, {87, 1288}, {69, 1117}, {81, 1623}]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/6/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day06Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "Time:      7  15   30\nDistance:  9  40  200"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day06.part1(input) == 288
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day06.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+
+  1) test part2/1 returns expected value (Day06Test)
+     lib/advent_of_code/2023/day-06.livemd#cell:ipofceimctzu42fkipkp37sr3pdg5bsr:19
+     Assertion with == failed
+     code:  assert Day06.part2(input) == [""]
+     left:  [{7, 9}, {15, 40}, {30, 200}]
+     right: [""]
+     stacktrace:
+       lib/advent_of_code/2023/day-06.livemd#cell:ipofceimctzu42fkipkp37sr3pdg5bsr:20: (test)
+
+.
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 1 failure
+
+Randomized with seed 924235
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 1, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day06.part1(input) end,
+    "Part 2" => fn -> Day06.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
