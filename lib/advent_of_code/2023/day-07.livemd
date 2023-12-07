@@ -1,0 +1,312 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 7 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/7)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/7/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-07.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+# input = AdventOfCode.Input.get!(7, 2023)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"4KTJ4 575\n38T4K 449\n4T437 860\n55954 240\nQ8K89 150\n85838 21\n68668 464\nJQT77 737\n99497 155\nA444A 653\nAA6QQ 28\n4Q39T 332\n8Q579 835\n58JQ5 397\nKJ77A 271\n88Q8T 365\nAATAJ 30\n3T582 325\nQ8AQQ 321\nKA6J4 215\nKA322 403\n54225 219\n4ATA4 225\n4222A 543\n2J9KK 749\n477AT 561\n6J699 880\nJ4348 655\nK4444 175\n775AA 567\nJ8AK6 334\n93A58 307\nJT43J 872\nA6662 929\nQ74JK 779\nAQAQQ 827\n55557 902\n6JAA6 512\n676T2 763\nQA3KK 181\n99939 377\n43T44 473\nAK48A 968\n44464 897\n7A454 475\n6JJQ8 496\n5KAKK 419\n77AKT 802\nK4K4K 719\n33739 959\n325K2 534\n93979 751\nQK9AK 290\n8J887 79\n8QKQK 203\nQ657Q 328\n23647 869\n4568K 686\n49374 63\n88882 578\n94A9A 680\n5T5T5 759\n95JJ5 502\nQ66QQ 771\n6A886 845\n74777 982\n2K222 49\nTQTQT 704\nJ7KK2 47\n98A5J 187\n66AA6 53\n57J68 443\nQ77Q7 610\n63KJJ 661\n6K46K 803\nK6279 596\n79999 85\nK2J29 592\n3T625 980\n2Q555 236\n3TTQK 687\n924A2 762\n6KQ2K 4\n3473K 418\n22QQ2 947\nJ69A7 915\nKJJKK 617\n989K5 993\n333JJ 257\nJ27TT 626\nK22KK 942\n2A4A3 801\n49JJK 398\n328J2 50\n4K5Q7 491\nTT2QQ 651\nKA5JQ 773\nA277K 160\nAAQQA 873\n7775A 318\n73377 847\n2J898 366\n88Q88 958\nQQQ2Q 756\nJ58AA 996\n387K3 190\n92999 149\n3Q5A9 843\n63434 865\n69992 643\n56983 619\n8T8AK 107\n25Q62 148\n444JJ 364\n24JA6 808\nJ8J82 967\nJKA98 347\n455Q8 249\nT65T8 713\n763A8 500\nQAT67 936\n9TT99 143\n39TQ3 425\n2J448 831\n393T9 904\n79KQ6 628\n8JA4Q 371\n8TQ8T 829\n3K2A9 277\n98T77 970\n96T7Q 306\nQKKJK 207\nQTQTQ 791\n2J9QA 344\nT84QQ 137\nJ4822 90\n77J77 800\n99994 858\nJK6J7 833\nQQ472 589\n389K6 761\nK35K4 547\n22244 284\nAT78K 164\nA848J 798\n57782 924\nAT998 660\nTQ8TT 663\n4J285 890\nQ7JQQ 960\n88JJJ 370\nJKKK7 866\n22J2J 916\nJT333 292\n555JJ 267\n7K75K 228\n4Q46J 66\n43T63 695\nT6TTT 606\nQQQ82 154\n86JKT 700\nKK464 111\n9QTJ8 541\nQJJQQ 386\nJ5989 110\n4JAJT 794\n7K7K6 707\nK4484 747\nJJK9J 3\n97555 10\n6QJ74 717\n95582 975\nT7468 51\nA37A3 416\nKK888 639\nJ2223 233\n8T7AA 944\nA3A78 16\n739T6 850\n945T2 654\n6J633 41\n2T222 339\n27469 851\nTT333 811\nA7JA8 129\nT6T93 995\n75488 459\nJQJ58 376\n7J6QQ 941\nTTTT8 787\n27JJJ 705\nJT3Q3 983\n7KKK6 668\n88899 162\n336K7 893\n5A35A 950\nT8T88 903\n7Q4K7 274\n22K27 429\n838J8 469\n27257 792\nJ666J 560\nAA2AT 554\n22228 112\n4997K 943\nKJ3J2 431\nKQ373 984\n9J694 901\n65259 917\n58885 372\nJT634 45\nK5777 848\n33TTT 720\n33233 422\n26J7K 114\nK8T45 170\n92A5K 480\n84884 218\n94739 739\n3472J 815\nJ5AT4 383\n8QJ3Q 946\nT99T6 891\n46674 135\nT66J7 125\n738QQ 100\nTT4T8 490\n98268 765\n465T6 477\nJ77QQ 624\n9K98J 199\nJ6666 176\n23KTJ 69\n7779Q 563\n46T7J 871\n8QQQQ 442\n84TK8 965\nKA3T9 326\nAKT25 448\n2J65J 253\n7KK77 714\n74Q44 36\nA498A 684\n359AK 615\nTTTQ5 874\nJ22JJ 121\n25247 59\nAJ322 613\n26222 27\nA57T5 355\n89886 544\nK9333 104\n36J98 566\nKQKJ4 142\n22276 716\nQ7222 436\nAAAA4 499\n66KK3 68\n89629 909\nT9KK9 208\n5ATT8 646\n69J59 894\nJ68T6 744\n57A2K 454\n93585 92\nJQT63 485\n4K4AA 877\n9936K 986\n6KK6K 65\n44484 841\n76557 672\n8T273 882\nQQ9QQ 956\nK6549 863\n3QJ39 324\nKKKJK 565\n737Q7 562\n99494 641\nTJTJT 445\n46AT4 728\n8K2AT 896\n2QT22 590\nK7JTK 156\n2K929 503\nTT2JT 799\nJAK7A 213\n32K59 470\n87899 881\nK2KK4 579\nK3AJ5 588\n68666 461\nQ4QQK 727\nQA9K8 261\n95999 122\n5A446 885\n3J335 291\n8K685 453\nK5KA5 231\n37KJK 586\nKQ6Q6 532\nQKKKA 82\n9KJ36 846\n83JJ6 202\n33T33 466\nQQQAQ 439\nQ4A94 282\n35AJT 577\n47ATQ 753\n44AAQ 745\n3AA99 330\n88533 774\nT9T6T 971\n5KT6T 685\nA999Q 913\n59555 44\n6J66Q 196\nTA542 268\n55598 487\n926A7 523\n4Q3J9 693\n47274 582\n2Q999 830\nJ599T 574\nT6TTJ 116\n6K5A2 358\n88J8A 580\nT22K2 161\n444A4 884\nA5J7A 842\n3JT3T 101\nTATTA 279\n82A82 531\nA9JTA 120\nKK4KT 60\n88J8K 314\nJKKJJ 722\n37797 467\nAA999 555\n52543 145\n55Q55 83\n4444J 408\nTTT97 232\nTKTTK 243\n8J882 602\nAJK6Q 724\n32TK9 536\n7569Q 823\n37777 410\n27772 462\n6T6JA 932\n99448 797\n69669 659\n83T89 382\nQQ68Q 392\nQ94TK 390\n4TTTT 8\nQ7QA7 998\n8JT8A 237\nK7J77 74\nAT5TT 518\n6KK66 336\n83388 89\n867Q2 629\nQ9889 409\n8J7A6 616\n333Q3 511\n333KQ 879\n9TAT9 319\nKQJ46 819\n2AA4A 93\n27774 849\n2T6J4 194\nTTKKA 597\nK9437 535\nK4J48 48\nA5J52 86\n22266 952\nAQ6Q6 245\nQJ24T 669\nQA779 638\nQ4263 694\nQQ7QQ 421\n9942J 174\nTJTJK 173\nT96A9 832\n55553 608\nK78KA 127\n444QQ 305\nAA99A 516\n33J22 348\nQ7TQT 25\n87888 793\n86884 217\n94Q99 742\nA3336 514\nK6492 748\n36363 201\nJT657 474\nAK766 905\nQ333J 788\n494Q4 171\n67776 144\n33939 701\nJ8265 557\n97KK7 197\n4T5TJ 614\n44494 109\n99J79 192\n3A9Q9 977\n77783 205\nA4575 14\n8K9QT 226\n8555J 32\nJAAAA 81" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day07 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.map(&prepare_p1/1)
+    |> calculate_winnings()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(&prepare_p2/1)
+    |> calculate_winnings()
+  end
+
+  defp prepare_p1([cards, bid]) do
+    cards = String.to_charlist(cards)
+    counts = group_counts(cards) |> Enum.filter(&(&1 > 1))
+
+    {
+      cards,
+      sort_values(cards, :part1),
+      group_counts(cards),
+      hand_value(counts),
+      String.to_integer(bid)
+    }
+  end
+
+  defp prepare_p2([cards, bid]) do
+    cards = String.to_charlist(cards)
+
+    counts =
+      group_counts(cards)
+      |> add_jokers(Enum.count(cards, &(&1 == ?J)))
+      |> Enum.filter(&(&1 > 1))
+
+    {
+      cards,
+      sort_values(cards, :part2),
+      group_counts(cards),
+      hand_value(counts),
+      String.to_integer(bid)
+    }
+  end
+
+  defp group_counts(cards) do
+    cards |> Enum.frequencies() |> Map.values() |> Enum.sort(:desc)
+  end
+
+  defp add_jokers([5], 5), do: [5]
+
+  defp add_jokers([joker_count | [max_count | tail]], joker_count),
+    do: [max_count + joker_count | tail]
+
+  defp add_jokers([max_count | tail], joker_count),
+    do: [max_count + joker_count | List.delete(tail, joker_count)]
+
+  defp hand_value([]), do: 1
+  defp hand_value([2]), do: 2
+  defp hand_value([2, 2]), do: 3
+  defp hand_value([3]), do: 4
+  defp hand_value([3, 2]), do: 5
+  defp hand_value([4]), do: 6
+  defp hand_value([5]), do: 7
+
+  defp sort_values(cards, part), do: Enum.map(cards, &sort_value(&1, part))
+
+  defp sort_value(?A, _), do: 14
+  defp sort_value(?K, _), do: 13
+  defp sort_value(?Q, _), do: 12
+  defp sort_value(?J, :part1), do: 11
+  defp sort_value(?J, :part2), do: 1
+  defp sort_value(?T, _), do: 10
+  defp sort_value(c, _), do: c - 48
+
+  defp calculate_winnings(cards) do
+    cards
+    |> Enum.sort_by(&[elem(&1, 3) | elem(&1, 1)], :asc)
+    |> Enum.with_index(1)
+    |> Enum.map(fn {hand, rank} ->
+      elem(hand, 4) * rank
+    end)
+    |> Enum.sum()
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      String.split(line, " ", trim: true)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day07, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+ {:module, Day07.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Find the rank of every hand in your set. **What are the total winnings?**
+
+Your puzzle answer was `248179786`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day07.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+248179786
+```
+
+Using the new joker rule, find the rank of every hand in your set. **What are the new total winnings?**
+
+Your puzzle answer was `247885995`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day07.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+247885995
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/7/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day07Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "32T3K 765\nT55J5 684\nKK677 28\nKTJJT 220\nQQQJA 483"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.part1(input) == 6440
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.part2(input) == 5905
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 514123
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day07.part1(input) end,
+    "Part 2" => fn -> Day07.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        990.73        1.01 ms     ±6.96%        0.98 ms        1.19 ms
+Part 2        921.82        1.08 ms     ±6.77%        1.05 ms        1.29 ms
+
+Comparison: 
+Part 1        990.73
+Part 2        921.82 - 1.07x slower +0.0755 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         1.79 MB
+Part 2         1.90 MB - 1.06x memory usage +0.104 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1        169.43 K
+Part 2        204.44 K - 1.21x reduction count +35.01 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
