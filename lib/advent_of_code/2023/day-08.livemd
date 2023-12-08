@@ -44,7 +44,7 @@ defmodule Day08 do
   def part1(input) do
     {turns, nodes} = parse(input)
 
-    step_count_p1("AAA", 0, turns, turns, nodes)
+    step_count("AAA", turns, nodes, &(&1 == "ZZZ"))
   end
 
   def part2(input) do
@@ -53,31 +53,26 @@ defmodule Day08 do
     nodes
     |> Map.keys()
     |> Enum.filter(&String.ends_with?(&1, "A"))
-    |> Enum.map(&step_count_p2(&1, 0, turns, turns, nodes))
+    |> Enum.map(fn start_node ->
+      step_count(start_node, turns, nodes, &String.ends_with?(&1, "Z"))
+    end)
     |> Enum.reduce(1, &Math.lcm/2)
   end
 
-  defp step_count_p1("ZZZ", count, _, _, _), do: count
-
-  defp step_count_p1(current, count, [], turns, nodes) do
-    step_count_p1(current, count, turns, turns, nodes)
+  defp step_count(start_node, turns, nodes, end_fun) do
+    step_count(start_node, 0, turns, turns, nodes, end_fun)
   end
 
-  defp step_count_p1(current, count, [next_turn | tail], turns, nodes) do
-    next_node(next_turn, nodes, current)
-    |> step_count_p1(count + 1, tail, turns, nodes)
+  defp step_count(current, count, [], turns, nodes, end_fun) do
+    step_count(current, count, turns, turns, nodes, end_fun)
   end
 
-  defp step_count_p2(current, count, [], turns, nodes) do
-    step_count_p2(current, count, turns, turns, nodes)
-  end
-
-  defp step_count_p2(current, count, [next_turn | tail], turns, nodes) do
-    if String.ends_with?(current, "Z") do
+  defp step_count(current, count, [next_turn | tail], turns, nodes, end_fun) do
+    if end_fun.(current) do
       count
     else
       next_node(next_turn, nodes, current)
-      |> step_count_p2(count + 1, tail, turns, nodes)
+      |> step_count(count + 1, tail, turns, nodes, end_fun)
     end
   end
 
@@ -121,9 +116,9 @@ end
  {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
-**QUESTION ONE?**
+Starting at AAA, follow the left/right instructions. **How many steps are required to reach ZZZ?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `20777`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -137,9 +132,9 @@ Day08.part1(input)
 20777
 ```
 
-**QUESTION TWO?**
+Simultaneously start on every node that ends with A. **How many steps does it take before you're only on nodes that end with Z?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `13289612809129`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -203,7 +198,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 92193
+Randomized with seed 254250
 ```
 
 <!-- livebook:{"output":true} -->
@@ -261,12 +256,12 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        415.03        2.41 ms     ±1.34%        2.40 ms        2.53 ms
-Part 2        118.29        8.45 ms     ±0.88%        8.43 ms        8.76 ms
+Part 1        407.25        2.46 ms     ±1.30%        2.45 ms        2.58 ms
+Part 2        117.59        8.50 ms     ±0.99%        8.48 ms        8.82 ms
 
 Comparison: 
-Part 1        415.03
-Part 2        118.29 - 3.51x slower +6.04 ms
+Part 1        407.25
+Part 2        117.59 - 3.46x slower +6.05 ms
 
 Memory usage statistics:
 
@@ -279,12 +274,12 @@ Part 2       173.02 KB - 1.08x memory usage +12.31 KB
 Reduction count statistics:
 
 Name           average  deviation         median         99th %
-Part 1        138.49 K     ±0.01%       138.49 K       138.53 K
-Part 2        802.50 K     ±0.00%       802.50 K       802.54 K
+Part 1        180.05 K     ±0.01%       180.05 K       180.08 K
+Part 2        900.35 K     ±0.00%       900.35 K       900.39 K
 
 Comparison: 
-Part 1        138.49 K
-Part 2        802.50 K - 5.79x reduction count +664.01 K
+Part 1        180.05 K
+Part 2        900.35 K - 5.00x reduction count +720.30 K
 ```
 
 <!-- livebook:{"output":true} -->
