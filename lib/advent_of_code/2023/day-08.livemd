@@ -1,0 +1,294 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 8 - Advent of Code 2023
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.11.3"},
+  {:benchee, "~> 1.2"},
+  {:math, "~> 0.7.0"}
+])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/8)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/8/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-08.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+# input = AdventOfCode.Input.get!(8, 2023)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"LLRLLRLRLRRRLLRRRLRRLRLRLRLRLRLRRLRRRLRLLRRLRRLRRRLLRLLRRLLRRRLLLRLRRRLLLLRRRLLRRRLRRLRLLRLRLRRRLRRRLRRLRRLRRLRLLRRRLRRLRRRLLRRRLRLRRLLRRLLRLRLRRLRRLLRLLRRLRLLRRRLLRRRLRRLLRRLRRRLRLRRRLRRLLLRLLRLLRRRLRLRLRLRRLRRRLLLRRRLRRRLRRRLRRLRLRLRLRRRLRRLLRLRRRLRLRLRRLLLRRRR\n\nTFN = (SMC, LQT)\nJKL = (XDN, KPK)\nJMF = (HGP, QKF)\nRJR = (VMR, RRM)\nFJS = (RMD, HSP)\nQKS = (KDN, KDN)\nVTN = (PQR, LVV)\nPNS = (SDG, XJF)\nRQC = (TDX, DSD)\nHSH = (QTK, VDS)\nSSM = (NFM, PRT)\nFDX = (JJJ, SCZ)\nMHS = (PBJ, THP)\nDPV = (KXL, STJ)\nHVP = (DPV, RGP)\nTPN = (TJC, KMC)\nTFD = (QVD, DRT)\nHQH = (TMT, SXJ)\nHGP = (TNG, GMK)\nFCC = (HGB, MLQ)\nMDJ = (CCH, HMG)\nQKF = (GMK, TNG)\nDBP = (FNP, TRB)\nQNQ = (SKD, HRG)\nVGC = (LFV, TVS)\nNQD = (PTD, TCM)\nGSQ = (PPP, KHS)\nLKC = (QKG, TTL)\nFDD = (TRX, NKV)\nQMG = (QSR, SDR)\nSXD = (DNN, KJC)\nNXD = (RLB, RLB)\nSBP = (PRG, CXT)\nXDM = (RKH, VRF)\nGHD = (JLX, VXS)\nXJV = (VXS, JLX)\nGXX = (TDJ, NXP)\nDMQ = (SLH, RTD)\nSMC = (RFR, DPS)\nBBC = (HPF, CJL)\nGVZ = (CQJ, HRT)\nMMT = (VPH, MGD)\nLCQ = (HSH, TPX)\nNXC = (NXP, TDJ)\nNLL = (VJM, QTP)\nNQZ = (CRR, KCL)\nKLT = (SFS, PSM)\nSDR = (FBB, KGM)\nGCS = (HNQ, BDH)\nHLJ = (JXV, SPG)\nSRP = (XXC, RKP)\nQJH = (XDC, DBP)\nXJF = (NHT, SLL)\nQCD = (RQM, LCQ)\nQSS = (KHD, QMG)\nXNJ = (FJS, GLF)\nPFH = (NSP, HSG)\nVVD = (JLQ, VKF)\nPNT = (PXQ, CMM)\nPJG = (DBP, XDC)\nTTL = (LFS, NHL)\nGJM = (HVL, GMF)\nBGM = (QBK, SKV)\nDXD = (GNN, HQH)\nJPP = (QHM, DXD)\nLPH = (JKS, HBQ)\nCDG = (LXQ, KTC)\nPLF = (HGG, LRS)\nJJP = (SRQ, NQD)\nPBH = (CMM, PXQ)\nHGD = (XGK, XCL)\nNNM = (GTK, XCB)\nTFG = (JHM, JMK)\nVDQ = (PSM, SFS)\nNDP = (CGF, LBM)\nCGF = (KVF, TVM)\nKDN = (KCL, CRR)\nRQM = (HSH, TPX)\nJKB = (JPP, VGH)\nXDC = (FNP, TRB)\nVDF = (BKD, NQQ)\nTKN = (VGM, BDK)\nNSN = (GJV, SPB)\nDSD = (QVK, MVX)\nVFX = (PKM, VTN)\nFRC = (JBH, BCK)\nXKX = (PNS, CVL)\nVRF = (QHR, FDX)\nJCV = (BGP, BGP)\nJRC = (JKV, NBL)\nHNQ = (QNQ, HFB)\nBMV = (DBV, CFH)\nFTC = (PKM, VTN)\nKHS = (TFD, VPM)\nJQX = (VBL, PPX)\nHGM = (NFM, PRT)\nBGD = (LCQ, RQM)\nPSM = (KJB, SJH)\nVXL = (TDB, HGD)\nLKT = (LDB, MMT)\nRJV = (CJL, HPF)\nJBF = (FJC, QHH)\nRBV = (QKS, CTD)\nGBL = (DCX, JRF)\nXVX = (XGT, DCJ)\nGSD = (JMG, CVR)\nRGP = (STJ, KXL)\nHRV = (LPG, DMQ)\nVPH = (PQF, KLF)\nSTP = (NMG, BXH)\nTTH = (HMV, NCR)\nMLQ = (SFP, GCS)\nRCR = (LBM, CGF)\nCCB = (HQB, VSQ)\nQGL = (RRS, RRS)\nHVL = (LDR, CXN)\nQKG = (NHL, LFS)\nXGN = (HGG, LRS)\nJCG = (KBS, QLP)\nPVX = (XHG, XPC)\nTPD = (TDH, QLT)\nXQG = (NXD, KSK)\nKHL = (GQX, TSK)\nGVF = (VBJ, DJL)\nSGB = (XXC, RKP)\nRKD = (BNP, PTZ)\nQNS = (JKS, HBQ)\nJXV = (BQX, PKN)\nJVJ = (SRQ, NQD)\nVLG = (BJL, MTP)\nVLJ = (KBP, VGC)\nHQL = (PLF, XGN)\nDTR = (SKV, QBK)\nGJV = (HLP, DQR)\nDTX = (GBQ, XDM)\nTDH = (KBL, PRK)\nKLF = (RPC, BMG)\nLBQ = (NRF, MGJ)\nXHG = (FBL, JMF)\nCBC = (TNT, TJS)\nSVP = (LTD, JQX)\nKCC = (NMX, NBF)\nNFS = (HVL, GMF)\nGMH = (RND, CSJ)\nFVF = (QVH, XLR)\nNHK = (MQT, HFR)\nNBN = (VMR, RRM)\nCSD = (CSK, JPS)\nVQL = (THK, SXT)\nHFB = (SKD, HRG)\nKHD = (QSR, SDR)\nNLV = (SDB, DDZ)\nCNP = (JHX, PDP)\nPRK = (KPS, DDS)\nCQB = (BBP, GCQ)\nPCJ = (JRF, DCX)\nHSG = (JCV, NTF)\nSXJ = (CML, RKD)\nSFP = (HNQ, BDH)\nDDZ = (GXX, NXC)\nHLR = (NKV, TRX)\nBJL = (XPH, MSC)\nJFS = (KJC, DNN)\nNPH = (TBX, QCG)\nKBR = (PJX, GVF)\nJQH = (VNT, KBT)\nMBX = (PTB, BMR)\nNXR = (JBT, KMD)\nNCR = (PMB, MJR)\nTHP = (BRT, FDV)\nRNG = (KJN, KTH)\nRPC = (PRR, RBC)\nXMR = (LSD, BMM)\nHMG = (SSM, HGM)\nPCH = (QJH, PJG)\nMMG = (NBF, NMX)\nQBJ = (HNS, JNR)\nKBL = (DDS, KPS)\nVBJ = (XJV, GHD)\nGHT = (CVL, PNS)\nVGH = (QHM, DXD)\nGTK = (NCX, CCB)\nBMR = (GMD, FHH)\nFDV = (MBK, VJQ)\nBKD = (CBQ, RVM)\nQTP = (TXR, FVX)\nVBL = (HMR, QFM)\nQTK = (TPB, SHF)\nRTD = (JRC, RNF)\nQFR = (MDP, HTC)\nMSF = (CSK, JPS)\nPKM = (PQR, LVV)\nVHK = (KHD, QMG)\nVGL = (BCK, JBH)\nVNT = (VKH, NLP)\nKXN = (VCN, VPS)\nHSP = (TMC, CMT)\nLSD = (GHT, XKX)\nLGN = (GNL, JDP)\nQGC = (QLT, TDH)\nNKV = (XPS, LKJ)\nDJK = (KTH, KJN)\nBCK = (NCF, MCQ)\nFDS = (PSD, RBQ)\nSCZ = (TDV, FKM)\nPGQ = (DSV, NJR)\nPTD = (VVD, BTH)\nSLK = (SMB, GSQ)\nMJR = (DMB, MBC)\nBGC = (HRQ, MVB)\nXLN = (QSS, VHK)\nKFG = (MRB, JQL)\nNQB = (TRR, SMV)\nFMV = (PBJ, THP)\nQGJ = (QQB, KNC)\nPQR = (LTS, VDF)\nTHK = (NCK, DKX)\nTDX = (QVK, MVX)\nQCN = (DHN, STP)\nKJN = (QGX, TQC)\nCBS = (QSS, VHK)\nDNN = (XQG, HGN)\nBQX = (SXD, JFS)\nCMT = (JGJ, NRC)\nFJC = (FSB, LRK)\nTPB = " <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day08 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    {turns, nodes} = parse(input)
+
+    step_count_p1("AAA", 0, turns, turns, nodes)
+  end
+
+  def part2(input) do
+    {turns, nodes} = parse(input)
+
+    nodes
+    |> Map.keys()
+    |> Enum.filter(&String.ends_with?(&1, "A"))
+    |> Enum.map(&step_count_p2(&1, 0, turns, turns, nodes))
+    |> Enum.reduce(1, &Math.lcm/2)
+  end
+
+  defp step_count_p1("ZZZ", count, _, _, _), do: count
+
+  defp step_count_p1(current, count, [], turns, nodes) do
+    step_count_p1(current, count, turns, turns, nodes)
+  end
+
+  defp step_count_p1(current, count, [next_turn | tail], turns, nodes) do
+    next_node(next_turn, nodes, current)
+    |> step_count_p1(count + 1, tail, turns, nodes)
+  end
+
+  defp step_count_p2(current, count, [], turns, nodes) do
+    step_count_p2(current, count, turns, turns, nodes)
+  end
+
+  defp step_count_p2(current, count, [next_turn | tail], turns, nodes) do
+    if String.ends_with?(current, "Z") do
+      count
+    else
+      next_node(next_turn, nodes, current)
+      |> step_count_p2(count + 1, tail, turns, nodes)
+    end
+  end
+
+  defp next_node(?L, nodes, current) do
+    nodes[current] |> elem(0)
+  end
+
+  defp next_node(?R, nodes, current) do
+    nodes[current] |> elem(1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      [turns | nodes] = input
+
+      {
+        String.to_charlist(turns),
+        Enum.map(nodes, &parse_line/1) |> Enum.into(%{})
+      }
+    end
+
+    def parse_line(line) do
+      [key, left, right] = String.split(line, [" = (", ")", ", "], trim: true)
+
+      {key, {left, right}}
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day08, <<70, 79, 82, 49, 0, 0, 14, ...>>,
+ {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**QUESTION ONE?**
+
+Your puzzle answer was `answer one`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day08.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+20777
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day08.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+13289612809129
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/8/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day08Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input1a:
+        "RL\n\nAAA = (BBB, CCC)\nBBB = (DDD, EEE)\nCCC = (ZZZ, GGG)\nDDD = (DDD, DDD)\nEEE = (EEE, EEE)\nGGG = (GGG, GGG)\nZZZ = (ZZZ, ZZZ)",
+      input1b: "LLR\n\nAAA = (BBB, BBB)\nBBB = (AAA, ZZZ)\nZZZ = (ZZZ, ZZZ)",
+      input2:
+        "LR\n\n11A = (11B, XXX)\n11B = (XXX, 11Z)\n11Z = (11B, XXX)\n22A = (22B, XXX)\n22B = (22C, 22C)\n22C = (22Z, 22Z)\n22Z = (22B, 22B)\nXXX = (XXX, XXX)"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input1a: input1a, input1b: input1b} do
+      assert Day08.part1(input1a) == 2
+      assert Day08.part1(input1b) == 6
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input2: input2} do
+      assert Day08.part2(input2) == 6
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 92193
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day08.part1(input) end,
+    "Part 2" => fn -> Day08.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        415.03        2.41 ms     ±1.34%        2.40 ms        2.53 ms
+Part 2        118.29        8.45 ms     ±0.88%        8.43 ms        8.76 ms
+
+Comparison: 
+Part 1        415.03
+Part 2        118.29 - 3.51x slower +6.04 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1       160.71 KB
+Part 2       173.02 KB - 1.08x memory usage +12.31 KB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1        138.49 K     ±0.01%       138.49 K       138.53 K
+Part 2        802.50 K     ±0.00%       802.50 K       802.54 K
+
+Comparison: 
+Part 1        138.49 K
+Part 2        802.50 K - 5.79x reduction count +664.01 K
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
