@@ -48,7 +48,10 @@ defmodule Day09 do
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Enum.map(fn line ->
+      find_sequence_p2(line) |> Enum.reduce(0, &(&1 - &2))
+    end)
+    |> Enum.sum()
   end
 
   def find_sequence(line) do
@@ -67,6 +70,25 @@ defmodule Day09 do
 
   defp find_sequence([a | [b | _] = tail], diffs, ends) do
     find_sequence(tail, [b - a | diffs], ends)
+  end
+
+  def find_sequence_p2(line) do
+    find_sequence_p2(line, [], [hd(line)])
+  end
+
+  defp find_sequence_p2([_], diffs, ends) do
+    diffs = Enum.reverse(diffs)
+    x = hd(diffs)
+
+    if Enum.all?(diffs, &(&1 == x)) do
+      [x | ends]
+    else
+      find_sequence_p2(diffs, [], [x | ends])
+    end
+  end
+
+  defp find_sequence_p2([a | [b | _] = tail], diffs, ends) do
+    find_sequence_p2(tail, [b - a | diffs], ends)
   end
 
   defmodule Input do
@@ -92,13 +114,13 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day09, <<70, 79, 82, 49, 0, 0, 12, ...>>,
+{:module, Day09, <<70, 79, 82, 49, 0, 0, 16, ...>>,
  {:module, Day09.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
-**QUESTION ONE?**
+Analyze your OASIS report and extrapolate the next value for each history. **What is the sum of these extrapolated values?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `1995001648`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -112,9 +134,9 @@ Day09.part1(input)
 1995001648
 ```
 
-**QUESTION TWO?**
+Analyze your OASIS report again, this time extrapolating the previous value for each history. **What is the sum of these extrapolated values?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `988`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -125,91 +147,7 @@ Day09.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[
-  [14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54],
-  [12, 27, 47, 68, 92, 149, 343, 943, 2562, 6504, 15418, 34500, 73686, 151710, 303812, 596709,
-   1157888, 2232401, 4290657, 8227316, 15717112],
-  [-1, 12, 52, 135, 290, 585, 1167, 2315, 4511, 8546, 15696, 28027, 48918, 83927, 142167, 238407,
-   396167, 652136, 1062308, 1710303, 2718418],
-  [5, 20, 41, 73, 130, 249, 514, 1092, 2286, 4613, 8918, 16538, 29533, 51004, 85521, 139687, 222867,
-   348114, 533327, 802679, 1188356],
-  [4, -1, -6, -11, -16, -21, -26, -31, -36, -41, -46, -51, -56, -61, -66, -71, -76, -81, -86, -91,
-   -96],
-  [17, 19, 24, 49, 132, 341, 793, 1706, 3535, 7295, 15259, 32346, 68692, 144135, 295652, 589171,
-   1137653, 2127907, 3859274, 6798103, 11652852],
-  [16, 22, 25, 27, 42, 114, 348, 958, 2336, 5146, 10447, 19849, 35706, 61350, 101370, 161940,
-   251200, 379694, 560869, 811639, 1153018],
-  [2, 4, 10, 20, 37, 75, 187, 530, 1502, 4019, 10054, 23656, 52851, 113180, 234277, 472014, 930586,
-   1801798, 3433154, 6442636, 11906905],
-  [8, 22, 38, 54, 68, 88, 164, 455, 1345, 3632, 8842, 19775, 41481, 83000, 160390, 301820, 555830,
-   1004266, 1781894, 3105292, 5314322],
-  [4, 22, 63, 144, 299, 591, 1136, 2153, 4054, 7588, 14053, 25590, 45573, 79109, 133662, 219815,
-   352184, 550498, 840859, 1257196, 1842927],
-  [6, 13, 22, 44, 98, 205, 391, 721, 1407, 3076, 7361, 18108, 43709, 101432, 225212, 479319, 981804,
-   1943871, 3734624, 6985356, 12754124],
-  [8, 25, 56, 106, 191, 351, 684, 1418, 3041, 6523, 13701, 27970, 55542, 107713, 204827, 382958,
-   704758, 1276453, 2273622, 3979178, 6837897],
-  [11, 12, 13, 13, 13, 23, 80, 288, 893, 2417, 5907, 13437, 29194, 61894, 130093, 273458, 575643,
-   1208626, 2514941, 5154141, 10354271],
-  [17, 21, 18, 5, -24, -70, -112, -80, 186, 998, 2913, 6870, 14387, 27837, 50825, 88691, 149167,
-   243219, 386108, 598707, 909114],
-  [4, 12, 24, 38, 63, 133, 320, 746, 1594, 3118, 5652, 9618, 15533, 24015, 35788, 51686, 72656,
-   99760, 134176, 177198, 230235],
-  [-3, 11, 47, 113, 228, 443, 886, 1848, 3942, 8401, 17640, 36304, 73200, 144877, 282435, 544969,
-   1046991, 2015276, 3906455, 7646338, 15104916],
-  [20, 26, 35, 65, 158, 395, 924, 2025, 4263, 8821, 18160, 37222, 75475, 150196, 291499, 549740,
-   1006070, 1787060, 3084489, 5181567, 8487060],
-  [3, 12, 39, 91, 186, 366, 726, 1471, 3014, 6138, 12269, 23947, 45637, 85088, 155518, 278967,
-   491205, 848592, 1437243, 2384731, 3874340],
-  [19, 37, 61, 91, 127, 169, 217, 271, 331, 397, 469, 547, 631, 721, 817, 919, 1027, 1141, 1261,
-   1387, 1519],
-  [14, 20, 35, 59, 85, 104, 126, 232, 679, 2087, 5744, 14072, 31304, 64429, 124469, 228159, 400108,
-   675526, 1103609, 1751681, 2710199],
-  [9, 25, 43, 63, 85, 109, 135, 163, 193, 225, 259, 295, 333, 373, 415, 459, 505, 553, 603, 655,
-   709],
-  [2, 8, 32, 85, 173, 292, 434, 624, 1028, 2199, 5556, 14212, 34271, 76689, 159726, 311889, 575062,
-   1007218, 1683688, 2695399, 4141761],
-  [5, 2, -3, -1, 39, 180, 528, 1245, 2563, 4797, 8366, 13873, 22401, 36426, 62308, 116593, 241137,
-   537800, 1244623, 2895947, 6644891],
-  [4, 19, 56, 134, 282, 555, 1056, 1972, 3652, 6782, 12759, 24462, 47816, 94935, 190357, 383171,
-   770012, 1537433, 3037698, 5920442, 11355046],
-  [-6, -10, -17, -31, -57, -100, -170, -294, -535, -1008, -1843, -2934, -3047, 2731, 29473, 117660,
-   367128, 1009454, 2556807, 6098291, 13872479],
-  [9, 29, 67, 137, 278, 564, 1112, 2091, 3733, 6343, 10299, 16025, 23910, 34134, 46348, 59139,
-   69193, 70049, 50315, -8807, -136866],
-  [7, 2, -7, -10, 20, 126, 358, 753, 1303, 1914, 2365, 2284, 1168, -1514, -6082, -12201, -18145,
-   -19662, -8311, 30882, 122628],
-  [8, 13, 32, 77, 159, 284, 449, 647, 903, 1382, 2635, 6080, 14852, 35199, 78650, 165236, 328106,
-   619947, 1121690, 1954063, 3292637],
-  [17, 28, 41, 54, 57, 37, -1, 6, 241, 1104, 3384, 8601, 19718, 42627, 89216, 183610, 374677,
-   760736, 1537998, 3095953, 6208677],
-  [28, 41, 65, 111, 199, 382, 795, 1736, 3782, 7951, 15955, 30668, 57093, 104426, 190420, 350385,
-   655208, 1246346, 2401747, 4656396, ...],
-  [15, 28, 50, 96, 189, 365, 695, 1341, 2671, 5466, 11260, 22862, 45117, 85971, 157913, 279875,
-   479679, 797128, 1287846, ...],
-  [0, -2, -5, 0, 44, 188, 531, 1228, 2552, 5080, 10164, 20983, 44686, 96460, 206828, 434143, 885144,
-   1747634, ...],
-  [7, 12, 37, 108, 272, 611, 1270, 2505, 4767, 8861, 16268, 29827, 55204, 104023, 200351, 393653,
-   783743, ...],
-  [7, 22, 51, 94, 151, 222, 307, 406, 519, 646, 787, 942, 1111, 1294, 1491, 1702, ...],
-  [17, 37, 68, 115, 201, 387, 815, 1796, 3982, 8686, 18455, 38089, 76500, 150244, 290479, ...],
-  [12, 29, 70, 158, 338, 695, 1395, 2758, 5380, 10356, 19729, 37409, 70976, 135004, ...],
-  [9, 11, 24, 67, 171, 379, 747, 1347, 2276, 3678, 5789, 9018, 14080, ...],
-  [12, 18, 23, 23, 12, -15, -52, -65, 34, 437, 1555, 4282, ...],
-  [11, 13, 21, 48, 117, 260, 525, 998, 1849, 3420, 6390, ...],
-  [15, 27, 48, 91, 194, 427, 895, 1747, 3214, 5711, ...],
-  [28, 39, 63, 115, 219, 418, 800, 1556, 3098, ...],
-  [9, 13, 33, 79, 164, 305, 529, 903, ...],
-  [5, 9, 17, 37, 82, 182, 407, ...],
-  [8, 34, 80, 157, 294, 551, ...],
-  [-6, -3, 15, 68, 189, ...],
-  [20, 32, 56, 103, ...],
-  [13, 26, 66, ...],
-  [12, 16, ...],
-  [7, ...],
-  [...],
-  ...
-]
+988
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -242,7 +180,7 @@ defmodule Day09Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day09.part2(input) == [""]
+      assert Day09.part2(input) == 2
     end
   end
 end
@@ -253,24 +191,9 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-.
-
-  1) test part2/1 returns expected value (Day09Test)
-     day-09.livemd#cell:z7u3p4wde3rorcuk3cgyhpv2l774ljly:19
-     Assertion with == failed
-     code:  assert Day09.part2(input) == [""]
-     left:  [
-              [0, 3, 6, 9, 12, 15],
-              [1, 3, 6, 10, 15, 21],
-              [10, 13, 16, 21, 30, 45]
-            ]
-     right: [""]
-     stacktrace:
-       day-09.livemd#cell:z7u3p4wde3rorcuk3cgyhpv2l774ljly:20: (test)
-
-
+..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 1 failure
+2 tests, 0 failures
 
 Randomized with seed 805062
 ```
@@ -278,7 +201,7 @@ Randomized with seed 805062
 <!-- livebook:{"output":true} -->
 
 ```
-%{total: 2, failures: 1, excluded: 0, skipped: 0}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
 
 ## Benchmarking
@@ -300,7 +223,60 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
 
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        2.72 K      368.18 μs     ±6.09%      363.54 μs      418.74 μs
+Part 2        2.63 K      379.78 μs     ±5.22%      375.04 μs      427.92 μs
+
+Comparison: 
+Part 1        2.72 K
+Part 2        2.63 K - 1.03x slower +11.60 μs
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         1.19 MB     ±0.00%        1.19 MB        1.19 MB
+Part 2         1.22 MB     ±0.01%        1.22 MB        1.22 MB
+
+Comparison: 
+Part 1         1.19 MB
+Part 2         1.22 MB - 1.03x memory usage +0.0340 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1         90.75 K
+Part 2         89.11 K - 0.98x reduction count -1.63400 K
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
