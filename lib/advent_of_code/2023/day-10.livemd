@@ -1,0 +1,296 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 10 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/10)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/10/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-10.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"F-F7----F7-7-J--J--7FFL7F-7FFF77JFL|7|-L7--F77FF-FF7..-J7.F---FF7-|-JF7-J-F|-7FF|-FLL--7F-F--.--|77F|F---7-F--F7.L7F77|F----FF-F7FF.F-.L.L.J\n7-L--|J|||FL-7|-|F7-LJ|F|-F7FJ|7.F-|-L7L-7LJ.-F--F.L--J---7|J|.|.LL||-|.F-|JL.FL.LLLJ7F7JL7JJ7-FL7L-F7L|J|FLJ.|JF--JFJJL7L.|LJ-|7F|-JJ77..F|\n|L|.7JF|J---J|J.|F.|L7LFFFJLJFJF7F77.F7.L7L-7F|7FLFJ.|F7J|LL.--|JJ|FJF-7J7L7|F-L---7J.|.F-|-F-7.LL7.|JF--7-7L7|7||J-|JJJFF||..|L7L7FJL7777FJ\nJ-FJJ-L|LF7|.|-F|J-|7J7LLL--7L-J||L7.FL|JFF-J-LL-JJ.F-L7F|-FF|||L7-LF7J|F|7|F7JFJ.L|J.L7JJF77-77-LL-JL|.J|LJJL7.F|..LJ.F--.LF-|.7F|FJ7|-F--J\n|FLJJ.L|F|LFF-.7J.FLJ-7.LFF7L7F-J|FJF--7|FJJF-7|-|L|-7F7-JF7F--7.--FF77-F.|FL|FJJ|7|-F7.LF-J-FJ|-.LL|.LF-7J|7LJF7L-L-F---|-F7F-|J7||.LF7LJJ.\n77|FF-FL-L-7J|L|-7-||FL7.F|L-J|F7|L7|F-J7.F-FFF7.77JFFJ||J||L-7|7LFFJL7F7.LJ.|7|.F-J7FL---|J-|JJJ7F|L7F|.|FFF7J--7J|.LJ|L|.FL-LLF-J|FLL--J.|\n|-F|J7L77-7J7|7L-|-J---JFFL7F-J|||FJ||F777JF.FJ|F7F-77-FF7||7J|L--7|F-J|L7|F7LJ-7J7.F7-7LLF-FJ-|JFJ|FL|J7L|JL|LL|JLJ7.FL-77LJ|L7.L|FLJL||-|J\n|LJJ|LJ--.L.LJ||LL|J|FLFF--JL7FJ|||-||||-|7JFL7||||FJF-7||||F7L7F7LJL7FL7|7|--|F--7FJLL|7FJF||L77JLFJLL7FF|.F7LL|-JJL7LJF.J7.77L-FL--7.L|7|J\nFF7L|JJF|7..JFLF-JFFJJ-LL---7|L7LJL-J||L-77FF7|||||L7|FJ|LJLJL7LJL-7FJF7||7||FFJJ-L7J7JJ|.FF-77LF..LF.LFF-JLL|-7L.F--J7FF7|LFJJ--JJ.F7-L77L-\nFJ|||--JLJ.FJF-JF-.F7L7.LF7FJL7|F----J|F-J--|LJLJLJFJ||FJF----JLF--JL7|LJL7-|7||.F|LF7-F777L7L77F-7.F7F77.FF|JL7JF-JFJ-FJJ.F.F7.F7|FJL|JL|||\n77J||.77.LLF.J7F|----7JLFJLJF7|||7F7F7||F7|.L-----7L7||L7L-7.FF7L---7LJF-7|||-77.F7.L|.FJLF7L7L-JFJFJLJ|-F-F-7F---7|77FL-J-77LF7|7|7..|.FFF-\n|J7|L7L|77.-7J7LJJ|7|LFJ|F7FJ|LJL7|||LJLJL7F-7F7F7L7LJ|FJF-JF7|L7LF7|F-J.LJF7|L|L7.-7FF7-FF77|F--J||F--J||-LJ|||JLLJJL|.LJ.J7FJ--7L-7-J7.LL|\n|FL7F|7|L77LJ7FJ7.LF||J.LJLJFJF-7|||L7F--7|L7||LJ|-L7FJL7|F-JLJFJ7|LJL-7F77|L7J|LLF-FF||-||L-JL7F--JL--7-|L|L|7|7.|7.FF7|||JF7.LJL7||FF-7.FJ\n.F7L7.--7|LF7F.||-7L-7JFJF--JFJF||||F|L-7LJFJ|L-7|F7|L7F|||F---JF7L-7F-J||FJFJ-F--J-LFJ|7FL--7FJL-7F---JF77|LF-7L7FLL7LJ-J|.L|F|.|LFL7JJL7||\nJ|L.|F-JLL.LJ-|7|.L7|J7LFL--7|F-JLJ|FJF7L-7L7L--JLJLJFJFJLJ|F-7FJ|F7|L-7|||FJ7J.|7||||FJF7F--J|F7FJ|F-7JF-7FFJFJF7JLF7J|.|LJLF-J--.7LJ.F.|L7\nF||FLJ7|FL-JL.LF-F7F77JF---7LJL7F--JL7|L--JJL7F-----7|-L7F-J|FJL7LJ||F7||LJ|F7F7F7-F-J|7|||F-7|||L7LJFJFJFJFJFJ||||FFJ-J-L7|F|FJJ|F-7LJ--|.-\nFLF7.LL77F|.FL7L---|L77L--7|F7FJL--7FJL--7.F7LJF7F-7|L-7||F7||F7|F7LJ|LJ|F-J|||||L7|F7L7||LJFJ||L-JF-JFL7|.L7|F7|L7F-7-LF7F7FF|LFF7.FJLL-7.J\nF-F-7F||F||--.-7|JF|FJ7JF-JLJLJF7F-JL7F--JFJ|F-J|L7||F7||LJ|||||LJ|F7L--JL7||||||FJLJ|FJ|L7FJFJL7F-JF-7FJ|F7|||LJFJ|FJ.F-JLLLJ|FLLJ-|-LLLL7.\nF.|--7F7L|J7|FFF7L-|L7F7L7F----J||F7FJ|F-7|FJL-7|FJ|||LJL-7|||||F7LJL7F7F7L7|||||L-7FJL7L7|L7L--JL--JFJ|FJ|||LJF-JJ|L7FL-J|7|-LF.F|J..|FLL|7\n||J7.L7.7JF7-F7-|LLL7LJL7LJF7JF7|LJ|L7|L7LJL7.FJ|L7|||FF-7|LJLJLJ|F77||LJ|FJ|LJ||F-JL7FJFJL-JF--7F---JJ|L7||L7FJ.F7L7L7JFJFJLF7JFJLF.F777F|.\nFJ7-LF-7||F.FJL.LFL7L--7|JFJL-J||F-JFJL-JF--JFJFJFJLJL7L7||F-----J||FJL-7LJFL-7||L7|FJL7L7F--JF7|L7F7F7|FJ|L-JL--J|J|FJF77.|7FJ7JL-LL7J|L7|L\n|7|JL|JJ-|.7LJ7FF|FF---JL7L7F7FJ||F7L7F--JF7-L7L-JF-7FJFJLJ||F--7FJ|L7F-JF7FF-J|L7|FJF-JFJ|F--J||FJ||||||LL7F-----JFJL7||J..|||77F7LJ|-7FJJJ\nFF7-J|JJFJ.L|L|FFJFL7F--7L7LJ|L-J||L-JL--7|L7JL--7L7||LL--7L7|F-JL7|FJ|F-JL-JF-JFJ|L7L-7L-JL--7LJL-J||LJ|F-J||F7-F-JF-J||LFFLJ-77|LJFL7LF.|7\n|J|L7J|F7-|.F7|F-F-7LJF7L7|F7L--7|L--7F--J|FJF7F7L7|LJF---JFJ|L-7L|||FJL7F---JF7L7L7L-7L-7F7F7L-7F--JL7FJL-7|FJL-JF-J7FJL7F-77LLJ-L.77FJF7||\nL.|-F7-L|.LJ|7J-FL7|F-JL-JLJL7FFJL-7FJ|F-7|L7|LJ|J|L7LL---7L-JF7|FJ|||.FJL--7|||FJFJF7|F-J||||F7||F7LFJ|F7FJLJF---JF-7L-7|L7|7J||-L7LLL7|-||\nL|.FL--JJ7F-JL|LF-J|L-------7L7L-7FJL7LJFJ|FJL-7L7L7L7F-7|L-7FJLJL7|||FJF---JFJLJFJ7||||F7|||||||LJL7L7||||F--JF7F7|FJF7|L-JL7.L---77F7J|.JJ\nF77|7.|LFF|L|77.L-7|F7F7F--7|FJF-JL77|F-JFJ|F77L7L7|FJL7|F--J|F7F-J||||FJ.F7|L--7|7FJ||||||||||LJF--JFJ||||||F7|||LJ|FJLJF---J7LJ7L|7L|.LJ7.\nLJ-F7J|F-LJ-7|LF7FJ||||||F7LJ|7L-7FJFJ|F7L7|||F7L7LJL7FJ|L--7|||L7FJ|LJL--J|F--7||FJFJ||||||||L-7L7F7L7||||L7||||L-7LJF--J-F--77L||L|-J77||7\nL-JLJLFL|7F|FF-J|L7LJLJ|LJL-7|F7-||7L7|||FJLJ|||FL-7FJ|FJF7FJ|||FJ|FJF--7F-JL-7|||L7|FJLJLJ||L--JFJ||7|LJ||FJ|||L7FJF7L----JF7|77.7-LL|J.|.7\n-7-F|F7" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day10 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    grid = parse(input)
+
+    {start_x, start_y} =
+      start =
+      Enum.find_value(grid, fn
+        {xy, ?S} -> xy
+        _ -> nil
+      end)
+
+    # Assume that the S is acting as a 'F',
+    # as it is in the examples and my real input
+    next_xy_a = {start_x + 1, start_y}
+    next_xy_b = {start_x, start_y + 1}
+
+    find_loop(
+      grid,
+      [{next_xy_a, grid[next_xy_a], ?E}, {start, ?S, nil}],
+      [{next_xy_b, grid[next_xy_b], ?S}, {start, ?S, nil}]
+    )
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  # The 2 paths have met
+  defp find_loop(_grid, [{xy, _, _} | _] = path_a, [{xy, _, _} | _] = _path_b) do
+    length(path_a) - 1
+  end
+
+  defp find_loop(grid, path_a, path_b) do
+    {next_xy_a, next_dir_a} = path_a |> hd() |> next_xy()
+    {next_xy_b, next_dir_b} = path_b |> hd() |> next_xy()
+
+    find_loop(
+      grid,
+      [{next_xy_a, grid[next_xy_a], next_dir_a} | path_a],
+      [{next_xy_b, grid[next_xy_b], next_dir_b} | path_b]
+    )
+  end
+
+  # | is a vertical pipe connecting north and south.
+  defp next_xy({{x, y}, ?|, ?N}), do: {{x, y - 1}, ?N}
+  defp next_xy({{x, y}, ?|, ?S}), do: {{x, y + 1}, ?S}
+  # - is a horizontal pipe connecting east and west.
+  defp next_xy({{x, y}, ?-, ?E}), do: {{x + 1, y}, ?E}
+  defp next_xy({{x, y}, ?-, ?W}), do: {{x - 1, y}, ?W}
+  # L is a 90-degree bend connecting north and east.
+  defp next_xy({{x, y}, ?L, ?S}), do: {{x + 1, y}, ?E}
+  defp next_xy({{x, y}, ?L, ?W}), do: {{x, y - 1}, ?N}
+  # J is a 90-degree bend connecting north and west.
+  defp next_xy({{x, y}, ?J, ?S}), do: {{x - 1, y}, ?W}
+  defp next_xy({{x, y}, ?J, ?E}), do: {{x, y - 1}, ?N}
+  # 7 is a 90-degree bend connecting south and west.
+  defp next_xy({{x, y}, ?7, ?N}), do: {{x - 1, y}, ?W}
+  defp next_xy({{x, y}, ?7, ?E}), do: {{x, y + 1}, ?S}
+  # F is a 90-degree bend connecting south and east.
+  defp next_xy({{x, y}, ?F, ?N}), do: {{x + 1, y}, ?E}
+  defp next_xy({{x, y}, ?F, ?W}), do: {{x, y + 1}, ?S}
+  # . is ground; there is no pipe in this tile.
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> Stream.with_index()
+      |> Enum.reduce(%{}, &parse_line/2)
+    end
+
+    def parse_line({line, y}, grid) do
+      line
+      |> String.to_charlist()
+      |> Enum.with_index()
+      |> Enum.reduce(grid, fn {char, x}, acc ->
+        Map.put(acc, {x, y}, char)
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day10, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+ {:module, Day10.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
+```
+
+Find the single giant loop starting at `S`. **How many steps along the loop does it take to get from the starting position to the point farthest from the starting position?**
+
+Your puzzle answer was `6690`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day10.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+6690
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day10.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {{109, 45}, 55},
+  {{117, 72}, 70},
+  {{101, 0}, 70},
+  {{119, 69}, 70},
+  {{4, 40}, 70},
+  {{37, 126}, 70},
+  {{74, 115}, 45},
+  {{126, 113}, 70},
+  {{127, 23}, 76},
+  {{85, 89}, 70},
+  {{23, 30}, 70},
+  {{17, 55}, 76},
+  {{67, 44}, 55},
+  {{82, 129}, 55},
+  {{53, 38}, 74},
+  {{22, 125}, 45},
+  {{110, 11}, 124},
+  {{15, 51}, 70},
+  {{93, 21}, 45},
+  {{116, 67}, 45},
+  {{111, 86}, 45},
+  {{69, 126}, 124},
+  {{83, 69}, 45},
+  {{68, 109}, 70},
+  {{78, 60}, 76},
+  {{62, 33}, 74},
+  {{16, 138}, 70},
+  {{84, 9}, 70},
+  {{92, 69}, 70},
+  {{47, 23}, 70},
+  {{4, 12}, 70},
+  {{102, 58}, 45},
+  {{133, 121}, 74},
+  {{124, 73}, 45},
+  {{62, 22}, 70},
+  {{56, 86}, 70},
+  {{87, 6}, 55},
+  {{138, 57}, 124},
+  {{32, 35}, 55},
+  {{0, 83}, 45},
+  {{42, 60}, 45},
+  {{124, 24}, 124},
+  {{113, 93}, 70},
+  {{17, 49}, 70},
+  {{98, 81}, 74},
+  {{85, 137}, 70},
+  {{18, 104}, 76},
+  {{102, ...}, 74},
+  {{...}, ...},
+  {...},
+  ...
+]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/10/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day10Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input1: ".....\n.S-7.\n.|.|.\n.L-J.\n.....",
+      input2: "..F7.\n.FJ|.\nSJ.L7\n|F--J\nLJ..."
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input1: input1, input2: input2} do
+      assert Day10.part1(input1) == 4
+      assert Day10.part1(input2) == 8
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input1: _input1} do
+      # assert Day10.part2(input1) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 958413
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day10.part1(input) end,
+    "Part 2" => fn -> Day10.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
