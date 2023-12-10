@@ -39,12 +39,10 @@ defmodule Day10 do
   def part1(input) do
     grid = parse(input)
     start_xy = find_start_xy(grid)
+    start_a = next({start_xy, ?F, ?W}, grid)
+    start_b = next({start_xy, ?F, ?N}, grid)
 
-    find_loop(
-      grid,
-      [{start_xy, ?F, ?W}],
-      [{start_xy, ?F, ?N}]
-    )
+    find_loop(grid, [start_a], [start_b])
   end
 
   def part2(input) do
@@ -61,8 +59,8 @@ defmodule Day10 do
   end
 
   # The 2 paths have met
-  defp find_loop(_grid, [{xy, _, _} | ta] = path_a, [{xy, _, _} | _] = _path_b) when ta != [] do
-    length(path_a) - 1
+  defp find_loop(_grid, [{xy, _, _} | _] = path_a, [{xy, _, _} | _] = _path_b) do
+    length(path_a)
   end
 
   defp find_loop(grid, path_a, path_b) do
@@ -312,19 +310,19 @@ Estimated total run time: 11 s
 Benchmarking Part 1 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        177.25        5.64 ms    ±10.67%        5.44 ms        7.34 ms
+Part 1        181.99        5.49 ms    ±10.53%        5.32 ms        7.22 ms
 
 Memory usage statistics:
 
 Name      Memory usage
-Part 1        11.77 MB
+Part 1        11.78 MB
 
 **All measurements for memory usage were the same**
 
 Reduction count statistics:
 
 Name           average  deviation         median         99th %
-Part 1        406.66 K     ±0.02%       406.63 K       406.90 K
+Part 1        411.37 K     ±0.01%       411.36 K       411.60 K
 ```
 
 <!-- livebook:{"output":true} -->
