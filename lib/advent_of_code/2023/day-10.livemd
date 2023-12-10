@@ -39,6 +39,8 @@ defmodule Day10 do
   def part1(input) do
     grid = parse(input)
     start_xy = find_start_xy(grid)
+    # Assume that the 'S' is acting as a 'F',
+    # as it is in the examples and my real input
     start_a = next({start_xy, ?F, ?W}, grid)
     start_b = next({start_xy, ?F, ?N}, grid)
 
