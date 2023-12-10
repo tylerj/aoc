@@ -70,34 +70,40 @@ defmodule Day10 do
   end
 
   defp find_loop(grid, path_a, path_b) do
-    {next_xy_a, next_dir_a} = path_a |> hd() |> next_xy()
-    {next_xy_b, next_dir_b} = path_b |> hd() |> next_xy()
+    next_a = path_a |> hd() |> next(grid)
+    next_b = path_b |> hd() |> next(grid)
 
     find_loop(
       grid,
-      [{next_xy_a, grid[next_xy_a], next_dir_a} | path_a],
-      [{next_xy_b, grid[next_xy_b], next_dir_b} | path_b]
+      [next_a | path_a],
+      [next_b | path_b]
     )
   end
 
+  defp next(current, grid) do
+    {next_xy, next_dir} = next_xy_and_dir(current)
+
+    {next_xy, grid[next_xy], next_dir}
+  end
+
   # | is a vertical pipe connecting north and south.
-  defp next_xy({{x, y}, ?|, ?N}), do: {{x, y - 1}, ?N}
-  defp next_xy({{x, y}, ?|, ?S}), do: {{x, y + 1}, ?S}
+  defp next_xy_and_dir({{x, y}, ?|, ?N}), do: {{x, y - 1}, ?N}
+  defp next_xy_and_dir({{x, y}, ?|, ?S}), do: {{x, y + 1}, ?S}
   # - is a horizontal pipe connecting east and west.
-  defp next_xy({{x, y}, ?-, ?E}), do: {{x + 1, y}, ?E}
-  defp next_xy({{x, y}, ?-, ?W}), do: {{x - 1, y}, ?W}
+  defp next_xy_and_dir({{x, y}, ?-, ?E}), do: {{x + 1, y}, ?E}
+  defp next_xy_and_dir({{x, y}, ?-, ?W}), do: {{x - 1, y}, ?W}
   # L is a 90-degree bend connecting north and east.
-  defp next_xy({{x, y}, ?L, ?S}), do: {{x + 1, y}, ?E}
-  defp next_xy({{x, y}, ?L, ?W}), do: {{x, y - 1}, ?N}
+  defp next_xy_and_dir({{x, y}, ?L, ?S}), do: {{x + 1, y}, ?E}
+  defp next_xy_and_dir({{x, y}, ?L, ?W}), do: {{x, y - 1}, ?N}
   # J is a 90-degree bend connecting north and west.
-  defp next_xy({{x, y}, ?J, ?S}), do: {{x - 1, y}, ?W}
-  defp next_xy({{x, y}, ?J, ?E}), do: {{x, y - 1}, ?N}
+  defp next_xy_and_dir({{x, y}, ?J, ?S}), do: {{x - 1, y}, ?W}
+  defp next_xy_and_dir({{x, y}, ?J, ?E}), do: {{x, y - 1}, ?N}
   # 7 is a 90-degree bend connecting south and west.
-  defp next_xy({{x, y}, ?7, ?N}), do: {{x - 1, y}, ?W}
-  defp next_xy({{x, y}, ?7, ?E}), do: {{x, y + 1}, ?S}
+  defp next_xy_and_dir({{x, y}, ?7, ?N}), do: {{x - 1, y}, ?W}
+  defp next_xy_and_dir({{x, y}, ?7, ?E}), do: {{x, y + 1}, ?S}
   # F is a 90-degree bend connecting south and east.
-  defp next_xy({{x, y}, ?F, ?N}), do: {{x + 1, y}, ?E}
-  defp next_xy({{x, y}, ?F, ?W}), do: {{x, y + 1}, ?S}
+  defp next_xy_and_dir({{x, y}, ?F, ?N}), do: {{x + 1, y}, ?E}
+  defp next_xy_and_dir({{x, y}, ?F, ?W}), do: {{x, y + 1}, ?S}
   # . is ground; there is no pipe in this tile.
 
   defmodule Input do
@@ -123,7 +129,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day10, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+{:module, Day10, <<70, 79, 82, 49, 0, 0, 17, ...>>,
  {:module, Day10.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
 ```
 
@@ -273,8 +279,8 @@ Randomized with seed 958413
 # https://github.com/bencheeorg/benchee
 Benchee.run(
   %{
-    "Part 1" => fn -> Day10.part1(input) end,
-    "Part 2" => fn -> Day10.part2(input) end
+    "Part 1" => fn -> Day10.part1(input) end
+    # "Part 2" => fn -> Day10.part2(input) end
   },
   memory_time: 2,
   reduction_time: 2
@@ -286,7 +292,43 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
 
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 11 s
+
+Benchmarking Part 1 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        177.25        5.64 ms    ±10.67%        5.44 ms        7.34 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1        11.77 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1        406.66 K     ±0.02%       406.63 K       406.90 K
 ```
 
 <!-- livebook:{"output":true} -->
