@@ -38,23 +38,12 @@ defmodule Day10 do
 
   def part1(input) do
     grid = parse(input)
-
-    {start_x, start_y} =
-      start =
-      Enum.find_value(grid, fn
-        {xy, ?S} -> xy
-        _ -> nil
-      end)
-
-    # Assume that the S is acting as a 'F',
-    # as it is in the examples and my real input
-    next_xy_a = {start_x + 1, start_y}
-    next_xy_b = {start_x, start_y + 1}
+    start_xy = find_start_xy(grid)
 
     find_loop(
       grid,
-      [{next_xy_a, grid[next_xy_a], ?E}, {start, ?S, nil}],
-      [{next_xy_b, grid[next_xy_b], ?S}, {start, ?S, nil}]
+      [{start_xy, ?F, ?W}],
+      [{start_xy, ?F, ?N}]
     )
   end
 
@@ -64,8 +53,15 @@ defmodule Day10 do
     |> Enum.map(& &1)
   end
 
+  defp find_start_xy(grid) do
+    Enum.find_value(grid, fn
+      {xy, ?S} -> xy
+      _ -> nil
+    end)
+  end
+
   # The 2 paths have met
-  defp find_loop(_grid, [{xy, _, _} | _] = path_a, [{xy, _, _} | _] = _path_b) do
+  defp find_loop(_grid, [{xy, _, _} | ta] = path_a, [{xy, _, _} | _] = _path_b) when ta != [] do
     length(path_a) - 1
   end
 
@@ -129,7 +125,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day10, <<70, 79, 82, 49, 0, 0, 17, ...>>,
+{:module, Day10, <<70, 79, 82, 49, 0, 0, 16, ...>>,
  {:module, Day10.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
 ```
 
