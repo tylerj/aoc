@@ -1,0 +1,254 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 11 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/11)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/11/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-11.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"...#......\n.......#..\n#.........\n..........\n......#...\n.#........\n.........#\n..........\n.......#..\n#...#....."
+```
+
+## Solution
+
+```elixir
+defmodule Day11 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    grid =
+      parse(input)
+      |> add_empties()
+      |> add_galaxies()
+
+    find_distances(grid.galaxies, [], grid)
+    |> Enum.map(&elem(&1, 2))
+    |> Enum.sum()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defp find_distances([_lastg], distances, _grid), do: distances
+
+  defp find_distances([g1 | tail], distances, grid) do
+    Enum.reduce(tail, distances, fn g2, acc ->
+      [{g1, g2, calc_distance(g1, g2, grid)} | acc]
+    end)
+    |> then(&find_distances(tail, &1, grid))
+  end
+
+  defp calc_distance({x1, y1}, {x2, y2}, grid) do
+    extra_x = x1..x2 |> Enum.count(&(&1 in grid.empty_x))
+    extra_y = y1..y2 |> Enum.count(&(&1 in grid.empty_y))
+
+    abs(x2 - x1) + abs(y2 - y1) + extra_x + extra_y
+  end
+
+  defp add_empties(grid) do
+    grid
+    |> Map.put(
+      :empty_y,
+      0..grid.max_y
+      |> Enum.reduce([], fn y, acc ->
+        if Enum.all?(0..grid.max_x, &(grid[{&1, y}] == ?.)) do
+          [y | acc]
+        else
+          acc
+        end
+      end)
+    )
+    |> Map.put(
+      :empty_x,
+      0..grid.max_x
+      |> Enum.reduce([], fn x, acc ->
+        if Enum.all?(0..grid.max_y, &(grid[{x, &1}] == ?.)) do
+          [x | acc]
+        else
+          acc
+        end
+      end)
+    )
+  end
+
+  defp add_galaxies(grid) do
+    Map.put(grid, :galaxies, for({k, ?#} <- grid, do: k))
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      input
+      |> Enum.with_index()
+      |> Enum.reduce(%{}, &parse_line/2)
+      |> add_max_xy()
+    end
+
+    def parse_line({line, row}, grid) do
+      line
+      |> String.to_charlist()
+      |> Enum.with_index()
+      |> Enum.reduce(grid, fn {char, col}, acc ->
+        Map.put(acc, {col, row}, char)
+      end)
+    end
+
+    defp add_max_xy(grid) do
+      x = Map.keys(grid) |> Enum.map(&elem(&1, 0)) |> Enum.max()
+      y = Map.keys(grid) |> Enum.map(&elem(&1, 1)) |> Enum.max()
+
+      Map.merge(grid, %{max_x: x, max_y: y})
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day11, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+ {:module, Day11.Input, <<70, 79, 82, ...>>, {:add_galaxies, 1}}}
+```
+
+Expand the universe, then find the length of the shortest path between every pair of galaxies. **What is the sum of these lengths?**
+
+Your puzzle answer was `10033566`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day11.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+374
+```
+
+Starting with the same initial image, expand the universe according to these new rules, then find the length of the shortest path between every pair of galaxies. **What is the sum of these lengths?**
+
+Your puzzle answer was ``.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day11.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1112
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/11/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day11Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day11.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day11.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day11.part1(input) end,
+    "Part 2" => fn -> Day11.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
