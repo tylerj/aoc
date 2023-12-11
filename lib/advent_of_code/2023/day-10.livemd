@@ -38,19 +38,53 @@ defmodule Day10 do
 
   def part1(input) do
     grid = parse(input)
+    loop = find_loop(grid)
+
+    length(loop) |> div(2)
+  end
+
+  def part2(input) do
+    grid = parse(input)
+    loop = find_loop(grid)
+
+    # https://en.wikipedia.org/wiki/Pick%27s_theorem
+    shoelace_area(loop) - (length(loop) |> div(2)) + 1
+  end
+
+  # Run it in both directions, not being sure
+  # which direction is "positively oriented".
+  # The incorrect direction will have a negative answer.
+  defp shoelace_area(loop) do
+    max(
+      shoelace_area_calc(loop),
+      shoelace_area_calc(Enum.reverse(loop))
+    )
+  end
+
+  # https://en.wikipedia.org/wiki/Shoelace_formula
+  defp shoelace_area_calc(loop) do
+    loop
+    |> Enum.chunk_every(2, 1, [hd(loop)])
+    |> Enum.map(fn [{x1, y1}, {x2, y2}] ->
+      x1 * y2 - x2 * y1
+    end)
+    |> Enum.sum()
+    |> div(2)
+  end
+
+  defp find_loop(grid) do
     start_xy = find_start_xy(grid)
     # Assume that the 'S' is acting as a 'F',
     # as it is in the examples and my real input
     start_a = next({start_xy, ?F, ?W}, grid)
     start_b = next({start_xy, ?F, ?N}, grid)
 
-    find_loop(grid, [start_a], [start_b])
-  end
-
-  def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
+    [
+      start_xy
+      | grid
+        |> find_loop([start_a], [start_b])
+        |> Enum.map(&elem(&1, 0))
+    ]
   end
 
   defp find_start_xy(grid) do
@@ -61,8 +95,8 @@ defmodule Day10 do
   end
 
   # The 2 paths have met
-  defp find_loop(_grid, [{xy, _, _} | _] = path_a, [{xy, _, _} | _] = _path_b) do
-    length(path_a)
+  defp find_loop(_grid, [{xy, _, _} | _] = path_a, [{xy, _, _} | path_b]) do
+    Enum.reverse(path_b) ++ path_a
   end
 
   defp find_loop(grid, path_a, path_b) do
@@ -125,7 +159,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day10, <<70, 79, 82, 49, 0, 0, 16, ...>>,
+{:module, Day10, <<70, 79, 82, 49, 0, 0, 21, ...>>,
  {:module, Day10.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
 ```
 
@@ -145,9 +179,9 @@ Day10.part1(input)
 6690
 ```
 
-**QUESTION TWO?**
+Figure out whether you have time to search for the nest by calculating the area within the loop. **How many tiles are enclosed by the loop?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `525`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -158,59 +192,7 @@ Day10.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[
-  {{109, 45}, 55},
-  {{117, 72}, 70},
-  {{101, 0}, 70},
-  {{119, 69}, 70},
-  {{4, 40}, 70},
-  {{37, 126}, 70},
-  {{74, 115}, 45},
-  {{126, 113}, 70},
-  {{127, 23}, 76},
-  {{85, 89}, 70},
-  {{23, 30}, 70},
-  {{17, 55}, 76},
-  {{67, 44}, 55},
-  {{82, 129}, 55},
-  {{53, 38}, 74},
-  {{22, 125}, 45},
-  {{110, 11}, 124},
-  {{15, 51}, 70},
-  {{93, 21}, 45},
-  {{116, 67}, 45},
-  {{111, 86}, 45},
-  {{69, 126}, 124},
-  {{83, 69}, 45},
-  {{68, 109}, 70},
-  {{78, 60}, 76},
-  {{62, 33}, 74},
-  {{16, 138}, 70},
-  {{84, 9}, 70},
-  {{92, 69}, 70},
-  {{47, 23}, 70},
-  {{4, 12}, 70},
-  {{102, 58}, 45},
-  {{133, 121}, 74},
-  {{124, 73}, 45},
-  {{62, 22}, 70},
-  {{56, 86}, 70},
-  {{87, 6}, 55},
-  {{138, 57}, 124},
-  {{32, 35}, 55},
-  {{0, 83}, 45},
-  {{42, 60}, 45},
-  {{124, 24}, 124},
-  {{113, 93}, 70},
-  {{17, 49}, 70},
-  {{98, 81}, 74},
-  {{85, 137}, 70},
-  {{18, 104}, 76},
-  {{102, ...}, 74},
-  {{...}, ...},
-  {...},
-  ...
-]
+525
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -232,7 +214,11 @@ defmodule Day10Test do
   setup_all do
     [
       input1: ".....\n.S-7.\n.|.|.\n.L-J.\n.....",
-      input2: "..F7.\n.FJ|.\nSJ.L7\n|F--J\nLJ..."
+      input2: "..F7.\n.FJ|.\nSJ.L7\n|F--J\nLJ...",
+      input3:
+        "...........\n.S-------7.\n.|F-----7|.\n.||.....||.\n.||.....||.\n.|L-7.F-J|.\n.|..|.|..|.\n.L--J.L--J.\n...........",
+      input4:
+        ".F----7F7F7F7F-7....\n.|F--7||||||||FJ....\n.||.FJ||||||||L7....\nFJL7L7LJLJ||LJ.L-7..\nL--J.L7...LJS7F-7L7.\n....F-J..F7FJ|L7L7L7\n....L7.F7||L7|.L7L7|\n.....|FJLJ|FJ|F7|.LJ\n....FJL-7.||.||||...\n....L---J.LJ.LJLJ..."
     ]
   end
 
@@ -244,8 +230,10 @@ defmodule Day10Test do
   end
 
   describe "part2/1" do
-    test "returns expected value", %{input1: _input1} do
-      # assert Day10.part2(input1) == [""]
+    test "returns expected value", context do
+      assert Day10.part2(context.input1) == 1
+      assert Day10.part2(context.input3) == 4
+      assert Day10.part2(context.input4) == 8
     end
   end
 end
@@ -275,8 +263,8 @@ Randomized with seed 958413
 # https://github.com/bencheeorg/benchee
 Benchee.run(
   %{
-    "Part 1" => fn -> Day10.part1(input) end
-    # "Part 2" => fn -> Day10.part2(input) end
+    "Part 1" => fn -> Day10.part1(input) end,
+    "Part 2" => fn -> Day10.part2(input) end
   },
   memory_time: 2,
   reduction_time: 2
@@ -289,6 +277,11 @@ nil
 
 ```
 Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Warning: the benchmark Part 2 is using an evaluated function.
   Evaluated functions perform slower than compiled functions.
   You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
   Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
@@ -307,24 +300,36 @@ memory time: 2 s
 reduction time: 2 s
 parallel: 1
 inputs: none specified
-Estimated total run time: 11 s
+Estimated total run time: 22 s
 
 Benchmarking Part 1 ...
+Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        181.99        5.49 ms    ±10.53%        5.32 ms        7.22 ms
+Part 1        181.02        5.52 ms     ±6.66%        5.49 ms        6.75 ms
+Part 2        130.07        7.69 ms     ±5.53%        7.54 ms        8.83 ms
+
+Comparison: 
+Part 1        181.02
+Part 2        130.07 - 1.39x slower +2.16 ms
 
 Memory usage statistics:
 
 Name      Memory usage
-Part 1        11.78 MB
+Part 1        12.05 MB
+Part 2        17.75 MB - 1.47x memory usage +5.70 MB
 
 **All measurements for memory usage were the same**
 
 Reduction count statistics:
 
 Name           average  deviation         median         99th %
-Part 1        411.37 K     ±0.01%       411.36 K       411.60 K
+Part 1        463.61 K     ±0.01%       463.60 K       463.71 K
+Part 2        935.87 K     ±0.00%       935.87 K       935.99 K
+
+Comparison: 
+Part 1        463.60 K
+Part 2        935.87 K - 2.02x reduction count +472.26 K
 ```
 
 <!-- livebook:{"output":true} -->
