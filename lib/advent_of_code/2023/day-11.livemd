@@ -27,7 +27,7 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-"...#......\n.......#..\n#.........\n..........\n......#...\n.#........\n.........#\n..........\n.......#..\n#...#....."
+"......................#..................#................................#............#..........................#.........................\n..........#....................................#.................#..........................................................................\n................................#......................#..........................#.....................#................#..................\n...........................#....................................................................#........................................#..\n.....#..........#...................................................................................................................#.......\n........................................................................................#...................................................\n........................................#............#......................................................................................\n.....................#....................................................#...................#.......................#.....................\n..............................................................................................................................#...........#.\n............................#.......#......................#................................................................................\n...........#......................................#..............#............#.............................................................\n.........................................................................................#..................................................\n....#...............................................................................#.....................................#...........#.....\n..................#...........#...............#..............................................#.......#........#.............................\n........................................#...........................#.......................................................................\n............................................................................................................................................\n.........................#..........................#.........................#.........................#...................................\n................#...................#..................................................................................#...................#\n...#...........................................................#........#.............#..............................................#......\n..................................................................................................#.........................................\n.............#..............................#...............................................................................................\n.....................#.........................................................................................#............................\n............................#........................#............#.........................#..................................#............\n.......#..............................................................................................................#.....................\n........................................................................#........#..................#.......................................\n...#......................................#.......#......................................................#........#...............#.........\n...........................................................#.............................................................................#..\n................................#..................................#........................................................................\n.............#.................................#............................................................................................\n#......" <> ...
 ```
 
 ## Solution
@@ -37,66 +37,35 @@ defmodule Day11 do
   defdelegate parse(input), to: __MODULE__.Input
 
   def part1(input) do
-    grid =
-      parse(input)
-      |> add_empties()
-      |> add_galaxies()
+    solve(input, 2)
+  end
 
-    find_distances(grid.galaxies, [], grid)
+  def part2(input) do
+    solve(input, 1_000_000)
+  end
+
+  def solve(input, mult) do
+    grid = parse(input)
+
+    find_distances(grid.galaxies, [], grid, mult)
     |> Enum.map(&elem(&1, 2))
     |> Enum.sum()
   end
 
-  def part2(input) do
-    input
-    |> parse()
-    |> Enum.map(& &1)
-  end
+  defp find_distances([_lastg], distances, _grid, _mult), do: distances
 
-  defp find_distances([_lastg], distances, _grid), do: distances
-
-  defp find_distances([g1 | tail], distances, grid) do
+  defp find_distances([g1 | tail], distances, grid, mult) do
     Enum.reduce(tail, distances, fn g2, acc ->
-      [{g1, g2, calc_distance(g1, g2, grid)} | acc]
+      [{g1, g2, calc_distance(g1, g2, grid, mult)} | acc]
     end)
-    |> then(&find_distances(tail, &1, grid))
+    |> then(&find_distances(tail, &1, grid, mult))
   end
 
-  defp calc_distance({x1, y1}, {x2, y2}, grid) do
+  defp calc_distance({x1, y1}, {x2, y2}, grid, mult) do
     extra_x = x1..x2 |> Enum.count(&(&1 in grid.empty_x))
     extra_y = y1..y2 |> Enum.count(&(&1 in grid.empty_y))
 
-    abs(x2 - x1) + abs(y2 - y1) + extra_x + extra_y
-  end
-
-  defp add_empties(grid) do
-    grid
-    |> Map.put(
-      :empty_y,
-      0..grid.max_y
-      |> Enum.reduce([], fn y, acc ->
-        if Enum.all?(0..grid.max_x, &(grid[{&1, y}] == ?.)) do
-          [y | acc]
-        else
-          acc
-        end
-      end)
-    )
-    |> Map.put(
-      :empty_x,
-      0..grid.max_x
-      |> Enum.reduce([], fn x, acc ->
-        if Enum.all?(0..grid.max_y, &(grid[{x, &1}] == ?.)) do
-          [x | acc]
-        else
-          acc
-        end
-      end)
-    )
-  end
-
-  defp add_galaxies(grid) do
-    Map.put(grid, :galaxies, for({k, ?#} <- grid, do: k))
+    abs(x2 - x1) + abs(y2 - y1) + (extra_x + extra_y) * (mult - 1)
   end
 
   defmodule Input do
@@ -111,6 +80,8 @@ defmodule Day11 do
       |> Enum.with_index()
       |> Enum.reduce(%{}, &parse_line/2)
       |> add_max_xy()
+      |> add_empties()
+      |> add_galaxies()
     end
 
     def parse_line({line, row}, grid) do
@@ -127,6 +98,36 @@ defmodule Day11 do
       y = Map.keys(grid) |> Enum.map(&elem(&1, 1)) |> Enum.max()
 
       Map.merge(grid, %{max_x: x, max_y: y})
+    end
+
+    defp add_empties(grid) do
+      grid
+      |> Map.put(
+        :empty_y,
+        0..grid.max_y
+        |> Enum.reduce([], fn y, acc ->
+          if Enum.all?(0..grid.max_x, &(grid[{&1, y}] == ?.)) do
+            [y | acc]
+          else
+            acc
+          end
+        end)
+      )
+      |> Map.put(
+        :empty_x,
+        0..grid.max_x
+        |> Enum.reduce([], fn x, acc ->
+          if Enum.all?(0..grid.max_y, &(grid[{x, &1}] == ?.)) do
+            [x | acc]
+          else
+            acc
+          end
+        end)
+      )
+    end
+
+    defp add_galaxies(grid) do
+      Map.put(grid, :galaxies, for({k, ?#} <- grid, do: k))
     end
   end
 end
@@ -152,12 +153,12 @@ Day11.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-374
+10033566
 ```
 
 Starting with the same initial image, expand the universe according to these new rules, then find the length of the shortest path between every pair of galaxies. **What is the sum of these lengths?**
 
-Your puzzle answer was ``.
+Your puzzle answer was `560822911938`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -168,7 +169,7 @@ Day11.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-1112
+560822911938
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -189,19 +190,21 @@ defmodule Day11Test do
 
   setup_all do
     [
-      input: ""
+      input:
+        "...#......\n.......#..\n#.........\n..........\n......#...\n.#........\n.........#\n..........\n.......#..\n#...#....."
     ]
   end
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day11.part1(input) == [""]
+      assert Day11.part1(input) == 374
     end
   end
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day11.part2(input) == [""]
+      assert Day11.solve(input, 10) == 1030
+      assert Day11.solve(input, 100) == 8410
     end
   end
 end
@@ -216,13 +219,13 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 471315
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
 
 ## Benchmarking
@@ -244,7 +247,60 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
 
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 2          4.98      200.91 ms     ±0.82%      200.82 ms      203.44 ms
+Part 1          4.96      201.65 ms     ±1.07%      200.98 ms      206.28 ms
+
+Comparison: 
+Part 2          4.98
+Part 1          4.96 - 1.00x slower +0.73 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 2        47.32 MB
+Part 1        47.32 MB - 1.00x memory usage +0 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 2         75.22 M     ±0.00%        75.22 M        75.22 M
+Part 1         75.22 M     ±0.00%        75.22 M        75.22 M
+
+Comparison: 
+Part 2         75.22 M
+Part 1         75.22 M - 1.00x reduction count +0.00012 M
 ```
 
 <!-- livebook:{"output":true} -->
