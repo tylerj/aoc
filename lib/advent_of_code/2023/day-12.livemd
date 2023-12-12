@@ -1,0 +1,225 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 12 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/12)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/12/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-12.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"???.### 1,1,3\n.??..??...?##. 1,1,3\n?#?#?#?#?#?#?#? 1,3,1,6\n????.#...#... 4,1,1\n????.######..#####. 1,6,5\n?###???????? 3,2,1"
+```
+
+## Solution
+
+```elixir
+defmodule Day12 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.map(fn {line, sizes} ->
+      {
+        line,
+        sizes,
+        sizes_regex(sizes)
+      }
+    end)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defp sizes_regex(sizes) do
+    regex =
+      sizes
+      |> Enum.map(&"[\\?#]{#{&1}}")
+      |> Enum.join("[\\.\\?]+")
+
+    ~r/^(?=[\.\?]*#{regex}[\.\?]*)$/
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Enum.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      [line, sizes] = String.split(line, " ", trim: true)
+      sizes = sizes |> String.split(",", trim: true) |> Enum.map(&String.to_integer/1)
+
+      {line, sizes}
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day12, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+ {:module, Day12.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+For each row, count all of the different arrangements of operational and broken springs that meet the given criteria. **What is the sum of those counts?**
+
+Your puzzle answer was `answer one`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day12.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {"???.###", [1, 1, 3], ~r/^(?=[\.\?]*[\?#]{1}[\.\?]+[\?#]{1}[\.\?]+[\?#]{3}[\.\?]*)$/},
+  {".??..??...?##.", [1, 1, 3], ~r/^(?=[\.\?]*[\?#]{1}[\.\?]+[\?#]{1}[\.\?]+[\?#]{3}[\.\?]*)$/},
+  {"?#?#?#?#?#?#?#?", [1, 3, 1, 6],
+   ~r/^(?=[\.\?]*[\?#]{1}[\.\?]+[\?#]{3}[\.\?]+[\?#]{1}[\.\?]+[\?#]{6}[\.\?]*)$/},
+  {"????.#...#...", [4, 1, 1], ~r/^(?=[\.\?]*[\?#]{4}[\.\?]+[\?#]{1}[\.\?]+[\?#]{1}[\.\?]*)$/},
+  {"????.######..#####.", [1, 6, 5], ~r/^(?=[\.\?]*[\?#]{1}[\.\?]+[\?#]{6}[\.\?]+[\?#]{5}[\.\?]*)$/},
+  {"?###????????", [3, 2, 1], ~r/^(?=[\.\?]*[\?#]{3}[\.\?]+[\?#]{2}[\.\?]+[\?#]{1}[\.\?]*)$/}
+]
+```
+
+```elixir
+~r/(?<!#)(?=[\?\#]{1})(?!#)[\?\.]+?(?<!#)(?=[\?\#]{1})(?!#)[\?\.]+?(?<!#)(?=[\?\#]{3})(?!#)/
+|> Regex.scan(".??..??...?##.")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[["??..??..."]]
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day12.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/12/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day12Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day12.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day12.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+# https://github.com/bencheeorg/benchee
+Benchee.run(
+  %{
+    "Part 1" => fn -> Day12.part1(input) end,
+    "Part 2" => fn -> Day12.part2(input) end
+  },
+  memory_time: 2,
+  reduction_time: 2
+)
+
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
