@@ -39,28 +39,68 @@ defmodule Day12 do
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(fn {line, sizes} ->
-      {
-        line,
-        sizes,
-        sizes_regex(sizes)
-      }
-    end)
+    |> Stream.map(&find_matches/1)
+    |> Stream.map(&length/1)
+    # |> Stream.with_index()
+    # |> Stream.map(fn {matches, i} ->
+    #   IO.inspect(length(matches), label: "LENGTH #{i}")
+    #   length(matches)
+    # end)
+    |> Enum.sum()
   end
 
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Stream.map(&expand/1)
+    |> Stream.map(&find_matches/1)
+    |> Stream.map(&length/1)
+    # |> Stream.with_index()
+    # |> Stream.map(fn {matches, i} ->
+    #   IO.inspect(length(matches), label: "LENGTH #{i}")
+    #   length(matches)
+    # end)
+    |> Enum.sum()
   end
 
-  defp sizes_regex(sizes) do
+  defp expand({line, sizes}) do
+    {
+      List.duplicate(String.to_charlist(line), 5) |> Enum.join("?"),
+      List.duplicate(sizes, 5) |> List.flatten()
+    }
+  end
+
+  def find_matches({line, sizes}) do
+    find_matches(String.to_charlist(line), sizes_regex(sizes), true, [])
+  end
+
+  defp find_matches(_, _, false, _), do: []
+  defp find_matches([], _regex, true, acc), do: [to_string(acc)]
+
+  defp find_matches([?? | tail], regex, true, acc) do
+    branch1 = List.insert_at(acc, -1, ?.)
+    branch2 = List.insert_at(acc, -1, ?#)
+
+    branch1_cont = Regex.match?(regex, to_string(branch1 ++ tail))
+    branch2_cont = Regex.match?(regex, to_string(branch2 ++ tail))
+
+    find_matches(tail, regex, branch1_cont, branch1) ++
+      find_matches(tail, regex, branch2_cont, branch2)
+  end
+
+  defp find_matches([next_char | tail], regex, true, acc) do
+    # cont = Regex.match?(regex, to_string(acc ++ tail))
+
+    find_matches(tail, regex, true, List.insert_at(acc, -1, next_char))
+  end
+
+  def sizes_regex(sizes) do
     regex =
       sizes
       |> Enum.map(&"[\\?#]{#{&1}}")
-      |> Enum.join("[\\.\\?]+")
+      |> Enum.join("[\\?\\.]+")
 
-    ~r/^(?=[\.\?]*#{regex}[\.\?]*)$/
+    ~r/^[\.\?]*#{regex}[\.\?]*$/
   end
 
   defmodule Input do
@@ -87,7 +127,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day12, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+{:module, Day12, <<70, 79, 82, 49, 0, 0, 18, ...>>,
  {:module, Day12.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -104,29 +144,10 @@ Day12.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[
-  {"???.###", [1, 1, 3], ~r/^(?=[\.\?]*[\?#]{1}[\.\?]+[\?#]{1}[\.\?]+[\?#]{3}[\.\?]*)$/},
-  {".??..??...?##.", [1, 1, 3], ~r/^(?=[\.\?]*[\?#]{1}[\.\?]+[\?#]{1}[\.\?]+[\?#]{3}[\.\?]*)$/},
-  {"?#?#?#?#?#?#?#?", [1, 3, 1, 6],
-   ~r/^(?=[\.\?]*[\?#]{1}[\.\?]+[\?#]{3}[\.\?]+[\?#]{1}[\.\?]+[\?#]{6}[\.\?]*)$/},
-  {"????.#...#...", [4, 1, 1], ~r/^(?=[\.\?]*[\?#]{4}[\.\?]+[\?#]{1}[\.\?]+[\?#]{1}[\.\?]*)$/},
-  {"????.######..#####.", [1, 6, 5], ~r/^(?=[\.\?]*[\?#]{1}[\.\?]+[\?#]{6}[\.\?]+[\?#]{5}[\.\?]*)$/},
-  {"?###????????", [3, 2, 1], ~r/^(?=[\.\?]*[\?#]{3}[\.\?]+[\?#]{2}[\.\?]+[\?#]{1}[\.\?]*)$/}
-]
+21
 ```
 
-```elixir
-~r/(?<!#)(?=[\?\#]{1})(?!#)[\?\.]+?(?<!#)(?=[\?\#]{1})(?!#)[\?\.]+?(?<!#)(?=[\?\#]{3})(?!#)/
-|> Regex.scan(".??..??...?##.")
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-[["??..??..."]]
-```
-
-**QUESTION TWO?**
+Unfold your condition records; **what is the new sum of possible arrangement counts?**
 
 Your puzzle answer was `answer two`.
 
@@ -139,7 +160,7 @@ Day12.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+525152
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -160,19 +181,20 @@ defmodule Day12Test do
 
   setup_all do
     [
-      input: ""
+      input:
+        "???.### 1,1,3\n.??..??...?##. 1,1,3\n?#?#?#?#?#?#?#? 1,3,1,6\n????.#...#... 4,1,1\n????.######..#####. 1,6,5\n?###???????? 3,2,1"
     ]
   end
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day12.part1(input) == [""]
+      assert Day12.part1(input) == 21
     end
   end
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day12.part2(input) == [""]
+      assert Day12.part2(input) == 525_152
     end
   end
 end
@@ -184,16 +206,16 @@ ExUnit.run()
 
 ```
 ..
-Finished in 0.00 seconds (0.00s async, 0.00s sync)
+Finished in 8.6 seconds (0.00s async, 8.6s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 957866
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
 
 ## Benchmarking
