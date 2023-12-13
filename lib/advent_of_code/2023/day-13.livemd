@@ -61,8 +61,7 @@ defmodule Day13 do
   defp find_smudge_reflection(grid) do
     reflection = find_reflection(grid)
 
-    grid
-    |> Enum.find_value(fn
+    Enum.find_value(grid, fn
       {{x, y}, ?.} ->
         find_reflection(Map.put(grid, {x, y}, ?#), reflection)
 
@@ -75,24 +74,26 @@ defmodule Day13 do
   end
 
   defp find_reflection(grid, reflection \\ nil) do
-    x =
-      Enum.find(1..grid.max_x, fn x ->
-        reflection != {:x, x} and is_reflection?(:x, x, grid)
-      end)
-
-    y =
-      Enum.find(1..grid.max_y, fn y ->
-        reflection != {:y, y} and is_reflection?(:y, y, grid)
-      end)
-
-    cond do
-      is_integer(x) -> {:x, x}
-      is_integer(y) -> {:y, y}
-      true -> nil
-    end
+    find_reflection(:x, grid, reflection) || find_reflection(:y, grid, reflection)
   end
 
-  def is_reflection?(:x, line_x, grid) do
+  defp find_reflection(:x, grid, reflection) do
+    Enum.find_value(1..grid.max_x, fn x ->
+      if reflection != {:x, x} and is_reflection?(:x, x, grid) do
+        {:x, x}
+      end
+    end)
+  end
+
+  defp find_reflection(:y, grid, reflection) do
+    Enum.find_value(1..grid.max_y, fn y ->
+      if reflection != {:y, y} and is_reflection?(:y, y, grid) do
+        {:y, y}
+      end
+    end)
+  end
+
+  defp is_reflection?(:x, line_x, grid) do
     Enum.all?(0..grid.max_y, fn y ->
       Enum.all?((line_x - 1)..0, fn x ->
         a = grid[{x, y}]
@@ -102,7 +103,7 @@ defmodule Day13 do
     end)
   end
 
-  def is_reflection?(:y, line_y, grid) do
+  defp is_reflection?(:y, line_y, grid) do
     Enum.all?(0..grid.max_x, fn x ->
       Enum.all?((line_y - 1)..0, fn y ->
         a = grid[{x, y}]
@@ -153,7 +154,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day13, <<70, 79, 82, 49, 0, 0, 23, ...>>,
+{:module, Day13, <<70, 79, 82, 49, 0, 0, 24, ...>>,
  {:module, Day13.Input, <<70, 79, 82, ...>>, {:add_max_xy, 1}}}
 ```
 
@@ -293,28 +294,28 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        233.57        4.28 ms     ±1.86%        4.28 ms        4.50 ms
-Part 2         14.09       70.95 ms     ±0.56%       70.85 ms       73.21 ms
+Part 1        247.11        4.05 ms     ±2.01%        4.04 ms        4.29 ms
+Part 2         14.05       71.17 ms     ±0.93%       71.00 ms       74.56 ms
 
 Comparison: 
-Part 1        233.57
-Part 2         14.09 - 16.57x slower +66.67 ms
+Part 1        247.11
+Part 2         14.05 - 17.59x slower +67.12 ms
 
 Memory usage statistics:
 
 Name           average  deviation         median         99th %
-Part 1         7.41 MB     ±0.05%        7.41 MB        7.42 MB
-Part 2        89.69 MB     ±0.01%       89.69 MB       89.70 MB
+Part 1         7.12 MB     ±0.06%        7.12 MB        7.13 MB
+Part 2        89.13 MB     ±0.00%       89.13 MB       89.14 MB
 
 Comparison: 
-Part 1         7.41 MB
-Part 2        89.69 MB - 12.10x memory usage +82.28 MB
+Part 1         7.12 MB
+Part 2        89.13 MB - 12.51x memory usage +82.01 MB
 
 Reduction count statistics:
 
 Name   Reduction count
-Part 1          0.47 M
-Part 2          9.58 M - 20.39x reduction count +9.11 M
+Part 1          0.44 M
+Part 2          9.67 M - 22.19x reduction count +9.23 M
 
 **All measurements for reduction count were the same**
 ```
