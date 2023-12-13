@@ -50,16 +50,45 @@ defmodule Day13 do
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Stream.map(&find_smudge_reflection/1)
+    |> Stream.map(fn
+      {:x, x} -> x
+      {:y, y} -> y * 100
+    end)
+    |> Enum.sum()
   end
 
-  defp find_reflection(grid) do
-    case Enum.find(1..grid.max_x, &is_reflection?(:x, &1, grid)) do
-      nil ->
-        {:y, Enum.find(1..grid.max_y, &is_reflection?(:y, &1, grid))}
+  defp find_smudge_reflection(grid) do
+    reflection = find_reflection(grid)
 
-      x ->
-        {:x, x}
+    grid
+    |> Enum.find_value(fn
+      {{x, y}, ?.} ->
+        find_reflection(Map.put(grid, {x, y}, ?#), reflection)
+
+      {{x, y}, ?#} ->
+        find_reflection(Map.put(grid, {x, y}, ?.), reflection)
+
+      _ ->
+        nil
+    end)
+  end
+
+  defp find_reflection(grid, reflection \\ nil) do
+    x =
+      Enum.find(1..grid.max_x, fn x ->
+        reflection != {:x, x} and is_reflection?(:x, x, grid)
+      end)
+
+    y =
+      Enum.find(1..grid.max_y, fn y ->
+        reflection != {:y, y} and is_reflection?(:y, y, grid)
+      end)
+
+    cond do
+      is_integer(x) -> {:x, x}
+      is_integer(y) -> {:y, y}
+      true -> nil
     end
   end
 
@@ -128,9 +157,9 @@ end
  {:module, Day13.Input, <<70, 79, 82, ...>>, {:add_max_xy, 1}}}
 ```
 
-**QUESTION ONE?**
+Find the line of reflection in each of the patterns in your notes. **What number do you get after summarizing all of your notes?**
 
-Your puzzle answer was `answer one`.
+Your puzzle answer was `34918`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -144,9 +173,9 @@ Day13.part1(input)
 34918
 ```
 
-**QUESTION TWO?**
+In each pattern, fix the smudge and find the different line of reflection. **What number do you get after summarizing the new reflection line in each pattern in your notes?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `33054`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -234,7 +263,60 @@ nil
 <!-- livebook:{"output":true} -->
 
 ```
+Warning: the benchmark Part 1 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
 
+Warning: the benchmark Part 2 is using an evaluated function.
+  Evaluated functions perform slower than compiled functions.
+  You can move the Benchee caller to a function in a module and invoke `Mod.fun()` instead.
+  Alternatively, you can move the benchmark into a benchmark.exs file and run mix run benchmark.exs
+
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        233.57        4.28 ms     ±1.86%        4.28 ms        4.50 ms
+Part 2         14.09       70.95 ms     ±0.56%       70.85 ms       73.21 ms
+
+Comparison: 
+Part 1        233.57
+Part 2         14.09 - 16.57x slower +66.67 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         7.41 MB     ±0.05%        7.41 MB        7.42 MB
+Part 2        89.69 MB     ±0.01%       89.69 MB       89.70 MB
+
+Comparison: 
+Part 1         7.41 MB
+Part 2        89.69 MB - 12.10x memory usage +82.28 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1          0.47 M
+Part 2          9.58 M - 20.39x reduction count +9.11 M
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
