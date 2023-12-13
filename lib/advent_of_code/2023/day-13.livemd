@@ -93,7 +93,26 @@ defmodule Day13 do
     end)
   end
 
-  defp is_reflection?(:x, line_x, grid) do
+  @doc """
+      ><
+  #.##..##.
+  ..#.##.#.
+  ##......#
+  ##......#
+  ..#.##.#.
+  ..##..##.
+  #.#.##.#.
+      ><
+
+  When x == 5, for every y, we want to check if:
+  - {4, y} == {5, y}
+  - {3, y} == {6, y}
+  - {2, y} == {7, y}
+  - {1, y} == {8, y}
+  - {0, y} == {9, y} (OFF GRID! this is ok)
+
+  """
+  def is_reflection?(:x, line_x, grid) do
     Enum.all?(0..grid.max_y, fn y ->
       Enum.all?((line_x - 1)..0, fn x ->
         a = grid[{x, y}]
@@ -103,7 +122,7 @@ defmodule Day13 do
     end)
   end
 
-  defp is_reflection?(:y, line_y, grid) do
+  def is_reflection?(:y, line_y, grid) do
     Enum.all?(0..grid.max_x, fn x ->
       Enum.all?((line_y - 1)..0, fn y ->
         a = grid[{x, y}]
