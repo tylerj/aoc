@@ -1,0 +1,363 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 14 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/14)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/14/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-14.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+".....O..#....O.O.....OO#...#.....#...........O#..OO...#O##..#.....#...O.OO...#.O......OO#...OO...O..\nOOO....#O.#..O#.#.OO...OO..O##...O.....O.O...#.O.......OOO.O...#.....#.#.O....O.O.....#...#.OOOO.O..\n...O..#...#O..#......O#.......#..O##O.#....##......O.O...O..#O.O..##..#..#O......##...OO.#.O#..O...#\n.O..#...##O..#....#...O.O...#........O.O..#...O..#O.O.....#O...OO.#....O..O....OO##OO#...O#.O#...#.#\n#.O......O.#.O..OO.O..#....#.OO....#.#..#..O#.O....OO......#.##O...#.OO........O..OO...OOO#O.#O#.O.#\n...##.O.#O.O.##.#..O....#.#..#.OO.O...#....#.O..O#O.O.O..O...O.O..##...O#..#.......O.O......#O.#O...\n.O.O..O..O#.O.O..O.O..O..O..............#...O#O#.O.#.##..........##O....O.O...........O..O..O#...#..\n...#O.O.OO#..O..#.#...#O...O..#...#.........O...#OO#...#.O#....O...##..O...O.#O#.O#...O.O...#OO.O#..\n...##.##.O...O..#..#O.O.O...O.##..#.#.O..OO.O......OO..#..O.O..#..#.......O..O.....OO.OOO.O..O..#O.#\n....#O.O...#OO..O.O............O.....#O..#O#...#.........O.O..O...OO....#..O..##.O..####O#O.#.......\n.OOO.......##..O..#O.OO.##.....O....#..OO.#O.......OO..........OO..O..O#...#..O..##.O........#....O.\n....#.O#...#OO..............O..O.O...O...O...O....O###....O.#OO...O#.OO.#...#.#.##.....O...........O\n.......#O##..#......#.O.#.......O#.#.O#O#..#.#...O.....O..O#..O..#.O#....O..#.......O..O..#O........\nO..O.#.O...#....##...#.....O..#.#......O..#O..#.OO..O.##.........O#O.#....#..#.###OOOO..#OO.#O.O.O#.\n...O##O.#.............#..O.O....O#.....#OO...OOO......O#.O...#O#.#..#....O..#.#..O..#.O...OO.....O..\n...O......#..O.#.#..##....O..#....#..O.#.......#..O...##O.O.......#..O.OO..O..........O....##.....#.\n........#O##..O....#....#.....O...O.O.O.OO..O........#..#.O.........O.....O..O.O..#O.O...O...#..##..\n.O.#.....O.O.#..##O#.....#.#..O......O..##.#.#....##...O...OO.#..........OO.#O#OOO..#....#.#...O.#..\n....#...#.OO....#..OO#.#OO.O....OO..#..O....OO.......##.##O####O.O.O#..#....O.O......O.....#.O..O...\n.O#O#........O.#...O#O..#O...O.#..#.#..O#........O###..O..#...#..O.##..#............O.......O..O....\n........#.O.....O...O.....##.....##.#.#.#....OO####.#..O#....#O...#.O#..O.O.#.O......O..#..O.....O..\n..O#..##O.OOOO...OO....OO#.#.O.....#.#......#...#OO#...####O#....O...O.O.O.O#....O.##OO#..O.#.O..##.\n.##...............#.O#OO.#.......#...#O.#.OOO#.O...#....#....O#..O.#..O...O#...#..O#.O#O#........OO#\n...#......##...#.#O..O......O#O.O..OOO..O##....#....O.#..O....#........OO#.#...#.O#..O....O.O##..O#.\n.OO......O.....O...##..#...#....O.#....O....O...........OO.#.#..#...#.O#O.#.#......#.O......O.O#.#.#\nO.O....#O...##.O..#O.O...#...O.......O.OO...O.O#.....#..#.O#.....O.O...........O.....O...O.....#....\n.#O#..O....O.......#..OOOO.....O.....####...#.......O...O#O...O..#..#...##.#.....#....O....#...##...\n........O.O#OO#..#.O.....#.OOO......OO#.#.....O.#..#O.........#OOO......O..#......O..##....#O....#.#\n..O..#O.....##..#.OO..O..........OO..O...#.##O.#.#..O.O#.#.#......OOO......#..O..#.O....O#...OO#....\n...#.OOO.O......O#O...O.O.OO....OO#.....O.O.O#.....O##.OO......#......OOO#O.OO.O#...#.....O....OO...\n...#.#O..O...##.#.###.O.#...#.#....O.OO...O.O.O.O...#.#.O....#OO#.OO...#O...#O...OO.O..O..O....O..O#\n.##.O......#.##.....O...OO#...O.....O..#.....O.........#....O..#....O.####......#...#........O#..OO.\n.#.#.O.#.O#..OO.#....O...#.O...O..#.O.....#OO....#.O.O.O......OO...#.#.O#O#OO.#O.O.....O.........#..\n..#.#..O...#..#.....OO.#O...O#...OO.O...O#....##O....#.#...OO.#.....#.O#.....O.....O...#.#O.....#...\n.O..OO#.#OO...O..#..........OO.............##..####...#.O....O...#.#...O#..O.O..OO.#....OOO..#...OO.\n#...#....#.........OOOO....OO....O#O..........#..O#..O...#.OOO.....OO.......OO.##...O.#....OOO...##.\n#.........#OO#.O.#..##.#.##O...#...OO....O#O......#.......O.O...#O...O.O.#O##O#..O....O#.#......O.#.\n...O..O#..#...##..O....O..O......O.O#...OO.......##......OO..#.O....#.##O.OO....#.O.#.OO..O....O.#..\n.O..O.#.O.#............O....#....#....#.#.....#...OO#...OO.##OO.#..#....#....#.O#.OO#.#.O.O#..O.....\n.OO#O...#.#......O...#...O##.O....O#...O..O..O..O.#O..#..###OO..#..O##O.#.O...O#O...OO.O..#.#O#..#.#\n#..OOOO...OOO.O..#O...OO##....O#..OO...O.O.#....#O#O...." <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day14 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> roll(:north)
+    |> calc_load()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> roll_cycle_loop()
+
+    # |> print_grid("PRE-CYCLE")
+    # |> roll_cycle()
+    # |> print_grid("AFTER CYCLE 1")
+    # |> roll_cycle()
+    # |> print_grid("AFTER CYCLE 2")
+    # |> roll_cycle()
+    # |> print_grid("AFTER CYCLE 3")
+  end
+
+  defp calc_load(grid) do
+    Enum.reduce(grid.max_y..0, 0, fn y, total ->
+      num_rounded = Enum.count(0..grid.max_x, &(grid[{&1, y}] == ?O))
+
+      total + num_rounded * (grid.max_y + 1 - y)
+    end)
+  end
+
+  defp roll_cycle_loop(grid, count \\ 0) do
+    new_grid = roll_cycle(grid)
+
+    if count + 1 >= 1000 do
+      IO.puts("#{calc_load(new_grid)}:#{count + 1}")
+    end
+
+    roll_cycle_loop(new_grid, count + 1)
+  end
+
+  defp roll_cycle(grid) do
+    grid
+    |> roll(:north)
+    |> roll(:west)
+    |> roll(:south)
+    |> roll(:east)
+  end
+
+  defp roll(grid, :north) do
+    roll(grid, :north, 1..grid.max_y, 0..grid.max_x, fn y, x -> {x, y} end)
+  end
+
+  defp roll(grid, :south) do
+    roll(grid, :south, (grid.max_y - 1)..0, 0..grid.max_x, fn y, x -> {x, y} end)
+  end
+
+  defp roll(grid, :west) do
+    roll(grid, :west, 1..grid.max_x, 0..grid.max_y, fn x, y -> {x, y} end)
+  end
+
+  defp roll(grid, :east) do
+    roll(grid, :east, (grid.max_x - 1)..0, 0..grid.max_y, fn x, y -> {x, y} end)
+  end
+
+  defp roll(grid, direction, range1, range2, xy_fun) do
+    range1
+    |> Enum.reduce(grid, fn a, acc ->
+      range2
+      |> Enum.reduce(acc, fn b, acc ->
+        xy = xy_fun.(a, b)
+
+        case acc[xy] do
+          ?O ->
+            new_xy = find_resting_xy(xy, acc, direction)
+
+            acc
+            |> Map.put(xy, ?.)
+            |> Map.put(new_xy, ?O)
+
+          _ ->
+            acc
+        end
+      end)
+    end)
+  end
+
+  defp find_resting_xy({x, y}, grid, :north) do
+    {
+      x,
+      Enum.find(y..0, &(grid[{x, &1 - 1}] != ?.))
+    }
+  end
+
+  defp find_resting_xy({x, y}, grid, :south) do
+    {
+      x,
+      Enum.find(y..grid.max_y, &(grid[{x, &1 + 1}] != ?.))
+    }
+  end
+
+  defp find_resting_xy({x, y}, grid, :west) do
+    {
+      Enum.find(x..0, &(grid[{&1 - 1, y}] != ?.)),
+      y
+    }
+  end
+
+  defp find_resting_xy({x, y}, grid, :east) do
+    {
+      Enum.find(x..grid.max_x, &(grid[{&1 + 1, y}] != ?.)),
+      y
+    }
+  end
+
+  def print_grid(grid, label) do
+    IO.puts(label)
+
+    0..grid.max_y
+    |> Enum.map(fn y ->
+      0..grid.max_x
+      |> Enum.map(fn x -> grid[{x, y}] end)
+      |> to_string()
+      |> IO.puts()
+    end)
+
+    grid
+  end
+
+  defmodule Input do
+    def parse(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> Stream.with_index()
+      |> Enum.reduce(%{}, &parse_line/2)
+      |> add_max_xy()
+    end
+
+    defp parse_line({line, row}, grid) do
+      line
+      |> String.to_charlist()
+      |> Enum.with_index()
+      |> Enum.reduce(grid, fn {char, col}, acc ->
+        Map.put(acc, {col, row}, char)
+      end)
+    end
+
+    defp add_max_xy(grid) do
+      x = Map.keys(grid) |> Enum.map(&elem(&1, 0)) |> Enum.max()
+      y = Map.keys(grid) |> Enum.map(&elem(&1, 1)) |> Enum.max()
+
+      Map.merge(grid, %{max_x: x, max_y: y})
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day14, <<70, 79, 82, 49, 0, 0, 32, ...>>,
+ {:module, Day14.Input, <<70, 79, 82, ...>>, {:add_max_xy, 1}}}
+```
+
+Tilt the platform so that the rounded rocks all roll north. Afterward, **what is the total load on the north support beams?**
+
+Your puzzle answer was `103614`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day14.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+103614
+```
+
+Run the spin cycle for 1000000000 cycles. Afterward, **what is the total load on the north support beams?**
+
+Your puzzle answer was `83790`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day14.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+83790:1000
+83795:1001
+83797:1002
+83787:1003
+83787:1004
+83796:1005
+83802:1006
+83811:1007
+83792:1008
+83794:1009
+83795:1010
+83783:1011
+83768:1012
+83766:1013
+83772:1014
+83778:1015
+83769:1016
+83794:1017
+83794:1018
+83790:1019
+83781:1020
+83782:1021
+83797:1022
+83809:1023
+83804:1024
+83808:1025
+83796:1026
+83789:1027
+83779:1028
+83778:1029
+83778:1030
+83779:1031
+83774:1032
+83775:1033
+83773:1034
+83789:1035
+83778:1036
+83785:1037
+83791:1038
+83795:1039
+83799:1040
+83806:1041
+83808:1042
+83803:1043
+83780:1044
+83784:1045
+83789:1046
+83791:1047
+83780:1048
+83776:1049
+83778:1050
+83770:1051
+83757:1052
+83784:1053
+83788:1054
+83798:1055
+83793:1056
+83792:1057
+83803:1058
+83801:1059
+83792:1060
+83798:1061
+83790:1062
+83797:1063
+83791:1064
+83788:1065
+83784:1066
+83771:1067
+83762:1068
+83765:1069
+83767:1070
+83797:1071
+83790:1072
+83795:1073
+83797:1074
+83787:1075
+83787:1076
+83796:1077
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/14/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day14Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "O....#....\nO.OO#....#\n.....##...\nOO.#O....O\n.O.....O#.\nO.#..O.#.#\n..O..#O..O\n.......O..\n#....###..\n#OO..#...."
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day14.part1(input) == 136
+    end
+  end
+
+  # describe "part2/1" do
+  #   test "returns expected value", %{input: input} do
+  #     assert Day14.part2(input) == [""]
+  #   end
+  # end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+.
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+1 test, 0 failures
+
+Randomized with seed 811435
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 1, failures: 0, excluded: 0, skipped: 0}
+```
