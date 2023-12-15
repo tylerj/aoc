@@ -74,11 +74,7 @@ defmodule Day15 do
     entry = {label, focal}
 
     Map.update(boxes, hash(label), [entry], fn acc ->
-      if List.keyfind(acc, label, 0) do
-        List.keyreplace(acc, label, 0, entry)
-      else
-        [entry | acc]
-      end
+      List.keystore(acc, label, 0, entry)
     end)
   end
 
@@ -93,7 +89,6 @@ defmodule Day15 do
 
       {box_id, box} ->
         box
-        |> Enum.reverse()
         |> Enum.with_index(1)
         |> Enum.map(fn {{_label, focal_length}, index} ->
           focal_length = String.to_integer(to_string(focal_length))
@@ -117,7 +112,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day15, <<70, 79, 82, 49, 0, 0, 19, ...>>,
+{:module, Day15, <<70, 79, 82, 49, 0, 0, 18, ...>>,
  {:module, Day15.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
 ```
 
@@ -198,7 +193,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 448471
+Randomized with seed 922499
 ```
 
 <!-- livebook:{"output":true} -->
@@ -241,11 +236,11 @@ Benchmarking.run(input)
 
 ```
 Operating System: macOS
-CPU Information: Apple M1
-Number of Available Cores: 8
-Available memory: 8 GB
-Elixir 1.15.7
-Erlang 26.1.1
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
 
 Benchmark suite executing with the following configuration:
 warmup: 2 s
@@ -260,28 +255,28 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        1.94 K        0.52 ms     ±3.36%        0.51 ms        0.57 ms
-Part 2        0.45 K        2.23 ms     ±2.56%        2.24 ms        2.38 ms
+Part 1        1.95 K        0.51 ms     ±5.72%        0.51 ms        0.57 ms
+Part 2        0.43 K        2.35 ms    ±10.70%        2.23 ms        2.91 ms
 
 Comparison: 
-Part 1        1.94 K
-Part 2        0.45 K - 4.34x slower +1.72 ms
+Part 1        1.95 K
+Part 2        0.43 K - 4.59x slower +1.84 ms
 
 Memory usage statistics:
 
 Name           average  deviation         median         99th %
-Part 1         1.29 MB     ±0.01%        1.29 MB        1.29 MB
-Part 2         5.88 MB     ±0.00%        5.88 MB        5.88 MB
+Part 1         1.29 MB     ±0.00%        1.29 MB        1.29 MB
+Part 2         5.89 MB     ±0.01%        5.89 MB        5.89 MB
 
 Comparison: 
 Part 1         1.29 MB
-Part 2         5.88 MB - 4.56x memory usage +4.59 MB
+Part 2         5.89 MB - 4.57x memory usage +4.60 MB
 
 Reduction count statistics:
 
 Name   Reduction count
 Part 1        137.41 K
-Part 2        434.56 K - 3.16x reduction count +297.15 K
+Part 2        431.04 K - 3.14x reduction count +293.62 K
 
 **All measurements for reduction count were the same**
 ```
