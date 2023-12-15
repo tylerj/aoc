@@ -1,0 +1,293 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 15 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/15)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/15/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-15.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"fzl-,tcjp=8,vkjr=9,xs-,jktcpk=3,gzp-,kfsxsd-,zxkv=7,fxz-,pj=7,mhbdch=7,xlss-,smk-,ppz-,kqggd-,dqh=7,gmv=6,tjjfm=2,gbv=5,gn-,ld=7,jdr-,phq=3,rd-,qz=3,sh-,gzsb=2,glrt=7,vjkrjg-,gjqmpc=7,qnx=7,mf=1,tnrm-,lppg-,gnvx=1,rv-,vnt-,bst-,gkb-,tl=1,bggff-,lm=8,mqq=7,hr-,gkb-,fspkn=2,tjjfm-,shshb=3,qfczq-,zk-,zcsc-,lnrjh=2,fz-,bkb-,rg-,bcfzn=6,xsbb=5,sm=3,rqs-,rvlv=9,pvh=9,rl-,zrb=9,lftk=1,cdn-,zp=8,hc-,mf-,hp-,zk-,dbj=5,tm=9,zx-,gmp=4,gcq-,mxq-,lvh-,lkhb-,vn=9,gzsb=6,xlss=9,drkhc=8,rgqg=1,hkr-,fxz=7,xsm-,fvmf=4,hsm=7,dlrss=9,rv-,kj-,ndtc-,zjf-,zj=9,kv=5,sxvv-,hj-,mltm-,qggz-,mntr-,td=5,lppg=1,xqb-,brt-,nm-,vlp=7,zcjnv=6,chh-,dd=2,fh-,hxfkx=6,hj=6,rzk=7,skpq-,rxb=1,fn=1,nc=1,vqq-,ndq-,xtgd=6,qlgv-,dl-,xln-,rqs=5,vpmmf=1,llvv-,hzp=6,dnbql=3,rqz=5,nfhb=7,vdb-,gmp-,hskv-,xs-,vk-,xll-,ng=2,xb-,mjjph-,tss-,lsd-,qsj-,tbdb-,tdnm=6,bv-,qz=5,zp=8,jn-,fh-,dqh=1,rgrd=5,kqggd-,ddccc-,gdx=3,br-,cnb=4,tfx-,scp=5,rgch-,xltvn=4,xdblmh-,jdr-,fz-,crd-,hfr-,xlss=2,fxz=5,rzl-,vdb-,tss=6,kc=2,bdmrg=6,mkv-,hdr=9,pv-,qcr=4,ntxqq-,mhbdch=8,npghs-,jb-,lzcp=1,zbl-,vsjs-,dmv=1,zhc-,tfx-,jc=8,vlhhb-,zcbg=2,fcbzpl=8,gkb-,zppn-,jj=6,xlc=6,xltvn-,cnb-,lftk-,ptmc-,fxz=6,ncn-,gzp-,lgtd=4,znp-,ncn=8,fg-,lnrjh=6,lkhb-,tnrm=4,hkr-,ltc-,lv-,ck-,dn=5,srt-,hk-,fspkn=9,drnvhj=5,gvf-,gzp-,pq-,lbq=8,lm-,lsx-,jf-,vkjr-,lcvzfp-,vqqp-,glrt=7,zx=4,hskv=9,bqm=6,jm=6,tshhq=7,sg-,pq-,rgqg=4,bcpb-,df=4,qpqx=6,fn=7,drnvhj=5,vf=8,zsx-,jbd-,kczn=9,fspkn=1,cjd=5,hzp=1,zpkc-,kczn=7,mrd=9,ndq-,hp=4,nfmf-,npghs-,zvd=9,dt=2,jdf=2,xzq-,xb=7,cpbb-,nd-,sgq=2,fc=1,tdnm-,fvmf-,ncn=4,zrdk=1,bvb-,gmp=2,pvh=2,klzj=7,lqlh-,tgm-,vf-,xll=3,lcvzfp=4,jrp=1,jq-,cjd-,nxqhqd=9,lx=4,ltc-,kc=9,gddghs=4,lj=9,bggff=8,pxk-,glgpxh-,mrd=6,mhkbd=1,lbq-,rgch-,vf-,ks=8,dt=5,tb=2,cdn=3,vlxv=6,rgrd-,mcfh=9,bkg-,fd-,bdz=4,vk=7,phd=4,bkg-,krz=6,flk=1,jf=8,zxkv=2,hdhk-,nxqhqd-,dvgz=7,dbj-,rvc-,fshfd=7,tb=4,mjx-,vnsgg=1,zppn=6,zx-,kk=2,xs-,xprp=7,hh=9,xnp=8,vndj=9,qnzlf=3,bdmrg-,dxl=5,ss=4,clv-,hk=3,kgx-,qqvmc=9,xzq-,kfsxsd-,bdt-,vqq-,lqlh-,jvp=7,tshhq=5,pvh=4,cp=4,bpd-,bqql-,dvx=8,qtql=7,zxkv=3,qfv-,xlss-,lzs-,kt=3,ltsb-,pfs=2,dmv-,qcr-,sl-,qsjch-,hmd-,bcpb-,drnvhj=4,bf=3,qx=1,gddghs-,zcjnv-,bdmrg-,rd-,ddccc=2,hvk=6,kk=1,chh=5,mxq=9,kcq-,vkjr-,ntxqq-,glgpxh=6,dvzlc-,lnt=2,rkk-,mzpgh=7,pl-,vndj-,nc-,xx=5,klzj=2,xhs-,cx-,jz=7,rmh=7,gjqmpc-,zdr=4,csqh-,zppn-,zc-,bvb=4,tjjfm-,rdzzjm=8,dbj-,sr=4,npghs=1,pxs-,blxq-,rqz=1,grxx-,sg-,fqmdgn-,jf-,pqjf-,xzljl=9,zdr-,hh-,cnb=5,jrq=1,dvx=2,pzbsd-,xpm=5,znp-,gqsr=2,qtql-,kssg=4,qm=3,scd=1,lzcp=4,gdx=9,shshb=2,sxmq=2,mtqb-,xn-,xln=4,vv-,nj-,tjjfm=7,rp=5,kcq=3,bcfzn-,dbj=9,zcbg-,bfx-,gvf=2,ptmc=7,jb=7,kv-,znl=5,gsk-,zjf=8,kmx-,rbft=1,csqh-,zp-,rq=1,rrx=9,mh=2,gnvx=9,mqq=9,bqql=6,gj=2,mhv=3,dcc-,kgx-,vhrd=6,ztj=2,ng-,rl-,bqm=1,rgqg=6,blmgvg=5,jx-,vqqp=8,jb-,lnk=2,rvlv=9,tz-,hj-,ltc=7,gcjgs=7,tm=2,mn=4,ss=7,vlhhb=4,hkd-,xf-,ltsb-,rzl=7,zx=5,phq=8,srt-,jvp=5,sgq-,qnzlf=9,lsd-,fbrz-,dsnd=3,hj-,tcjp-,vnsgg=9,xn-,mzpgh-,sxvv-,gjqmpc-,ncn-,mqq=2,tmpd-,rkk=6,qrlrxg-,csnq-,ltsb=6,pq-,mjx=6,bkc-,bvb-,kgpnf=2,xv=7,cjd=6,hp=3,vf-,pg-,jnq=2,tnng=7,qq-,dxl=5,nfpqv-,rg=9,dmv-,gd-,rgch-,nfpqv=9,gjqmpc=6,sgq-,cjd-,qnn-,ztj-,gn-,jqhg-,pzbsd-,qjn-,gggk=6,mntr=8,sxvv=3,jtx-,krz-,lzs-,pvh-,rrx=1,kgpnf-,bkg-,krz=4,vpmmf=8,rm=5,jr-,lx-,hbsv=1,pq=4,txs=9,mltm=3,sr=1,hr=8,dqh-,rm-,vdb=8,hdhk-,fzx-,xpm=1,hkr=1,qx=3,xn=1,zjf-,bpd=7,vxb=4,mcfh-,dcc=7,sgq-,vpmmf-,zcsc-,gggk=2,hr-,sgq-,tmpd-,rbft-,xm-,pqjf=6,vnt-,hmd-,vg-,sv-,bqm-,dsnd=2,hbq-,zc-,fxjc-,vsjs-,xv-,jqhg=2,bqm=6,qtz-,rxb-,mjx=3,br=8,hp-,bf=8,hbq-,lnrjh=3,xb=9,cdf=4,pm-,xlc-,tm=8,jrq=1,hq-,kqggd-,dhh-,tf-,nxqhqd-,qpqx=9,vpmmf=8,kgx-,glgpxh=2,rzl=1,qtz-,rl=5,sb=5,lfz-,bcpb-,xsdlmd=8,fshfd-,vlkx-,ss=3,xs=2,mn=5,dl-,lzcp=8,bqql=3,nd=4,lsx-,znl-,ltc=1,qggz-,zrb-,tbdb=4,drkhc=7,dkvqm-,tz-,hvk-,ld=5,mjx-,bl=5,qx=2,zppn=7,rgrd=1,bpd=7,bdmrg-,rl-,rqz=7,kc=1,gzp-,kcx=6,kmx-,rxptm=4,rrn=4,mhv=4,zjf-,blmgvg-,csnq-,ttgzdn-,ptmc=6,jq-,rxptm=8,mtqb=5,bpt=7,pxs-,cx=7,cz-,mn-,qfv=5,kgv=2,xv-,blmgvg-,cp=4,hq-,vlp-,xnp-,hh-,lbrn-,crd=3,jc=2,sr=9,vkxm-,mtqb-,sf=3,sv-,hfdzfc-,gbv=3,xsdlmd=9,nst=2,kf-,vn=4,nfhb=8,gkb-,rvlv-,drqq=5,kx=9,hp=8,dh=3,hbq-,pfxqhx=9,zx=9,jc-,zjttq" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day15 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Stream.map(&hash/1)
+    |> Enum.sum()
+  end
+
+  defp hash(list) do
+    Enum.reduce(list, 0, fn char, acc ->
+      rem((acc + char) * 17, 256)
+    end)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> hashmap()
+    |> calc_focusing_powers()
+    |> List.flatten()
+    |> Enum.sum()
+  end
+
+  defp hashmap(steps) do
+    Enum.reduce(steps, %{}, fn step, boxes ->
+      case Enum.chunk_by(step, &(&1 in ~c"=-")) do
+        [label, [?=], focal] ->
+          add_label(boxes, label, focal)
+
+        [label, [?-]] ->
+          remove_label(boxes, label)
+      end
+    end)
+  end
+
+  defp add_label(boxes, label, focal) do
+    entry = {label, focal}
+
+    Map.update(boxes, hash(label), [entry], fn acc ->
+      if List.keyfind(acc, label, 0) do
+        List.keyreplace(acc, label, 0, entry)
+      else
+        [entry | acc]
+      end
+    end)
+  end
+
+  defp remove_label(boxes, label) do
+    Map.update(boxes, hash(label), [], &List.keydelete(&1, label, 0))
+  end
+
+  defp calc_focusing_powers(boxes) do
+    Enum.map(boxes, fn
+      {_, []} ->
+        0
+
+      {box_id, box} ->
+        box
+        |> Enum.reverse()
+        |> Enum.with_index(1)
+        |> Enum.map(fn {{_label, focal_length}, index} ->
+          focal_length = String.to_integer(to_string(focal_length))
+
+          (box_id + 1) * index * focal_length
+        end)
+    end)
+  end
+
+  defmodule Input do
+    def parse(input) do
+      input
+      |> String.replace("\n", "")
+      |> String.splitter(",", trim: true)
+      |> Stream.map(&String.to_charlist/1)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day15, <<70, 79, 82, 49, 0, 0, 19, ...>>,
+ {:module, Day15.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
+```
+
+Run the HASH algorithm on each step in the initialization sequence. **What is the sum of the results?**
+
+Your puzzle answer was `511257`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day15.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+511257
+```
+
+With the help of an over-enthusiastic reindeer in a hard hat, follow the initialization sequence. **What is the focusing power of the resulting lens configuration?**
+
+Your puzzle answer was `239484`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day15.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+239484
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/15/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day15Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day15.part1(input) == 1320
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day15.part2(input) == 145
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 448471
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day15.part1(input) end,
+        "Part 2" => fn -> Day15.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
+
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.15.7
+Erlang 26.1.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        1.94 K        0.52 ms     ±3.36%        0.51 ms        0.57 ms
+Part 2        0.45 K        2.23 ms     ±2.56%        2.24 ms        2.38 ms
+
+Comparison: 
+Part 1        1.94 K
+Part 2        0.45 K - 4.34x slower +1.72 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         1.29 MB     ±0.01%        1.29 MB        1.29 MB
+Part 2         5.88 MB     ±0.00%        5.88 MB        5.88 MB
+
+Comparison: 
+Part 1         1.29 MB
+Part 2         5.88 MB - 4.56x memory usage +4.59 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1        137.41 K
+Part 2        434.56 K - 3.16x reduction count +297.15 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
