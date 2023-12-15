@@ -35,6 +35,7 @@ input = input |> Kino.Input.read()
 ```elixir
 defmodule Day14 do
   defdelegate parse(input), to: __MODULE__.Input
+  alias __MODULE__.Cache
 
   def part1(input) do
     input
@@ -47,14 +48,6 @@ defmodule Day14 do
     input
     |> parse()
     |> roll_cycle_loop()
-
-    # |> print_grid("PRE-CYCLE")
-    # |> roll_cycle()
-    # |> print_grid("AFTER CYCLE 1")
-    # |> roll_cycle()
-    # |> print_grid("AFTER CYCLE 2")
-    # |> roll_cycle()
-    # |> print_grid("AFTER CYCLE 3")
   end
 
   defp calc_load(grid) do
@@ -65,14 +58,27 @@ defmodule Day14 do
     end)
   end
 
-  defp roll_cycle_loop(grid, count \\ 0) do
+  defp roll_cycle_loop(grid) do
+    {:ok, cache} = Cache.start_link([])
+    Cache.put(cache, string_grid(grid), 0)
+
+    roll_cycle_loop(grid, cache, 0)
+  end
+
+  defp roll_cycle_loop(grid, cache, count) do
     new_grid = roll_cycle(grid)
+    grid_key = string_grid(new_grid)
 
-    if count + 1 >= 1000 do
-      IO.puts("#{calc_load(new_grid)}:#{count + 1}")
+    case Cache.get(cache, grid_key) do
+      nil ->
+        Cache.put(cache, grid_key, count + 1)
+        Cache.put(cache, count + 1, calc_load(new_grid))
+        roll_cycle_loop(new_grid, cache, count + 1)
+
+      value ->
+        lookup_index = value + rem(1_000_000_000 - value, count - value + 1)
+        Cache.get(cache, lookup_index)
     end
-
-    roll_cycle_loop(new_grid, count + 1)
   end
 
   defp roll_cycle(grid) do
@@ -149,18 +155,41 @@ defmodule Day14 do
     }
   end
 
-  def print_grid(grid, label) do
-    IO.puts(label)
+  def string_grid(grid) do
+    grid
+    |> string_rows()
+    |> to_string()
+  end
 
+  def string_rows(grid) do
     0..grid.max_y
     |> Enum.map(fn y ->
       0..grid.max_x
       |> Enum.map(fn x -> grid[{x, y}] end)
       |> to_string()
-      |> IO.puts()
     end)
+  end
 
+  def print_grid(grid, label) do
+    IO.puts(label)
+    grid |> string_rows() |> Enum.each(&IO.puts/1)
     grid
+  end
+
+  defmodule Cache do
+    use Agent
+
+    def start_link(_opts) do
+      Agent.start_link(fn -> %{} end)
+    end
+
+    def get(cache, key) do
+      Agent.get(cache, &Map.get(&1, key))
+    end
+
+    def put(cache, key, value) do
+      Agent.update(cache, &Map.put(&1, key, value))
+    end
   end
 
   defmodule Input do
@@ -194,7 +223,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day14, <<70, 79, 82, 49, 0, 0, 32, ...>>,
+{:module, Day14, <<70, 79, 82, 49, 0, 0, 35, ...>>,
  {:module, Day14.Input, <<70, 79, 82, ...>>, {:add_max_xy, 1}}}
 ```
 
@@ -227,84 +256,7 @@ Day14.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-83790:1000
-83795:1001
-83797:1002
-83787:1003
-83787:1004
-83796:1005
-83802:1006
-83811:1007
-83792:1008
-83794:1009
-83795:1010
-83783:1011
-83768:1012
-83766:1013
-83772:1014
-83778:1015
-83769:1016
-83794:1017
-83794:1018
-83790:1019
-83781:1020
-83782:1021
-83797:1022
-83809:1023
-83804:1024
-83808:1025
-83796:1026
-83789:1027
-83779:1028
-83778:1029
-83778:1030
-83779:1031
-83774:1032
-83775:1033
-83773:1034
-83789:1035
-83778:1036
-83785:1037
-83791:1038
-83795:1039
-83799:1040
-83806:1041
-83808:1042
-83803:1043
-83780:1044
-83784:1045
-83789:1046
-83791:1047
-83780:1048
-83776:1049
-83778:1050
-83770:1051
-83757:1052
-83784:1053
-83788:1054
-83798:1055
-83793:1056
-83792:1057
-83803:1058
-83801:1059
-83792:1060
-83798:1061
-83790:1062
-83797:1063
-83791:1064
-83788:1065
-83784:1066
-83771:1067
-83762:1068
-83765:1069
-83767:1070
-83797:1071
-83790:1072
-83795:1073
-83797:1074
-83787:1075
-83787:1076
-83796:1077
+83790
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -336,11 +288,11 @@ defmodule Day14Test do
     end
   end
 
-  # describe "part2/1" do
-  #   test "returns expected value", %{input: input} do
-  #     assert Day14.part2(input) == [""]
-  #   end
-  # end
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day14.part2(input) == 64
+    end
+  end
 end
 
 ExUnit.run()
@@ -349,9 +301,9 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-.
+..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-1 test, 0 failures
+2 tests, 0 failures
 
 Randomized with seed 811435
 ```
@@ -359,5 +311,91 @@ Randomized with seed 811435
 <!-- livebook:{"output":true} -->
 
 ```
-%{total: 1, failures: 0, excluded: 0, skipped: 0}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day14.part1(input) end,
+        "Part 2" => fn -> Day14.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
+
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.6
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        198.84      0.00503 s     ±7.26%      0.00493 s      0.00598 s
+Part 2          0.59         1.70 s     ±6.80%         1.70 s         1.80 s
+
+Comparison: 
+Part 1        198.84
+Part 2          0.59 - 337.26x slower +1.69 s
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1      0.00763 GB     ±0.01%     0.00763 GB     0.00763 GB
+Part 2         2.01 GB     ±0.00%        2.01 GB        2.01 GB
+
+Comparison: 
+Part 1      0.00763 GB
+Part 2         2.01 GB - 262.92x memory usage +2.00 GB
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1          0.45 M     ±0.00%         0.45 M         0.45 M
+Part 2        156.09 M     ±0.00%       156.09 M       156.09 M
+
+Comparison: 
+Part 1          0.45 M
+Part 2        156.09 M - 348.48x reduction count +155.64 M
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
 ```
