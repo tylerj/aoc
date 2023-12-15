@@ -6,12 +6,6 @@
 Mix.install([:kino, :benchee])
 ```
 
-<!-- livebook:{"output":true} -->
-
-```
-:ok
-```
-
 ## Links
 
 * [Advent of Code (AoC)](https://adventofcode.com/2023/day/1)
@@ -192,17 +186,21 @@ Randomized with seed 162351
 ## Benchmarking
 
 ```elixir
-# https://github.com/bencheeorg/benchee
-Benchee.run(
-  %{
-    "Part 1" => fn -> Day01.part1(input) end,
-    "Part 2" => fn -> Day01.part2(input) end
-  },
-  memory_time: 2,
-  reduction_time: 2
-)
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day14.part1(input) end,
+        "Part 2" => fn -> Day14.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
 
-nil
+    nil
+  end
+end
 ```
 
 <!-- livebook:{"output":true} -->
@@ -215,4 +213,8 @@ nil
 
 ```
 nil
+```
+
+```elixir
+Benchmarking.run(input)
 ```
