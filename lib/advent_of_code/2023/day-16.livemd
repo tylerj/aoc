@@ -45,31 +45,33 @@ defmodule Day16 do
   def part2(input) do
     grid = parse(input)
 
-    xs =
-      0..grid.max_x
-      |> Enum.map(fn x ->
-        max(
-          energize(grid, {{x, 0}, :down}),
-          energize(grid, {{x, grid.max_y}, :up})
-        )
-      end)
+    max(
+      max_x_energize(grid),
+      max_y_energize(grid)
+    )
+  end
 
-    ys =
-      0..grid.max_y
-      |> Enum.map(fn y ->
-        max(
-          energize(grid, {{0, y}, :right}),
-          energize(grid, {{grid.max_x, y}, :left})
-        )
-      end)
+  defp max_x_energize(grid) do
+    0..grid.max_x
+    |> Enum.reduce(0, fn x, max_acc ->
+      max_acc
+      |> max(energize(grid, {{x, 0}, :down}))
+      |> max(energize(grid, {{x, grid.max_y}, :up}))
+    end)
+  end
 
-    Enum.max(xs ++ ys)
+  defp max_y_energize(grid) do
+    0..grid.max_y
+    |> Enum.reduce(0, fn y, max_acc ->
+      max_acc
+      |> max(energize(grid, {{0, y}, :right}))
+      |> max(energize(grid, {{grid.max_x, y}, :left}))
+    end)
   end
 
   defp energize(grid, start) do
     grid
     |> advance_light([start], MapSet.new([start]))
-    |> MapSet.to_list()
     |> Enum.map(&elem(&1, 0))
     |> Enum.uniq()
     |> length()
@@ -227,7 +229,7 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 982443
+Randomized with seed 296943
 ```
 
 <!-- livebook:{"output":true} -->
@@ -289,30 +291,30 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        131.47      0.00761 s     ±6.05%      0.00739 s      0.00857 s
-Part 2          0.75         1.33 s     ±0.49%         1.33 s         1.33 s
+Part 1        131.55      0.00760 s     ±5.98%      0.00751 s      0.00854 s
+Part 2          0.77         1.30 s     ±0.43%         1.30 s         1.30 s
 
 Comparison: 
-Part 1        131.47
-Part 2          0.75 - 174.46x slower +1.32 s
+Part 1        131.55
+Part 2          0.77 - 170.72x slower +1.29 s
 
 Memory usage statistics:
 
 Name      Memory usage
-Part 1       0.0132 GB
-Part 2         2.09 GB - 158.31x memory usage +2.08 GB
+Part 1       0.0135 GB
+Part 2         2.19 GB - 161.55x memory usage +2.17 GB
 
 **All measurements for memory usage were the same**
 
 Reduction count statistics:
 
 Name           average  deviation         median         99th %
-Part 1          0.58 M     ±0.01%         0.58 M         0.58 M
-Part 2         99.09 M     ±0.00%        99.09 M        99.09 M
+Part 1          0.61 M     ±0.00%         0.61 M         0.61 M
+Part 2        107.24 M     ±0.00%       107.24 M       107.24 M
 
 Comparison: 
-Part 1          0.58 M
-Part 2         99.09 M - 170.36x reduction count +98.51 M
+Part 1          0.61 M
+Part 2        107.24 M - 176.11x reduction count +106.63 M
 ```
 
 <!-- livebook:{"output":true} -->
