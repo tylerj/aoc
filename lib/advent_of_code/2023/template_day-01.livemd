@@ -191,8 +191,8 @@ defmodule Benchmarking do
   def run(input) do
     Benchee.run(
       %{
-        "Part 1" => fn -> Day14.part1(input) end,
-        "Part 2" => fn -> Day14.part2(input) end
+        "Part 1" => fn -> Day01.part1(input) end,
+        "Part 2" => fn -> Day01.part2(input) end
       },
       memory_time: 2,
       reduction_time: 2

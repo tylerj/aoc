@@ -1,0 +1,322 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 16 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/16)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/16/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-16.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"\\....../...|..........|....../.../..-../.|...|......-.|..................................|.............../....\n|....-.........\\..........\\......./.....................................|.....-...........||..................\n.........-......|./...........\\.../-......./.|...\\.-.......................\\....\\.............................\n...............//...............\\.........................\\.......................\\....../........./.........\\\n..-........................-..........................................|............../..\\.........../.........\n..........\\....\\../...............|--....../..............-.............|...-.....\\........\\.........-...\\-...\n....|...|..|........................../..................-............./..\\-........../|.........|...........|\n.........-.....\\...................-.............|.............../....-....-....|............../....\\../-.....\n.....\\../\\......../..|........................|.......-........................../-...|.......................\n..............|/................|........|..-......|....|.|.......|.-....\\.../.............|.....-.......-....\n.-...|..................../..|......\\......|./..-.....\\../......................\\.|..--...................../.\n.............../..|...................-........./.................../....|.............-..........|.|..\\../...\n.|...........|-.........|/....\\.....\\...-...-.-.-......-...................................../.......\\-.......\n./................./.................\\..................../.-..................|.....................\\.....\\..\n\\........-...|......|........-...................\\.........................-..-........./....../.....\\........\n........-../..........|........................-..-/\\...\\........-.../.../...-......................./\\.....-.\n..//|\\.........../\\.......-...........\\....\\.....-./.|.............\\...../..\\.......||.......-................\n........./....\\.........\\-................/................................|-...\\/.........|......|...........\n...|........\\.../......\\....../......\\........./....|....../...../..|......../.-.........................\\....\n../......./....|................................................................................\\\\.......\\..|.\n.............-.\\.|..........|....................................................-..........|.................\n\\......|.............\\..-.....................................-.|...................................-|........\n.....................-......|\\......................|...-.\\......-.........-.........\\............//...-......\n.../.....\\..................|..-/....|.......\\......\\........./......./../............................\\../....\n....|....../.....-.............../........................../...................-...-.........................\n...................|....|.........-..../....|.......|../|...../....\\................../.............|.........\n........./..\\..-............................................\\.....\\......|...../\\.\\\\..|..|/................\\..\n.....|\\......|.............../............................/............................................../...-\n...............|./../............/.\\.\\..............-./...................-./...|./...........................\n-...|./.........../\\...-...........................|....-.....................-......\\..................-.....\n....................|..|/............-./.....-\\....|.............\\./.............../.|.................\\...|..\n..\\.|.-.\\.................\\...........-.........-..-.......................\\.....|\\......./.....-..........\\..\n.........|.........../............-...-...........-...-.......\\.|....................-......./...|............\n...|.......|.......................|...........\\................\\................\\............../..\\..........\n/........../..-..............-................../..........\\|..|..........-....\\...........|-.................\n.......\\.............-..................-\\......................\\...................-..........-..........|...\n../.....-\\...............-.....\\.............-....-\\/..........|.-............/...............\\....." <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day16 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> energize({{0, 0}, :right})
+  end
+
+  def part2(input) do
+    grid = parse(input)
+
+    xs =
+      0..grid.max_x
+      |> Enum.map(fn x ->
+        max(
+          energize(grid, {{x, 0}, :down}),
+          energize(grid, {{x, grid.max_y}, :up})
+        )
+      end)
+
+    ys =
+      0..grid.max_y
+      |> Enum.map(fn y ->
+        max(
+          energize(grid, {{0, y}, :right}),
+          energize(grid, {{grid.max_x, y}, :left})
+        )
+      end)
+
+    Enum.max(xs ++ ys)
+  end
+
+  defp energize(grid, start) do
+    grid
+    |> advance_light([start], MapSet.new([start]))
+    |> MapSet.to_list()
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.uniq()
+    |> length()
+  end
+
+  defp advance_light(_grid, [], set), do: set
+
+  defp advance_light(grid, lights, set) do
+    new_lights =
+      lights
+      |> Enum.map(fn {xy, direction} ->
+        next_xys(xy, direction, grid[xy])
+      end)
+      |> List.flatten()
+      |> Enum.filter(fn {xy, _} -> Map.has_key?(grid, xy) end)
+      |> Enum.reject(&MapSet.member?(set, &1))
+
+    new_set = Enum.reduce(new_lights, set, &MapSet.put(&2, &1))
+
+    advance_light(grid, new_lights, new_set)
+  end
+
+  defp next_xys(xy, :up, c) when c in ~c".|", do: up(xy)
+  defp next_xys(xy, :down, c) when c in ~c".|", do: down(xy)
+  defp next_xys(xy, :left, c) when c in ~c".-", do: left(xy)
+  defp next_xys(xy, :right, c) when c in ~c".-", do: right(xy)
+  defp next_xys(xy, :up, ?/), do: right(xy)
+  defp next_xys(xy, :up, ?\\), do: left(xy)
+  defp next_xys(xy, :down, ?/), do: left(xy)
+  defp next_xys(xy, :down, ?\\), do: right(xy)
+  defp next_xys(xy, :left, ?/), do: down(xy)
+  defp next_xys(xy, :left, ?\\), do: up(xy)
+  defp next_xys(xy, :right, ?/), do: up(xy)
+  defp next_xys(xy, :right, ?\\), do: down(xy)
+  defp next_xys(xy, :up, ?-), do: [left(xy), right(xy)]
+  defp next_xys(xy, :down, ?-), do: [left(xy), right(xy)]
+  defp next_xys(xy, :left, ?|), do: [up(xy), down(xy)]
+  defp next_xys(xy, :right, ?|), do: [up(xy), down(xy)]
+
+  defp right({x, y}), do: {{x + 1, y}, :right}
+  defp left({x, y}), do: {{x - 1, y}, :left}
+  defp down({x, y}), do: {{x, y + 1}, :down}
+  defp up({x, y}), do: {{x, y - 1}, :up}
+
+  defmodule Input do
+    def parse(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> Stream.with_index()
+      |> Enum.reduce(%{}, &parse_line/2)
+      |> add_max_xy()
+    end
+
+    defp parse_line({line, row}, grid) do
+      line
+      |> String.to_charlist()
+      |> Enum.with_index()
+      |> Enum.reduce(grid, fn {char, col}, acc ->
+        Map.put(acc, {col, row}, char)
+      end)
+    end
+
+    defp add_max_xy(grid) do
+      x = Map.keys(grid) |> Enum.map(&elem(&1, 0)) |> Enum.max()
+      y = Map.keys(grid) |> Enum.map(&elem(&1, 1)) |> Enum.max()
+
+      Map.merge(grid, %{max_x: x, max_y: y})
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day16, <<70, 79, 82, 49, 0, 0, 24, ...>>,
+ {:module, Day16.Input, <<70, 79, 82, ...>>, {:add_max_xy, 1}}}
+```
+
+The light isn't energizing enough tiles to produce lava; to debug the contraption, you need to start by analyzing the current situation. With the beam starting in the top-left heading right, **how many tiles end up being energized?**
+
+Your puzzle answer was `6514`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day16.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+6514
+```
+
+Find the initial beam configuration that energizes the largest number of tiles; **how many tiles are energized in that configuration?**
+
+Your puzzle answer was `8089`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day16.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+8089
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/16/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day16Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        ".|...\\....\n|.-.\\.....\n.....|-...\n........|.\n..........\n.........\\\n..../.\\\\..\n.-.-/..|..\n.|....-|.\\\n..//.|...."
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day16.part1(input) == 46
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day16.part2(input) == 51
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 982443
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day16.part1(input) end,
+        "Part 2" => fn -> Day16.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
+
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.15.7
+Erlang 26.1.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        131.47      0.00761 s     ±6.05%      0.00739 s      0.00857 s
+Part 2          0.75         1.33 s     ±0.49%         1.33 s         1.33 s
+
+Comparison: 
+Part 1        131.47
+Part 2          0.75 - 174.46x slower +1.32 s
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1       0.0132 GB
+Part 2         2.09 GB - 158.31x memory usage +2.08 GB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1          0.58 M     ±0.01%         0.58 M         0.58 M
+Part 2         99.09 M     ±0.00%        99.09 M        99.09 M
+
+Comparison: 
+Part 1          0.58 M
+Part 2         99.09 M - 170.36x reduction count +98.51 M
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
