@@ -1,0 +1,334 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 17 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/17)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/17/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-17.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"333213136361262336321612214531777457112145343436646554277834586842636477377358665483232322865545123271135255712112742775561145666154365233356\n625436214642112116663631316165754345156613447614784645884723775385422237785533457846422687888517441575665644164125345724771731422533345336535\n135464262413363523172353673663343124614327663325483447348582478365458326464522365884857228745883344645545337271265517463212456153534241544452\n463341164253235233654257664712176156221273446338438725387868466637872246443458373458772474446735864427171225417624722447465614145334226531133\n612123231364647651775663426212224226114337776577776736788424832776656343782563357835523563646643373362516426762263641757743221457544513132115\n554121446241214313746711736452662635625733462823288665545675563668763743787742653833765545345747825838821335355445434347415641445636564324243\n224451135242133732146576324716743753368865727642288276285674826268356773857358774272262757346428753268886423252537566456457145362241413235356\n312115633663242411233636615741633726487283228864835444425576777233878745223464452866553565685646725656653473162633463643521135773411433452466\n542364224173757771326524416535552277757354762743288837354468764353627364676267546484532727724264832675772357663444464333544311464653635434155\n644453415415675332722151756256718248247685882878285324462473375646475283722538546752748236463677656374757244824312452134314757122175246666133\n553335516731473766365715331215568572352758878273527332573426865584372534367686638785426548725847452264452655432363227522743746771746731616324\n133445474224722676227554462116647666753275526734788533873228633423522662378822462553685245662683348523576827224635133441463776656147576542321\n262263545476415133716375434754684868667682745356337755425335477366862483227738582326352468542752785886234837282845863613725264761734336443244\n114557561615633115446342258245858844385456266756554434328822765476533686573637497788623453646223225852468238675466763313713633227154741356245\n611315162633241542646131578684535533767564585652735786467776834489896877967363837453335767245825426445885342673428236331451157547442775237312\n362261614652576557153353266488324456657568285858237439538887578466544663574533349347999664436466843472663827648852522875316714732344324217372\n154236775775512321522263368636678482445745255477872966786867669355994753645973978496654594795457367226453428858886655252654623377164654233436\n462622424671674313226637785458826766472883676833993634453836356375787779937773696649358983467446647337585265887587723374463642735172144752645\n256461325176535257663462355464575334764872223438763949469848778946443559566434444799354636443886736785674266463345527548557615613664272723332\n624227517633531434243827827654636862345763525366656758486948446474677985365493464466378853868458497378656656647884675348243277163765174172612\n642426252112436471458742474775766555755482666556764666989755347483839876866543593833948554547649543695673778734785343556567234476436622452236\n472761551511731356577488843522288387648575847749585654676577859987674545338478446453935695888655834749368252388424646347784477427672675234731\n747257136413274266658434523648663224583865945533979664865739647394863547663534658684836947849398659354975525423267856334772333414472751271125\n574343547662773544664738635233783383586446637996489896655677988659366366569546668595949965836367778345574626644234463758638787822267745754521\n367475241771674622685256576755377256694657754777544899383684634438534485979934747656784795398385666575337783432384738285554737675522715746365\n256367447543715652882652564564844549667487979647384545688783886347534748746799385454464568597377867697868876544676868477782387732724561552121\n261235663177628353884845384445766258763957538398695337944456734653958794684775489984866453396736953989445799737336434633265843536845722326147\n431276435456537534853737352526378373785887936397348334479754963636988696675746463374338676858375353484947593688636237753457284385777117617624\n421367347552372223365324757658483977886994994547997755837953398686686495795587856558739768889585363493453579446427556683" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day17 do
+  defdelegate parse(input), to: __MODULE__.Input
+  alias __MODULE__.Queue
+
+  def part1(input) do
+    queue = [{0, {0, 0, :R, 0}}]
+    seen = MapSet.new([])
+
+    input
+    |> parse()
+    |> shortest_path(queue, seen, :part1)
+  end
+
+  def part2(input) do
+    queue = [{0, {0, 0, :R, 0}}]
+    seen = MapSet.new([])
+
+    input
+    |> parse()
+    |> shortest_path(queue, seen, :part2)
+  end
+
+  defp shortest_path(grid, [h | tail], seen, part) do
+    neighbors(h, grid, part)
+    |> Enum.reject(&MapSet.member?(seen, elem(&1, 1)))
+    |> Enum.reduce_while({tail, seen}, fn next, {queue, seen} ->
+      {distance, {x, y, _, moves}} = next
+
+      if (part != :part2 or moves >= 4) and x == grid.max_x and y == grid.max_y do
+        {:halt, distance}
+      else
+        {:cont, {Queue.add(queue, next), MapSet.put(seen, elem(next, 1))}}
+      end
+    end)
+    |> then(fn
+      {queue, seen} ->
+        shortest_path(grid, queue, seen, part)
+
+      distance when is_integer(distance) ->
+        distance
+    end)
+  end
+
+  defp neighbors({distance, {x, y, dir, moves}}, grid, part) do
+    [:U, :D, :L, :R]
+    |> part_filters(dir, moves, part)
+    |> Enum.reject(fn
+      :U -> dir == :D
+      :D -> dir == :U
+      :L -> dir == :R
+      :R -> dir == :L
+    end)
+    |> Enum.map(fn
+      :U -> {x, y - 1, :U}
+      :D -> {x, y + 1, :D}
+      :L -> {x - 1, y, :L}
+      :R -> {x + 1, y, :R}
+    end)
+    |> Enum.reject(fn {x, y, _} -> grid[{x, y}] |> is_nil() end)
+    |> Enum.map(fn
+      {x, y, ^dir} -> {x, y, dir, moves + 1}
+      next -> Tuple.append(next, 1)
+    end)
+    |> Enum.map(fn {x, y, _, _} = next ->
+      {distance + grid[{x, y}], next}
+    end)
+  end
+
+  defp part_filters(directions, curr_dir, moves, :part1) do
+    directions
+    |> Enum.reject(&(moves == 3 and &1 == curr_dir))
+  end
+
+  defp part_filters(directions, curr_dir, moves, :part2) do
+    directions
+    |> Enum.reject(&(moves < 4 and &1 != curr_dir))
+    |> Enum.reject(&(moves == 10 and &1 == curr_dir))
+  end
+
+  defmodule Queue do
+    def add([{lowest, _} | _] = queue, {weight, _} = next) when weight <= lowest do
+      [next | queue]
+    end
+
+    def add([head | tail], next) do
+      [head | add(tail, next)]
+    end
+
+    def add([], next) do
+      [next]
+    end
+  end
+
+  defmodule Input do
+    def parse(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> Stream.with_index()
+      |> Enum.reduce(%{}, &parse_line/2)
+      |> add_max_xy()
+    end
+
+    defp parse_line({line, row}, grid) do
+      line
+      |> String.to_charlist()
+      |> Enum.with_index()
+      |> Enum.reduce(grid, fn {char, col}, acc ->
+        Map.put(acc, {col, row}, char - 48)
+      end)
+    end
+
+    defp add_max_xy(grid) do
+      x = Map.keys(grid) |> Enum.map(&elem(&1, 0)) |> Enum.max()
+      y = Map.keys(grid) |> Enum.map(&elem(&1, 1)) |> Enum.max()
+
+      Map.merge(grid, %{max_x: x, max_y: y})
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day17, <<70, 79, 82, 49, 0, 0, 25, ...>>,
+ {:module, Day17.Input, <<70, 79, 82, ...>>, {:add_max_xy, 1}}}
+```
+
+Directing the crucible from the lava pool to the machine parts factory, but not moving more than three consecutive blocks in the same direction, **what is the least heat loss it can incur?**
+
+Your puzzle answer was `1128`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day17.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1128
+```
+
+Directing the ultra crucible from the lava pool to the machine parts factory, **what is the least heat loss it can incur?**
+
+Your puzzle answer was `1268`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day17.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+1268
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/17/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day17Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input1:
+        "2413432311323\n3215453535623\n3255245654254\n3446585845452\n4546657867536\n1438598798454\n4457876987766\n3637877979653\n4654967986887\n4564679986453\n1224686865563\n2546548887735\n4322674655533",
+      input2: "111111111111\n999999999991\n999999999991\n999999999991\n999999999991"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input1: input1} do
+      assert Day17.part1(input1) == 102
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input1: input1, input2: input2} do
+      assert Day17.part2(input1) == 94
+      assert Day17.part2(input2) == 71
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 941637
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, excluded: 0, failures: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day17.part1(input) end,
+        "Part 2" => fn -> Day17.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
+
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.15.7
+Erlang 26.1.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1          0.41         2.44 s     ±0.11%         2.44 s         2.44 s
+Part 2        0.0435        22.99 s     ±0.00%        22.99 s        22.99 s
+
+Comparison: 
+Part 1          0.41
+Part 2        0.0435 - 9.44x slower +20.55 s
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         4.04 GB
+Part 2        37.26 GB - 9.22x memory usage +33.22 GB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1          0.52 B
+Part 2          4.94 B - 9.44x reduction count +4.41 B
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
