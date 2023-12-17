@@ -3,7 +3,11 @@
 # Day 17 - Advent of Code 2023
 
 ```elixir
-Mix.install([:kino, :benchee])
+Mix.install([
+  {:heap, "~> 3.0"},
+  {:kino, "~> 0.12.0"},
+  {:benchee, "~> 1.2"}
+])
 ```
 
 ## Links
@@ -35,27 +39,30 @@ input = input |> Kino.Input.read()
 ```elixir
 defmodule Day17 do
   defdelegate parse(input), to: __MODULE__.Input
-  alias __MODULE__.Queue
 
   def part1(input) do
-    queue = [{0, {0, 0, :R, 0}}]
-    seen = MapSet.new([])
+    {grid, queue, seen} = setup(input)
 
-    input
-    |> parse()
-    |> shortest_path(queue, seen, :part1)
+    shortest_path(grid, queue, seen, :part1)
   end
 
   def part2(input) do
-    queue = [{0, {0, 0, :R, 0}}]
-    seen = MapSet.new([])
+    {grid, queue, seen} = setup(input)
 
-    input
-    |> parse()
-    |> shortest_path(queue, seen, :part2)
+    shortest_path(grid, queue, seen, :part2)
   end
 
-  defp shortest_path(grid, [h | tail], seen, part) do
+  defp setup(input) do
+    {
+      parse(input),
+      [{0, {0, 0, :R, 0}}] |> Enum.into(Heap.min()),
+      MapSet.new([])
+    }
+  end
+
+  defp shortest_path(grid, queue, seen, part) do
+    {h, tail} = Heap.split(queue)
+
     neighbors(h, grid, part)
     |> Enum.reject(&MapSet.member?(seen, elem(&1, 1)))
     |> Enum.reduce_while({tail, seen}, fn next, {queue, seen} ->
@@ -64,7 +71,7 @@ defmodule Day17 do
       if (part != :part2 or moves >= 4) and x == grid.max_x and y == grid.max_y do
         {:halt, distance}
       else
-        {:cont, {Queue.add(queue, next), MapSet.put(seen, elem(next, 1))}}
+        {:cont, {Heap.push(queue, next), MapSet.put(seen, elem(next, 1))}}
       end
     end)
     |> then(fn
@@ -112,20 +119,6 @@ defmodule Day17 do
     |> Enum.reject(&(moves == 10 and &1 == curr_dir))
   end
 
-  defmodule Queue do
-    def add([{lowest, _} | _] = queue, {weight, _} = next) when weight <= lowest do
-      [next | queue]
-    end
-
-    def add([head | tail], next) do
-      [head | add(tail, next)]
-    end
-
-    def add([], next) do
-      [next]
-    end
-  end
-
   defmodule Input do
     def parse(input) do
       input
@@ -157,7 +150,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day17, <<70, 79, 82, 49, 0, 0, 25, ...>>,
+{:module, Day17, <<70, 79, 82, 49, 0, 0, 26, ...>>,
  {:module, Day17.Input, <<70, 79, 82, ...>>, {:add_max_xy, 1}}}
 ```
 
@@ -241,13 +234,13 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 941637
+Randomized with seed 540641
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{total: 2, excluded: 0, failures: 0, skipped: 0}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
 
 ## Benchmarking
@@ -303,28 +296,30 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1          0.41         2.44 s     ±0.11%         2.44 s         2.44 s
-Part 2        0.0435        22.99 s     ±0.00%        22.99 s        22.99 s
+Part 1          2.63         0.38 s     ±7.43%         0.37 s         0.44 s
+Part 2          0.66         1.51 s     ±1.77%         1.50 s         1.54 s
 
 Comparison: 
-Part 1          0.41
-Part 2        0.0435 - 9.44x slower +20.55 s
+Part 1          2.63
+Part 2          0.66 - 3.96x slower +1.13 s
 
 Memory usage statistics:
 
 Name      Memory usage
-Part 1         4.04 GB
-Part 2        37.26 GB - 9.22x memory usage +33.22 GB
+Part 1         0.57 GB
+Part 2         1.90 GB - 3.34x memory usage +1.33 GB
 
 **All measurements for memory usage were the same**
 
 Reduction count statistics:
 
-Name   Reduction count
-Part 1          0.52 B
-Part 2          4.94 B - 9.44x reduction count +4.41 B
+Name           average  deviation         median         99th %
+Part 1         45.98 M     ±0.01%        45.98 M        45.99 M
+Part 2        151.71 M     ±0.01%       151.71 M       151.71 M
 
-**All measurements for reduction count were the same**
+Comparison: 
+Part 1         45.98 M
+Part 2        151.71 M - 3.30x reduction count +105.72 M
 ```
 
 <!-- livebook:{"output":true} -->
