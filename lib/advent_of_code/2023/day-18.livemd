@@ -1,0 +1,312 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 18 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/18)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/18/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-18.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"R 10 (#3180b0)\nU 8 (#017833)\nR 2 (#1b4a10)\nU 3 (#017831)\nR 11 (#4026e0)\nU 6 (#54c783)\nR 3 (#31fcc0)\nU 7 (#4e9493)\nL 6 (#5afbc2)\nU 2 (#0bd503)\nL 8 (#0915f2)\nU 6 (#0bd501)\nR 5 (#5adcb2)\nU 10 (#08ce13)\nR 6 (#358a90)\nD 10 (#55b9d3)\nR 7 (#045310)\nU 4 (#0c8861)\nR 4 (#6942a0)\nD 8 (#479e01)\nR 3 (#35d6d0)\nD 6 (#35ab11)\nR 4 (#2fd170)\nU 3 (#60ef11)\nR 6 (#58dd50)\nU 8 (#0f2651)\nL 6 (#059b50)\nU 3 (#2da143)\nR 5 (#066ee0)\nU 5 (#5b2963)\nL 6 (#527410)\nU 4 (#711c33)\nL 8 (#577010)\nU 4 (#083323)\nL 3 (#75fc72)\nD 4 (#183e23)\nL 5 (#3718d2)\nU 4 (#3569a3)\nL 5 (#0de902)\nU 3 (#570cb1)\nR 5 (#3c1cd2)\nU 3 (#570cb3)\nR 6 (#45e2c2)\nU 6 (#0b9413)\nR 5 (#50dd60)\nD 9 (#279343)\nR 9 (#5fb8e0)\nU 4 (#498903)\nR 2 (#166b20)\nU 10 (#1e2983)\nL 8 (#75fc70)\nU 2 (#1e5023)\nL 11 (#451642)\nU 3 (#4a17b3)\nL 2 (#2d0862)\nU 7 (#2d8203)\nL 11 (#2d0860)\nU 7 (#630fa3)\nL 2 (#60be02)\nU 3 (#326253)\nL 3 (#288692)\nU 4 (#46a9e3)\nL 9 (#415332)\nU 5 (#5c2991)\nR 3 (#582242)\nU 6 (#1ce2a1)\nR 5 (#15ccc2)\nU 5 (#4fe401)\nR 3 (#0b7832)\nU 9 (#791d41)\nR 5 (#0b7830)\nD 2 (#11a811)\nR 3 (#21f8a2)\nD 12 (#752373)\nR 5 (#4273f2)\nD 4 (#0bef43)\nR 6 (#472ef2)\nD 2 (#0ae933)\nR 4 (#6e8fa0)\nU 6 (#4b3fc3)\nR 11 (#1a18a0)\nU 2 (#204183)\nR 10 (#689d72)\nU 2 (#166963)\nR 6 (#200ad2)\nU 9 (#409303)\nR 3 (#5168a2)\nU 6 (#182991)\nR 7 (#00de82)\nU 4 (#41fc51)\nR 6 (#5648a0)\nU 2 (#17c011)\nR 3 (#5648a2)\nU 11 (#472561)\nR 4 (#00de80)\nU 2 (#145b81)\nR 7 (#6bad12)\nD 5 (#5e9d63)\nR 3 (#4c1952)\nD 4 (#002863)\nR 9 (#124bd2)\nD 3 (#25f571)\nR 5 (#39af72)\nU 9 (#261871)\nR 2 (#39af70)\nU 3 (#3e3d51)\nR 5 (#1ba6d2)\nU 6 (#11b181)\nR 8 (#5e0242)\nU 7 (#631bd3)\nL 8 (#1d0562)\nU 5 (#38e0e3)\nL 3 (#2052b2)\nU 9 (#423193)\nL 5 (#05ba00)\nU 7 (#3648c3)\nL 4 (#4871c0)\nU 4 (#30bdc1)\nL 8 (#421980)\nD 3 (#30bdc3)\nL 4 (#201d60)\nD 8 (#181023)\nL 4 (#18ea50)\nU 7 (#4cfb23)\nL 8 (#0d4ee2)\nU 7 (#1f53c3)\nR 7 (#118482)\nU 7 (#36b581)\nR 3 (#190502)\nU 4 (#3fc8e1)\nR 9 (#6832a2)\nU 7 (#19c913)\nR 2 (#471882)\nU 4 (#5cb553)\nR 5 (#3531d2)\nD 4 (#1f53c1)\nR 4 (#264472)\nD 6 (#5e7773)\nL 6 (#61f782)\nD 5 (#3b3223)\nR 6 (#648152)\nD 7 (#478223)\nR 6 (#1c4420)\nU 5 (#243b71)\nR 7 (#6c3910)\nU 2 (#243b73)\nR 2 (#3dfba0)\nU 12 (#19c593)\nR 3 (#77f502)\nD 11 (#381303)\nR 4 (#0cff42)\nD 3 (#1cd823)\nR 4 (#5f54b2)\nU 4 (#141391)\nR 6 (#1a7fd2)\nU 3 (#40d791)\nR 3 (#4d9772)\nU 9 (#19cab1)\nR 9 (#226420)\nU 5 (#284511)\nL 6 (#3456e2)\nU 12 (#2ff501)\nL 4 (#3456e0)\nU 4 (#3472f1)\nR 2 (#226422)\nU 5 (#018221)\nR 8 (#4abc80)\nU 4 (#6418f1)\nL 13 (#56d0e0)\nU 2 (#1d3d21)\nL 5 (#06aec0)\nU 5 (#309301)\nR 11 (#34e632)\nU 3 (#565641)\nR 2 (#7355f2)\nU 6 (#254551)\nR 6 (#097332)\nU 7 (#61be21)\nR 5 (#185f12)\nD 5 (#0883e3)\nR 5 (#4c8672)\nD 4 (#0883e1)\nR 8 (#4b20b2)\nD 6 (#2b7841)\nR 4 (#68a900)\nD 4 (#2a69f1)\nR 10 (#15f5d2)\nD 6 (#143051)\nR 3 (#40af22)\nD 12 (#789491)\nR 5 (#4c75c2)\nD 10 (#49b161)\nR 4 (#026a90)\nD 4 (#1302b3)\nR 4 (#742f40)\nD 2 (#1302b1)\nR 11 (#2c80e0)\nD 6 (#2f3d61)\nL 9 (#68a902)\nD 9 (#18e511)\nL 6 (#52a2a2)\nD 11 (#668143)\nR 6 (#3e9d32)\nD 9 (#6f5ce3)\nR 5 (#453c72)\nD 4 (#5c53d3)\nR 4 (#245842)\nD 6 (#4248f3)\nR 5 (#52f642)\nU 8 (#0a4793)\nR 5 (#275470)\nU 8 (#633e43)\nR 3 (#5b9d50)\nU 6 (#6a1b83)\nR 5 (#4ccf90)\nU 4 (#0773d3)\nR 3 (#4fe152)\nU 7 (#0ee221)\nL 4 (#1c62c2)\nD 4 (#0ee223)\nL 6 (#3c28d2)\nU 4 (#094fb3)\nL 5 (#0d5eb0)\nU 3 (#0e2413)\nR 8 (#648660)\nU 3 (#3def33)\nR 7 (#1d86d0)\nU 6 (#294523)\nR 7 (#21e280)\nD 6 (#311ab1)\nR 11 (#5d4fd0)\nD 3 (#4da171)\nR 2 (#21c892)\nD 5 (#41aa41)\nR 5 (#21c890)\nD 4 (#143b21)\nR 3 (#1e0360)\nD 10 (#405ff3)\nR 6 (#55f4f0)\nD 12 (#70c2d3)\nL 6 (#55f4f2)\nD 2 (#237ec3)\nL 4 (#2d9e90)\nD 2 (#04ff73)\nL 6 (#465980)\nD 7 (#04ff71)\nL 4 (#06e620)\nD 4 (#10c923)\nL 7 (#456d32)\nD 8 (#543f03)\nL 3 (#3c50d0)\nD 6 (#2a5f93)\nL 5 (#3c50d2)\nD 6 (#2c66a3)\nL 7 (#5acb22)\nD 11 (#15d5d3)\nL 3 (#377b02)\nU 11 (#1b8d03)\nL 5 (#1b3fe0)\nD 2 (#015fd3)\nL 2 (#134a20)\nD 7 (#1160d3)\nL 6 (#06aee2)\nU 3 (#384eb3)\nL 10 (#738212)\nU 6 (#1a6053)\nL 11 (#7a30f0)\nU 6 (#23e2e3)\nL 6 (#4d7a80)\nU 10 (#12b763)\nL 2 (#5baed0)\nU 8 (#4572e3)\nL 6 (#5ac8b0)\nD 4 (#5dec33)\nL 3 (#0fc0b0)\nD 3 (#52fb53)\nL 5 (#2b4970)\nD 11 (#25dee3)\nL 3 (#583090)\nD 7 (#2535c1)\nR 9 (#2dafb0)\nD 5 (#345101)\nR 5 (#3068d0)\nD 4 (#0a6ba1)\nR 4 (#4a6b30)\nD 3 (#72d401)\nR 12 (#1479f0)\nD 3 (#18d0e3)\nR 2 (#222b30)\nD 4 (#4dc203)\nL 10 " <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day18 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> Enum.reduce({{0, 0}, [], 0}, &make_move/2)
+    |> calc_total_points()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> convert_hex_input()
+    |> Enum.reduce({{0, 0}, [], 0}, &make_move/2)
+    |> calc_total_points()
+  end
+
+  defp make_move({dir, num, _color}, {current, list, points}) do
+    next = next_vertex(current, dir, num)
+
+    {next, [next | list], points + num}
+  end
+
+  defp next_vertex({x, y}, ?U, num), do: {x, y - num}
+  defp next_vertex({x, y}, ?D, num), do: {x, y + num}
+  defp next_vertex({x, y}, ?L, num), do: {x - num, y}
+  defp next_vertex({x, y}, ?R, num), do: {x + num, y}
+
+  defp calc_total_points({_, vertices, boundary_point_count}) do
+    boundary_point_count + interior_point_count(vertices, boundary_point_count)
+  end
+
+  @doc """
+  https://en.wikipedia.org/wiki/Pick's_theorem
+
+  Suppose that a polygon has integer coordinates for all of its vertices.
+  Let `i` be the number of integer points interior to the polygon, and let 
+  `b` be the number of integer points on its boundary (including both
+  vertices and points along the sides).
+  Then the area `A` of this polygon is:
+
+  A = i + b/2 - 1
+
+  The number of interior points is then:
+
+  i = A - b/2 + 1
+  """
+  def interior_point_count(vertices, b) do
+    shoelace_area(vertices) - div(b, 2) + 1
+  end
+
+  # https://en.wikipedia.org/wiki/Shoelace_formula
+  defp shoelace_area(loop) do
+    loop
+    |> Enum.chunk_every(2, 1, [hd(loop)])
+    |> Enum.map(fn [{x1, y1}, {x2, y2}] ->
+      x1 * y2 - x2 * y1
+    end)
+    |> Enum.sum()
+    |> div(2)
+    |> abs()
+  end
+
+  @direction %{"0" => ?R, "1" => ?D, "2" => ?L, "3" => ?U}
+  defp convert_hex_input(input) do
+    Enum.map(input, fn {_, _, color} ->
+      {distance, dir} = String.split_at(color, 5)
+
+      {
+        @direction[dir],
+        String.to_integer(distance, 16),
+        nil
+      }
+    end)
+  end
+
+  defmodule Input do
+    def parse(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> Stream.map(&parse_line/1)
+    end
+
+    def parse_line(line) do
+      ~r/([UDLR]) (\d+) \(\#([0-9a-f]{6})\)/
+      |> Regex.run(line, capture: :all_but_first)
+      |> then(fn [dir, num, color] ->
+        {
+          String.to_charlist(dir) |> hd(),
+          String.to_integer(num),
+          color
+        }
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day18, <<70, 79, 82, 49, 0, 0, 18, ...>>,
+ {:module, Day18.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+The Elves are concerned the lagoon won't be large enough; if they follow their dig plan, **how many cubic meters of lava could it hold?**
+
+Your puzzle answer was 70026.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day18.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+70026
+```
+
+Convert the hexadecimal color codes into the correct instructions; if the Elves follow this new dig plan, **how many cubic meters of lava could the lagoon hold?**
+
+Your puzzle answer was `68548301037382`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day18.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+68548301037382
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/18/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day18Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "R 6 (#70c710)\nD 5 (#0dc571)\nL 2 (#5713f0)\nD 2 (#d2c081)\nR 2 (#59c680)\nD 2 (#411b91)\nL 5 (#8ceee2)\nU 2 (#caa173)\nL 1 (#1b58a2)\nU 2 (#caa171)\nR 2 (#7807d2)\nU 3 (#a77fa3)\nL 2 (#015232)\nU 2 (#7a21e3)"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day18.part1(input) == 62
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day18.part2(input) == 952_408_144_115
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 950624
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day18.part1(input) end,
+        "Part 2" => fn -> Day18.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
+
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.7
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        1.47 K      682.48 μs     ±4.01%      672.17 μs      770.24 μs
+Part 2        1.15 K      872.01 μs     ±2.93%      861.71 μs      942.04 μs
+
+Comparison: 
+Part 1        1.47 K
+Part 2        1.15 K - 1.28x slower +189.54 μs
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         0.66 MB     ±0.20%        0.66 MB        0.67 MB
+Part 2         1.10 MB     ±0.00%        1.10 MB        1.10 MB
+
+Comparison: 
+Part 1         0.66 MB
+Part 2         1.10 MB - 1.65x memory usage +0.43 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1         51.62 K
+Part 2         77.67 K - 1.50x reduction count +26.05 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
