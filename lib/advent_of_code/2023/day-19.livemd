@@ -88,13 +88,13 @@ defmodule Day19 do
     |> Enum.sum()
   end
 
-  defp find_ranges(ranges, ["A"], _wfs), do: [ranges]
-  defp find_ranges(_ranges, ["R"], _wfs), do: []
+  def find_ranges(ranges, ["A"], _wfs), do: [ranges]
+  def find_ranges(_ranges, ["R"], _wfs), do: []
 
-  defp find_ranges(ranges, [next], wfs),
+  def find_ranges(ranges, [next], wfs),
     do: find_ranges(ranges, wfs[next], wfs)
 
-  defp find_ranges(ranges, [{cat, op, value, next} | tail], wfs) do
+  def find_ranges(ranges, [{cat, op, value, next} | tail], wfs) do
     case next_range_values(ranges[cat], op, value) do
       {nil, no_ranges} ->
         find_ranges(Map.put(ranges, cat, no_ranges), tail, wfs)
@@ -188,7 +188,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day19, <<70, 79, 82, 49, 0, 0, 24, ...>>,
+{:module, Day19, <<70, 79, 82, 49, 0, 0, 25, ...>>,
  {:module, Day19.Input, <<70, 79, 82, ...>>, {:parse_parts, 1}}}
 ```
 
@@ -222,11 +222,125 @@ r = Day19.part2(input)
 138625360533574
 ```
 
+```elixir
+example_input =
+  "px{a<2006:qkq,m>2090:A,rfg}\npv{a>1716:R,A}\nlnx{m>1548:A,A}\nrfg{s<537:gd,x>2440:R,A}\nqs{s>3448:A,lnx}\nqkq{x<1416:A,crn}\ncrn{x>2662:A,R}\nin{s<1351:px,qqz}\nqqz{s>2770:qs,m<1801:hdj,R}\ngd{a>3333:R,R}\nhdj{m>838:A,pv}\n\n{x=787,m=2655,a=1222,s=2876}\n{x=1679,m=44,a=2067,s=496}\n{x=2036,m=264,a=79,s=2244}\n{x=2461,m=1339,a=466,s=291}\n{x=2127,m=1623,a=2188,s=1013}"
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"px{a<2006:qkq,m>2090:A,rfg}\npv{a>1716:R,A}\nlnx{m>1548:A,A}\nrfg{s<537:gd,x>2440:R,A}\nqs{s>3448:A,lnx}\nqkq{x<1416:A,crn}\ncrn{x>2662:A,R}\nin{s<1351:px,qqz}\nqqz{s>2770:qs,m<1801:hdj,R}\ngd{a>3333:R,R}\nhdj{m>838:A,pv}\n\n{x=787,m=2655,a=1222,s=2876}\n{x=1679,m=44,a=2067,s=496}\n{x=2036,m=264,a=79,s=2244}\n{x=2461,m=1339,a=466,s=291}\n{x=2127,m=1623,a=2188,s=1013}"
+```
+
 Both parts of this puzzle are complete! They provide two gold stars: **
 
 At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
 
 If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/19/input).
+
+## Accepted Ranges for the Example Input
+
+Here are a list of all the accepted ranges for the puzzle's example input.
+
+```elixir
+{wfs, _parts} = Day19.parse(example_input)
+
+start_ranges = %{
+  "x" => 1..4000,
+  "m" => 1..4000,
+  "a" => 1..4000,
+  "s" => 1..4000
+}
+
+accepted_ranges = Day19.find_ranges(start_ranges, wfs["in"], wfs)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  %{"a" => 1..2005, "m" => 1..4000, "s" => 1..1350, "x" => 1..1415},
+  %{"a" => 1..2005, "m" => 1..4000, "s" => 1..1350, "x" => 2663..4000},
+  %{"a" => 2006..4000, "m" => 2091..4000, "s" => 1..1350, "x" => 1..4000},
+  %{"a" => 2006..4000, "m" => 1..2090, "s" => 537..1350, "x" => 1..2440},
+  %{"a" => 1..4000, "m" => 1..4000, "s" => 3449..4000, "x" => 1..4000},
+  %{"a" => 1..4000, "m" => 1549..4000, "s" => 2771..3448, "x" => 1..4000},
+  %{"a" => 1..4000, "m" => 1..1548, "s" => 2771..3448, "x" => 1..4000},
+  %{"a" => 1..4000, "m" => 839..1800, "s" => 1351..2770, "x" => 1..4000},
+  %{"a" => 1..1716, "m" => 1..838, "s" => 1351..2770, "x" => 1..4000}
+]
+```
+
+Given the approach for finding these ranges, none of them are overlapping - you can see that with this example data by eyeballing them.
+
+Therefore, to get the Part 2 answer: for each of these range sets, multiply the size of each of the 4 ranges together, then sum those values.
+
+```elixir
+sizes =
+  accepted_ranges
+  |> Enum.map(fn ranges ->
+    ranges
+    |> Map.values()
+    |> Enum.map(&Range.size/1)
+  end)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  [2005, 4000, 1350, 1415],
+  [2005, 4000, 1350, 1338],
+  [1995, 1910, 1350, 4000],
+  [1995, 2090, 814, 2440],
+  [4000, 4000, 552, 4000],
+  [4000, 2452, 678, 4000],
+  [4000, 1548, 678, 4000],
+  [4000, 962, 1420, 4000],
+  [1716, 838, 1420, 4000]
+]
+```
+
+```elixir
+products = Enum.map(sizes, &Enum.product/1)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[15320205000000, 14486526000000, 20576430000000, 8281393428000, 35328000000000, 26599296000000,
+ 16792704000000, 21856640000000, 8167885440000]
+```
+
+```elixir
+Enum.sum(products)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+167409079868000
+```
+
+And the full calculation:
+
+```elixir
+accepted_ranges
+|> Enum.map(fn ranges ->
+  ranges
+  |> Map.values()
+  |> Enum.map(&Range.size/1)
+  |> Enum.product()
+end)
+|> Enum.sum()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+167409079868000
+```
 
 ## Tests
 
@@ -330,12 +444,12 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        427.57        2.34 ms     ±2.37%        2.32 ms        2.49 ms
-Part 2        407.40        2.45 ms     ±2.03%        2.44 ms        2.62 ms
+Part 1        423.77        2.36 ms     ±3.44%        2.34 ms        2.57 ms
+Part 2        392.46        2.55 ms     ±2.21%        2.54 ms        2.76 ms
 
 Comparison: 
-Part 1        427.57
-Part 2        407.40 - 1.05x slower +0.116 ms
+Part 1        423.77
+Part 2        392.46 - 1.08x slower +0.188 ms
 
 Memory usage statistics:
 
