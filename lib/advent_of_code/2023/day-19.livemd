@@ -1,0 +1,365 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 19 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/19)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/19/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-19.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"jtx{s<3181:R,R}\nrkd{s>2386:tdr,R}\nsvj{x>1520:A,A}\nvkv{x<3627:A,x>3794:A,A}\nksz{m<1450:R,a<2837:R,a<2928:R,A}\nfp{x<1293:sjt,bv}\njq{m>1493:R,m>1377:A,m<1344:R,R}\ngts{m<3166:R,A}\nxxr{s<231:R,x<3055:R,R}\nrz{a<2982:A,m<1763:R,x>1878:A,A}\nkq{s<2900:R,s>3591:A,R}\ntmg{s<1500:A,x>2504:R,a<1166:A,R}\ndvn{s<1632:R,A}\nznj{m>1884:A,R}\ndb{m<1554:cg,m>3173:R,x<1203:A,xsm}\nchr{a<682:R,x>3120:R,m>2313:A,R}\npd{x<1433:kp,a<2715:fjd,xtx}\nqkd{s<666:R,R}\nrbf{x>2541:R,R}\ngx{s>1347:A,m<812:gxz,s>1079:tpg,lt}\nfqb{x<1290:A,R}\njf{x<1340:A,s>2972:dq,x>1378:bqh,jps}\nsr{m>776:A,A}\nvs{s<1377:R,R}\nvx{x>1237:R,A}\ndz{m<192:A,m<271:A,R}\nmhr{m<2568:R,m<3466:R,a>3791:A,R}\nvv{m<3559:A,s>3108:R,R}\npsk{a>2830:A,a<2278:A,A}\ngvv{a>2993:A,a>2553:A,R}\ngsx{x<2656:A,A}\njps{a<1216:A,R}\nlt{s<967:A,A}\nng{s<3259:R,s<3674:R,A}\nzd{s>2267:R,R}\nks{a>1951:bg,m<1522:gpf,gj}\nprk{m<2242:R,s>56:R,R}\nnr{x>3432:R,sg}\nfkd{s>2014:mxf,sps}\ntk{x<1133:jzj,vq}\nsgl{a<1237:R,A}\nsmg{x<2071:R,m<387:R,A}\nqd{s<3197:sl,x>1479:lqs,m>1300:rrp,gm}\ntr{s<1306:R,x>1183:A,A}\nbxh{a>1123:fpp,R}\nhjp{a>2545:nb,a>2381:qx,m>2463:nn,bt}\nzg{s<1932:smc,m<1443:rq,jf}\nnnq{m>3341:lx,s<2737:A,a<3408:A,R}\nlx{s>3219:A,a>2886:A,m<3691:A,R}\nstl{s<2701:R,m>3442:A,s<3282:A,A}\ngsp{m<619:R,s<529:R,A}\nfkk{x<3359:svx,sp}\ndsk{x<1499:kn,xj}\njmx{m<1426:zq,fvz}\nst{s>2257:slt,rvv}\nprm{a<470:A,tts}\nfkj{x<2514:R,x>2784:R,a>2830:R,qft}\nbh{m<1740:mmf,a>503:zn,s>1702:vfp,fft}\nrv{m<2642:A,sfv}\nqk{s<1846:A,A}\nnqr{a>786:ssx,qbh}\nkng{a<3059:A,a<3463:A,a<3661:A,A}\ntcd{m<3753:R,a<2566:pq,m<3792:R,hsq}\nrhc{x>1415:mzt,x>1395:qp,x>1386:rk,nnq}\nhn{x>3532:A,a>1227:R,a>1109:A,R}\nbtd{s<2462:ftz,A}\nxv{s>1573:pv,m>730:pn,s<1201:vtz,fjk}\nsm{a>787:R,R}\nmqz{m<645:R,m<682:A,A}\nrvv{m<867:vkv,a>556:R,mx}\nfft{x>581:jb,a<314:R,R}\ntxz{s<1338:R,x>2633:A,m<1168:A,A}\npcq{x<1531:A,R}\nkvj{s<2721:A,x>2637:A,R}\nkfj{x<1129:kz,s>1501:zfm,pk}\nrd{m<3742:A,A}\nqft{x<2653:A,s>1281:A,A}\nzzr{a<3875:R,m>249:A,a<3917:R,A}\nnh{a>3744:zcn,gxg}\nfsp{m>3306:R,R}\nrt{m<310:zlk,qgj}\nmpb{m>2954:R,R}\nqgj{s>1083:R,m<502:A,s<949:A,A}\nhq{x<1527:dfg,m>3017:jvm,a>947:jts,gqf}\nbfc{x>1423:R,a<2789:A,A}\nbnv{a>900:R,A}\ntdr{a>518:R,m>657:A,x>2576:R,R}\njmm{a<3410:mq,fv}\nqjr{a>2534:R,s<1365:A,m<261:A,R}\nin{x<1624:zsf,ks}\njgs{m<702:R,A}\nqg{a<1733:A,R}\npv{x<1559:hnp,x>1588:gbv,R}\nrpx{m<2361:zv,A}\nbzm{x<1510:rhc,x<1580:lct,m>3357:rrj,zld}\ndnf{x>2931:xkp,s>1747:A,s<858:qhb,zf}\nsk{x>3528:A,x<3113:bnx,psk}\nxgt{s>2544:vn,sft}\nkjv{s>1334:gsh,a>95:rbf,a>50:bmf,trd}\npvt{s>2784:A,s<2303:qk,a<1589:A,R}\nnv{a>3108:R,x>1923:R,s>652:A,A}\nnlg{m>383:A,s>1520:A,s>749:R,R}\nlk{a<2425:R,s>598:R,a>2517:R,A}\nnt{m>1682:R,m>999:A,m>428:A,A}\nrmp{m>2634:R,s<317:nt,lk}\nfs{m<2408:A,x<1842:R,R}\nsjt{x<1133:nqr,vt}\ntbk{m<2779:R,a>3554:R,a>3415:A,R}\njr{m>3312:A,R}\nbmf{s<509:xxs,a<68:qxr,R}\nxz{s<1845:A,x<1392:A,A}\ntpn{m>2419:A,x>2999:A,s<2347:A,R}\nfcg{a<196:A,m>1248:nbt,a>276:R,R}\nkv{x>1467:R,m>891:R,s>2429:A,A}\nrq{m>570:bft,x<1349:R,m<215:R,A}\ncpr{s>140:cdl,m<2079:znj,prk}\nfc{a<3507:R,x<1454:A,s<1296:A,A}\nkfs{x<2459:R,A}\nvr{m<3596:A,a<2837:R,A}\nvg{a>3513:xl,x<569:sr,x>740:bp,qxs}\nmzc{m<3026:R,a>1169:A,A}\njhk{m<3520:A,m<3692:A,a<701:R,A}\nqx{s<1241:A,A}\nbv{x<1412:zg,m<1721:hh,hq}\npj{s>3641:A,x>1535:mj,m<1145:A,jxb}\nsvx{x<3194:A,m<1734:gsp,m<2937:zk,kng}\nkp{x<1404:jj,m>1015:R,x>1415:bfc,A}\ncxh{m>619:R,m>536:A,R}\nffj{x<2728:R,s<231:A,R}\nfh{m<1629:A,a<1260:A,A}\ntrd{a>29:qc,A}\nhj{a<706:kvj,s<3197:grd,a>1057:mzc,gsx}\nqcx{a<265:R,R}\nbhz{x<1415:R,A}\nccq{a<3195:mtr,a<3700:jzv,x>1501:xv,tj}\nqpn{s>499:vpz,a>804:qsc,lsm}\njk{x<3497:R,x>3734:A,A}\nbz{x>568:A,a<773:A,R}\nhkv{a<1753:R,x<2544:A,a>1849:R,ps}\ngj{m>2405:fkd,s>1405:pf,qpn}\nlg{a<1611:rlx,a<1731:fps,A}\nln{a<1637:R,s<3175:A,A}\nshk{a<1729:htt,m>1833:R,A}\nsct{m>1497:A,R}\nrnj{a>2878:R,m>1475:R,a<2792:R,A}\nqp{a<3308:R,m>3268:vv,A}\nvq{s<2622:R,R}\nnbt{s<1656:A,m<1413:R,m>1485:A,A}\nbdm{x<2476:gv,x>2650:vhv,kh}\nbjh{x<2660:R,A}\nfnx{a<3874:A,A}\nqzt{s>3620:A,A}\nft{a<1286:A,m>1846:R,R}\ncx{a>2841:A,m<425:qjr,s>1229:qm,R}\nrrj{m<3695:nm,m>3867:sz,a>3080:cd,tcd}\nghj{s<2416:A,m<2698:R,R}\nxm{a<3638:pcq,m>2433:pnx,tsc}\nhkg{a<1186:A,R}\nts{s>905:A,m<299:R,R}\ndbf{m<1691:sct,s<3740:mnr,A}\nssq{s>3183:A,m<2388:A,A}" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day19 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    {wfs, parts} = parse(input)
+
+    parts
+    |> Stream.map(&sort_part(&1, "in", wfs))
+    |> Stream.reject(&is_nil/1)
+    |> Stream.map(&Map.values/1)
+    |> Stream.map(&Enum.sum/1)
+    |> Enum.sum()
+  end
+
+  defp sort_part(part, wf, wfs) do
+    case do_sort_part(part, wfs[wf]) do
+      "A" -> part
+      "R" -> nil
+      next_wf -> sort_part(part, next_wf, wfs)
+    end
+  end
+
+  defp do_sort_part(part, conditions) do
+    Enum.find_value(conditions, fn
+      {cat, ">", value, next} ->
+        if part[cat] > value, do: next, else: nil
+
+      {cat, "<", value, next} ->
+        if part[cat] < value, do: next, else: nil
+
+      next ->
+        next
+    end)
+  end
+
+  @start_ranges %{
+    "x" => 1..4000,
+    "m" => 1..4000,
+    "a" => 1..4000,
+    "s" => 1..4000
+  }
+  def part2(input) do
+    {wfs, _parts} = parse(input)
+
+    @start_ranges
+    |> find_ranges(wfs["in"], wfs)
+    |> Enum.map(fn range ->
+      range
+      |> Map.values()
+      |> Enum.map(&Range.size/1)
+      |> Enum.product()
+    end)
+    |> Enum.sum()
+  end
+
+  defp find_ranges(ranges, ["A"], _wfs), do: [ranges]
+  defp find_ranges(_ranges, ["R"], _wfs), do: []
+
+  defp find_ranges(ranges, [next], wfs),
+    do: find_ranges(ranges, wfs[next], wfs)
+
+  defp find_ranges(ranges, [{cat, op, value, next} | tail], wfs) do
+    case next_range_values(ranges[cat], op, value) do
+      {nil, no_ranges} ->
+        find_ranges(Map.put(ranges, cat, no_ranges), tail, wfs)
+
+      {yes_ranges, nil} ->
+        find_ranges(Map.put(ranges, cat, yes_ranges), [next], wfs)
+
+      {yes_ranges, no_ranges} ->
+        find_ranges(Map.put(ranges, cat, yes_ranges), [next], wfs) ++
+          find_ranges(Map.put(ranges, cat, no_ranges), tail, wfs)
+    end
+  end
+
+  defp next_range_values(%{last: l} = range, ">", value) when l <= value do
+    {nil, range}
+  end
+
+  defp next_range_values(range, ">", value) do
+    yes_range = (value + 1)..range.last
+
+    if value < range.first do
+      {yes_range, nil}
+    else
+      {yes_range, range.first..value}
+    end
+  end
+
+  defp next_range_values(%{first: f} = range, "<", value) when f >= value do
+    {nil, range}
+  end
+
+  defp next_range_values(range, "<", value) do
+    yes_range = range.first..(value - 1)
+
+    if value > range.last do
+      {yes_range, nil}
+    else
+      {yes_range, value..range.last}
+    end
+  end
+
+  defmodule Input do
+    def parse(input) do
+      [workflows, parts] = String.split(input, "\n\n", trim: true)
+
+      {
+        parse_workflows(workflows),
+        parse_parts(parts)
+      }
+    end
+
+    defp parse_workflows(workflows) do
+      workflows
+      |> String.split("\n", trim: true)
+      |> Enum.map(fn line ->
+        [key | wfs] = String.split(line, ["{", "}", ","], trim: true)
+
+        {key, Enum.map(wfs, &process_wf/1)}
+      end)
+      |> Enum.into(%{})
+    end
+
+    defp process_wf(wf) do
+      ~r/([^<>]+)([<>])(\d+)\:(.+)/
+      |> Regex.run(wf, capture: :all_but_first)
+      |> return_wf(wf)
+    end
+
+    defp return_wf([part, op, value, next], _) do
+      {part, op, String.to_integer(value), next}
+    end
+
+    defp return_wf(nil, wf), do: wf
+
+    defp parse_parts(parts) do
+      parts
+      |> String.split("\n", trim: true)
+      |> Enum.map(fn line ->
+        String.split(line, ["{", "}", ","], trim: true)
+        |> Enum.map(fn part ->
+          [key, value] = String.split(part, "=")
+          {key, String.to_integer(value)}
+        end)
+        |> Enum.into(%{})
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day19, <<70, 79, 82, 49, 0, 0, 24, ...>>,
+ {:module, Day19.Input, <<70, 79, 82, ...>>, {:parse_parts, 1}}}
+```
+
+Sort through all of the parts you've been given; **what do you get if you add together all of the rating numbers for all of the parts that ultimately get accepted?**
+
+Your puzzle answer was `406849`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day19.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+406849
+```
+
+Consider only your list of workflows; the list of part ratings that the Elves wanted you to sort is no longer relevant. **How many distinct combinations of ratings will be accepted by the Elves' workflows?**
+
+Your puzzle answer was `138625360533574`.
+
+```elixir
+r = Day19.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+138625360533574
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/19/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day19Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "px{a<2006:qkq,m>2090:A,rfg}\npv{a>1716:R,A}\nlnx{m>1548:A,A}\nrfg{s<537:gd,x>2440:R,A}\nqs{s>3448:A,lnx}\nqkq{x<1416:A,crn}\ncrn{x>2662:A,R}\nin{s<1351:px,qqz}\nqqz{s>2770:qs,m<1801:hdj,R}\ngd{a>3333:R,R}\nhdj{m>838:A,pv}\n\n{x=787,m=2655,a=1222,s=2876}\n{x=1679,m=44,a=2067,s=496}\n{x=2036,m=264,a=79,s=2244}\n{x=2461,m=1339,a=466,s=291}\n{x=2127,m=1623,a=2188,s=1013}"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day19.part1(input) == 19114
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day19.part2(input) == 167_409_079_868_000
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 402846
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day19.part1(input) end,
+        "Part 2" => fn -> Day19.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
+
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.7
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        427.57        2.34 ms     ±2.37%        2.32 ms        2.49 ms
+Part 2        407.40        2.45 ms     ±2.03%        2.44 ms        2.62 ms
+
+Comparison: 
+Part 1        427.57
+Part 2        407.40 - 1.05x slower +0.116 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         0.90 MB     ±0.00%        0.90 MB        0.90 MB
+Part 2         1.18 MB     ±0.00%        1.18 MB        1.18 MB
+
+Comparison: 
+Part 1         0.90 MB
+Part 2         1.18 MB - 1.31x memory usage +0.28 MB
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1        101.36 K     ±0.00%       101.36 K       101.36 K
+Part 2        112.38 K     ±0.00%       112.38 K       112.38 K
+
+Comparison: 
+Part 1        101.36 K
+Part 2        112.38 K - 1.11x reduction count +11.02 K
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
