@@ -3,7 +3,11 @@
 # Day 20 - Advent of Code 2023
 
 ```elixir
-Mix.install([:kino, :benchee])
+Mix.install([
+  {:kino, "~> 0.12.0"},
+  {:benchee, "~> 1.2"},
+  {:math, "~> 0.7.0"}
+])
 ```
 
 ## Links
@@ -27,7 +31,59 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-"broadcaster -> a\n%a -> inv, con\n&inv -> b\n%b -> con\n&con -> output"
+"%gv -> lq, pm\n%rv -> jd, nh\n%nh -> rs, jd\n&vt -> tj\n%zv -> pm, gv\n%gh -> jd, vd\n%hh -> bf, qm\n%kx -> nf\n%st -> pm, zc\n%bh -> qm, pv\n&sk -> tj\n%hl -> nf, pn\n%mt -> st, pm\n&jd -> ts, gh, vd, dc, xc\n%zm -> hm\n%pv -> vv\n%zf -> nf, cz\n&xc -> tj\n%bf -> qm\n%ts -> sg\n%ht -> ch, nf\n%pb -> rv, jd\n%nx -> fc\n%mb -> mt\n%mh -> jd, pb\n%lc -> bh\n%xg -> mb, pm\n%vd -> dc\nbroadcaster -> gh, dl, xg, fb\n%sg -> mh, jd\n%qq -> ts, jd\n%dl -> nf, sv\n%vv -> sm, qm\n%zc -> tb\n%sr -> zv, pm\n%dc -> gb\n%cz -> nf, zm\n%rs -> jd\n%hm -> nf, hl\n%gd -> sr\n&qm -> lc, pv, nx, fb, kk\n&tj -> rx\n%gb -> qq, jd\n%xf -> zf\n%tb -> lg\n%sm -> qm, hh\n%fb -> dr, qm\n%lq -> pm\n&nf -> zm, dl, ch, xf, vt\n&pm -> sk, zc, tb, gd, mb, xg\n%pn -> nf, kx\n%fc -> xb, qm\n%ch -> xf\n&kk -> tj\n%lg -> pm, gd\n%sv -> nf, ht\n%xb -> qm, lc\n%dr -> nx, qm"
+```
+
+```elixir
+~w(bf bh dr fb fc hh sm vv xb gv lg lq mt sr st xg zv cz dl hl hm ht kx pn sv zf gb gh mh nh pb qq rs rv sg)
+|> Enum.sort()
+|> Enum.each(&IO.puts/1)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+bf
+bh
+cz
+dl
+dr
+fb
+fc
+gb
+gh
+gv
+hh
+hl
+hm
+ht
+kx
+lg
+lq
+mh
+mt
+nh
+pb
+pn
+qq
+rs
+rv
+sg
+sm
+sr
+st
+sv
+vv
+xb
+xg
+zf
+zv
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
 ```
 
 ## Solution
@@ -36,27 +92,55 @@ input = input |> Kino.Input.read()
 defmodule Day20 do
   defdelegate parse(input), to: __MODULE__.Input
 
+  @highs ~w(bf bh cz dl dr fb fc gb gh gv hh hl hm ht kx lg lq mh mt nh pb pn qq rs rv sg sm sr st sv vv xb xg zf zv)
+
   def part1(input) do
     input
     |> parse()
-    |> press_button(1000)
-    |> then(fn %{high: high, low: low} -> high * low end)
+
+    # |> press_button(1000)
+    # |> then(fn %{high: high, low: low} -> high * low end)
   end
 
   def part2(input) do
+    high_cycles = for k <- @highs, into: %{}, do: {k, []}
+
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Map.merge(%{high_cycles: high_cycles, button_count: 0, low_rx_count: 0})
+    |> find_single_low_pulse()
+
+    # |> Enum.uniq()
+    # |> Enum.reduce(1, &Math.lcm/2)
   end
 
   defp press_button(state, count \\ 0, max_count)
 
   defp press_button(state, count, max_count) when count < max_count do
-    send_pulses([{:low, "button", "broadcaster"}], state)
+    [{:low, "button", "broadcaster"}]
+    |> send_pulses(state)
     |> press_button(count + 1, max_count)
   end
 
   defp press_button(state, _, _), do: state
+
+  defp find_single_low_pulse(state) do
+    if state.button_count > 250_000 do
+      state.high_cycles
+    else
+      case press_button(state, 1) do
+        %{low_rx_count: 1, button_count: count} ->
+          count + 1
+
+        new_state ->
+          # IO.puts("BUTTON: #{new_state.button_count + 1} - RX LOW: #{new_state.low_rx_count}")
+          new_state
+          |> Map.update!(:button_count, &(&1 + 1))
+          |> Map.put(:low_rx_count, 0)
+          |> find_single_low_pulse
+      end
+    end
+  end
 
   defp send_pulses([], state), do: state
 
@@ -71,9 +155,13 @@ defmodule Day20 do
     do_send_pulse(pulse, source_module, module, state[module], new_state)
   end
 
+  defp do_send_pulse(:low, _source, "rx", nil, state) do
+    {[], Map.update!(state, :low_rx_count, &(&1 + 1))}
+  end
+
   # 'output' for example testing
   defp do_send_pulse(_pulse, _source, _module, nil, state) do
-    # IO.puts("from #{source}, #{pulse} sent to output")
+    # IO.puts("from #{source}, #{pulse} sent to #{module}")
     {[], state}
   end
 
@@ -113,9 +201,21 @@ defmodule Day20 do
 
   defp do_send_pulse(pulse, source, module, {:conj, dests, memory}, state) do
     # IO.puts("from #{source}, #{pulse} sent to #{module}, a conjunction")
+    state =
+      cond do
+        source in @highs and pulse == :high ->
+          # IO.puts("COUNT: #{state.button_count + 1} - from #{source}, #{pulse} sent to #{module}")
+
+          Map.update!(state, :high_cycles, fn cycles ->
+            Map.update!(cycles, source, &[state.button_count + 1 | &1])
+          end)
+
+        true ->
+          state
+      end
+
     new_memory = Map.put(memory, source, pulse)
     new_state = Map.put(state, module, {:conj, dests, new_memory})
-
     next_pulse = if Enum.all?(new_memory, &(elem(&1, 1) == :high)), do: :low, else: :high
 
     {
@@ -175,8 +275,1041 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day20, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+{:module, Day20, <<70, 79, 82, 49, 0, 0, 27, ...>>,
  {:module, Day20.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+high_cycles = Day20.part2(input)
+nil
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+high_cycles["cz"]
+|> Enum.each(&IO.puts/1)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+...
+127008
+126880
+126752
+126624
+126496
+126368
+126240
+126137
+126009
+125881
+125753
+125625
+125497
+125369
+125241
+125113
+124985
+124857
+124729
+124601
+124473
+124345
+124217
+124089
+123961
+123833
+123705
+123577
+123449
+123321
+123193
+123065
+122937
+122809
+122681
+122553
+122425
+122297
+122194
+122066
+121938
+121810
+121682
+121554
+121426
+121298
+121170
+121042
+120914
+120786
+120658
+120530
+120402
+120274
+120146
+120018
+119890
+119762
+119634
+119506
+119378
+119250
+119122
+118994
+118866
+118738
+118610
+118482
+118354
+118251
+118123
+117995
+117867
+117739
+117611
+117483
+117355
+117227
+117099
+116971
+116843
+116715
+116587
+116459
+116331
+116203
+116075
+115947
+115819
+115691
+115563
+115435
+115307
+115179
+115051
+114923
+114795
+114667
+114539
+114411
+114308
+114180
+114052
+113924
+113796
+113668
+113540
+113412
+113284
+113156
+113028
+112900
+112772
+112644
+112516
+112388
+112260
+112132
+112004
+111876
+111748
+111620
+111492
+111364
+111236
+111108
+110980
+110852
+110724
+110596
+110468
+110365
+110237
+110109
+109981
+109853
+109725
+109597
+109469
+109341
+109213
+109085
+108957
+108829
+108701
+108573
+108445
+108317
+108189
+108061
+107933
+107805
+107677
+107549
+107421
+107293
+107165
+107037
+106909
+106781
+106653
+106525
+106422
+106294
+106166
+106038
+105910
+105782
+105654
+105526
+105398
+105270
+105142
+105014
+104886
+104758
+104630
+104502
+104374
+104246
+104118
+103990
+103862
+103734
+103606
+103478
+103350
+103222
+103094
+102966
+102838
+102710
+102582
+102479
+102351
+102223
+102095
+101967
+101839
+101711
+101583
+101455
+101327
+101199
+101071
+100943
+100815
+100687
+100559
+100431
+100303
+100175
+100047
+99919
+99791
+99663
+99535
+99407
+99279
+99151
+99023
+98895
+98767
+98639
+98536
+98408
+98280
+98152
+98024
+97896
+97768
+97640
+97512
+97384
+97256
+97128
+97000
+96872
+96744
+96616
+96488
+96360
+96232
+96104
+95976
+95848
+95720
+95592
+95464
+95336
+95208
+95080
+94952
+94824
+94696
+94593
+94465
+94337
+94209
+94081
+93953
+93825
+93697
+93569
+93441
+93313
+93185
+93057
+92929
+92801
+92673
+92545
+92417
+92289
+92161
+92033
+91905
+91777
+91649
+91521
+91393
+91265
+91137
+91009
+90881
+90753
+90650
+90522
+90394
+90266
+90138
+90010
+89882
+89754
+89626
+89498
+89370
+89242
+89114
+88986
+88858
+88730
+88602
+88474
+88346
+88218
+88090
+87962
+87834
+87706
+87578
+87450
+87322
+87194
+87066
+86938
+86810
+86707
+86579
+86451
+86323
+86195
+86067
+85939
+85811
+85683
+85555
+85427
+85299
+85171
+85043
+84915
+84787
+84659
+84531
+84403
+84275
+84147
+84019
+83891
+83763
+83635
+83507
+83379
+83251
+83123
+82995
+82867
+82764
+82636
+82508
+82380
+82252
+82124
+81996
+81868
+81740
+81612
+81484
+81356
+81228
+81100
+80972
+80844
+80716
+80588
+80460
+80332
+80204
+80076
+79948
+79820
+79692
+79564
+79436
+79308
+79180
+79052
+78924
+78821
+78693
+78565
+78437
+78309
+78181
+78053
+77925
+77797
+77669
+77541
+77413
+77285
+77157
+77029
+76901
+76773
+76645
+76517
+76389
+76261
+76133
+76005
+75877
+75749
+75621
+75493
+75365
+75237
+75109
+74981
+74878
+74750
+74622
+74494
+74366
+74238
+74110
+73982
+73854
+73726
+73598
+73470
+73342
+73214
+73086
+72958
+72830
+72702
+72574
+72446
+72318
+72190
+72062
+71934
+71806
+71678
+71550
+71422
+71294
+71166
+71038
+70935
+70807
+70679
+70551
+70423
+70295
+70167
+70039
+69911
+69783
+69655
+69527
+69399
+69271
+69143
+69015
+68887
+68759
+68631
+68503
+68375
+68247
+68119
+67991
+67863
+67735
+67607
+67479
+67351
+67223
+67095
+66992
+66864
+66736
+66608
+66480
+66352
+66224
+66096
+65968
+65840
+65712
+65584
+65456
+65328
+65200
+65072
+64944
+64816
+64688
+64560
+64432
+64304
+64176
+64048
+63920
+63792
+63664
+63536
+63408
+63280
+63152
+63049
+62921
+62793
+62665
+62537
+62409
+62281
+62153
+62025
+61897
+61769
+61641
+61513
+61385
+61257
+61129
+61001
+60873
+60745
+60617
+60489
+60361
+60233
+60105
+59977
+59849
+59721
+59593
+59465
+59337
+59209
+59106
+58978
+58850
+58722
+58594
+58466
+58338
+58210
+58082
+57954
+57826
+57698
+57570
+57442
+57314
+57186
+57058
+56930
+56802
+56674
+56546
+56418
+56290
+56162
+56034
+55906
+55778
+55650
+55522
+55394
+55266
+55163
+55035
+54907
+54779
+54651
+54523
+54395
+54267
+54139
+54011
+53883
+53755
+53627
+53499
+53371
+53243
+53115
+52987
+52859
+52731
+52603
+52475
+52347
+52219
+52091
+51963
+51835
+51707
+51579
+51451
+51323
+51220
+51092
+50964
+50836
+50708
+50580
+50452
+50324
+50196
+50068
+49940
+49812
+49684
+49556
+49428
+49300
+49172
+49044
+48916
+48788
+48660
+48532
+48404
+48276
+48148
+48020
+47892
+47764
+47636
+47508
+47380
+47277
+47149
+47021
+46893
+46765
+46637
+46509
+46381
+46253
+46125
+45997
+45869
+45741
+45613
+45485
+45357
+45229
+45101
+44973
+44845
+44717
+44589
+44461
+44333
+44205
+44077
+43949
+43821
+43693
+43565
+43437
+43334
+43206
+43078
+42950
+42822
+42694
+42566
+42438
+42310
+42182
+42054
+41926
+41798
+41670
+41542
+41414
+41286
+41158
+41030
+40902
+40774
+40646
+40518
+40390
+40262
+40134
+40006
+39878
+39750
+39622
+39494
+39391
+39263
+39135
+39007
+38879
+38751
+38623
+38495
+38367
+38239
+38111
+37983
+37855
+37727
+37599
+37471
+37343
+37215
+37087
+36959
+36831
+36703
+36575
+36447
+36319
+36191
+36063
+35935
+35807
+35679
+35551
+35448
+35320
+35192
+35064
+34936
+34808
+34680
+34552
+34424
+34296
+34168
+34040
+33912
+33784
+33656
+33528
+33400
+33272
+33144
+33016
+32888
+32760
+32632
+32504
+32376
+32248
+32120
+31992
+31864
+31736
+31608
+31505
+31377
+31249
+31121
+30993
+30865
+30737
+30609
+30481
+30353
+30225
+30097
+29969
+29841
+29713
+29585
+29457
+29329
+29201
+29073
+28945
+28817
+28689
+28561
+28433
+28305
+28177
+28049
+27921
+27793
+27665
+27562
+27434
+27306
+27178
+27050
+26922
+26794
+26666
+26538
+26410
+26282
+26154
+26026
+25898
+25770
+25642
+25514
+25386
+25258
+25130
+25002
+24874
+24746
+24618
+24490
+24362
+24234
+24106
+23978
+23850
+23722
+23619
+23491
+23363
+23235
+23107
+22979
+22851
+22723
+22595
+22467
+22339
+22211
+22083
+21955
+21827
+21699
+21571
+21443
+21315
+21187
+21059
+20931
+20803
+20675
+20547
+20419
+20291
+20163
+20035
+19907
+19779
+19676
+19548
+19420
+19292
+19164
+19036
+18908
+18780
+18652
+18524
+18396
+18268
+18140
+18012
+17884
+17756
+17628
+17500
+17372
+17244
+17116
+16988
+16860
+16732
+16604
+16476
+16348
+16220
+16092
+15964
+15836
+15733
+15605
+15477
+15349
+15221
+15093
+14965
+14837
+14709
+14581
+14453
+14325
+14197
+14069
+13941
+13813
+13685
+13557
+13429
+13301
+13173
+13045
+12917
+12789
+12661
+12533
+12405
+12277
+12149
+12021
+11893
+11790
+11662
+11534
+11406
+11278
+11150
+11022
+10894
+10766
+10638
+10510
+10382
+10254
+10126
+9998
+9870
+9742
+9614
+9486
+9358
+9230
+9102
+8974
+8846
+8718
+8590
+8462
+8334
+8206
+8078
+7950
+7847
+7719
+7591
+7463
+7335
+7207
+7079
+6951
+6823
+6695
+6567
+6439
+6311
+6183
+6055
+5927
+5799
+5671
+5543
+5415
+5287
+5159
+5031
+4903
+4775
+4647
+4519
+4391
+4263
+4135
+4007
+3904
+3776
+3648
+3520
+3392
+3264
+3136
+3008
+2880
+2752
+2624
+2496
+2368
+2240
+2112
+1984
+1856
+1728
+1600
+1472
+1344
+1216
+1088
+960
+832
+704
+576
+448
+320
+192
+64
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+:ok
 ```
 
 Consult your module configuration; determine the number of low pulses and high pulses that would be sent after pushing the button 1000 times, waiting for all pulses to be fully handled after each push of the button. **What do you get if you multiply the total number of low pulses sent by the total number of high pulses sent?**
@@ -192,29 +1325,208 @@ Day20.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-11687500
+%{
+  "zv" => {:flip, ["pm", "gv"], :off},
+  "nf" => {:conj, ["zm", "dl", "ch", "xf", "vt"],
+   %{
+     "cz" => :low,
+     "dl" => :low,
+     "hl" => :low,
+     "hm" => :low,
+     "ht" => :low,
+     "kx" => :low,
+     "pn" => :low,
+     "sv" => :low,
+     "zf" => :low
+   }},
+  "tj" => {:conj, ["rx"], %{"kk" => :low, "sk" => :low, "vt" => :low, "xc" => :low}},
+  "tb" => {:flip, ["lg"], :off},
+  "pn" => {:flip, ["nf", "kx"], :off},
+  "qq" => {:flip, ["ts", "jd"], :off},
+  "nh" => {:flip, ["rs", "jd"], :off},
+  "hl" => {:flip, ["nf", "pn"], :off},
+  "lc" => {:flip, ["bh"], :off},
+  "gh" => {:flip, ["jd", "vd"], :off},
+  "qm" => {:conj, ["lc", "pv", "nx", "fb", "kk"],
+   %{
+     "bf" => :low,
+     "bh" => :low,
+     "dr" => :low,
+     "fb" => :low,
+     "fc" => :low,
+     "hh" => :low,
+     "sm" => :low,
+     "vv" => :low,
+     "xb" => :low
+   }},
+  "sm" => {:flip, ["qm", "hh"], :off},
+  "ht" => {:flip, ["ch", "nf"], :off},
+  "mt" => {:flip, ["st", "pm"], :off},
+  "ts" => {:flip, ["sg"], :off},
+  "zc" => {:flip, ["tb"], :off},
+  "sr" => {:flip, ["zv", "pm"], :off},
+  "bh" => {:flip, ["qm", "pv"], :off},
+  "zf" => {:flip, ["nf", "cz"], :off},
+  "fc" => {:flip, ["xb", "qm"], :off},
+  "xf" => {:flip, ["zf"], :off},
+  "cz" => {:flip, ["nf", "zm"], :off},
+  "vt" => {:conj, ["tj"], %{"nf" => :low}},
+  "ch" => {:flip, ["xf"], :off},
+  "mh" => {:flip, ["jd", "pb"], :off},
+  "jd" => {:conj, ["ts", "gh", "vd", "dc", "xc"],
+   %{
+     "gb" => :low,
+     "gh" => :low,
+     "mh" => :low,
+     "nh" => :low,
+     "pb" => :low,
+     "qq" => :low,
+     "rs" => :low,
+     "rv" => :low,
+     "sg" => :low
+   }},
+  "vv" => {:flip, ["sm", "qm"], :off},
+  "st" => {:flip, ["pm", "zc"], :off},
+  "bf" => {:flip, ["qm"], :off},
+  "dc" => {:flip, ["gb"], :off},
+  "gb" => {:flip, ["qq", "jd"], :off},
+  "gv" => {:flip, ["lq", "pm"], :off},
+  "lg" => {:flip, ["pm", "gd"], :off},
+  "kk" => {:conj, ["tj"], %{"qm" => :low}},
+  "vd" => {:flip, ["dc"], :off},
+  "rv" => {:flip, ["jd", "nh"], :off},
+  "dr" => {:flip, ["nx", "qm"], :off},
+  "kx" => {:flip, ["nf"], :off},
+  "sv" => {:flip, ["nf", "ht"], :off},
+  "pm" => {:conj, ["sk", "zc", "tb", "gd", "mb", "xg"],
+   %{
+     "gv" => :low,
+     "lg" => :low,
+     "lq" => :low,
+     "mt" => :low,
+     "sr" => :low,
+     "st" => :low,
+     "xg" => :low,
+     ...
+   }},
+  "pv" => {:flip, ["vv"], :off},
+  "nx" => {:flip, ["fc"], :off},
+  "gd" => {:flip, ["sr"], :off},
+  "pb" => {:flip, ["rv", "jd"], :off},
+  "sk" => {:conj, ["tj"], %{"pm" => :low}},
+  "hh" => {:flip, ["bf", "qm"], :off},
+  "xc" => {:conj, ["tj"], %{...}},
+  "broadcaster" => {:broadcast, [...]},
+  "sg" => {:flip, ...},
+  "xg" => {...},
+  ...
+}
 ```
 
-**QUESTION TWO?**
+```elixir
 
-Your puzzle answer was `answer two`.
-
-<!-- livebook:{"reevaluate_automatically":true} -->
+```
 
 ```elixir
-Day20.part2(input)
+~w(qm pm nf jd)
+|> Enum.flat_map(fn k -> state[k] |> elem(2) |> Map.keys() end)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-[
-  {"a", {:flip, ["inv", "con"], :off}},
-  {"b", {:flip, ["con"], :off}},
-  {"broadcaster", {:broadcast, ["a"]}},
-  {"con", {:conj, ["output"], %{"a" => :low, "b" => :low}}},
-  {"inv", {:conj, ["b"], %{"a" => :low}}}
-]
+["bf", "bh", "dr", "fb", "fc", "hh", "sm", "vv", "xb", "gv", "lg", "lq", "mt", "sr", "st", "xg",
+ "zv", "cz", "dl", "hl", "hm", "ht", "kx", "pn", "sv", "zf", "gb", "gh", "mh", "nh", "pb", "qq",
+ "rs", "rv", "sg"]
+```
+
+```elixir
+%{
+  "rx" => ["&tj"],
+  # All need to be high
+  "&tj" => ["&kk", "&sk", "&vt", "&xc"],
+  # qm needs to send low
+  "&kk" => ["&qm"],
+  # pm needs to send low
+  "&sk" => ["&pm"],
+  # nf needs to send low
+  "&vt" => ["&nf"],
+  # jd needs to send low
+  "&xc" => ["&jd"],
+  # All need to be high
+  "&qm" => ["&bf", "&bh", "&dr", "&fb", "&fc", "&hh", "&sm", "&vv", "&xb"],
+  # All need to be high
+  "&pm" => ["&gv", "&lg", "&lq", "&mt", "&sr", "&st", "&xg", "&zv"],
+  # All need to be high
+  "&nf" => ["&cz", "&dl", "&hl", "&hm", "&ht", "&kx", "&pn", "&sv", "&zf"],
+  # All need to be high
+  "&jd" => ["&gb", "&gh", "&mh", "&nh", "&pb", "&qq", "&rs", "&rv", "&sg"]
+}
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  "&jd" => ["&gb", "&gh", "&mh", "&nh", "&pb", "&qq", "&rs", "&rv", "&sg"],
+  "&kk" => ["&qm"],
+  "&nf" => ["&cz", "&dl", "&hl", "&hm", "&ht", "&kx", "&pn", "&sv", "&zf"],
+  "&pm" => ["&gv", "&lg", "&lq", "&mt", "&sr", "&st", "&xg", "&zv"],
+  "&qm" => ["&bf", "&bh", "&dr", "&fb", "&fc", "&hh", "&sm", "&vv", "&xb"],
+  "&sk" => ["&pm"],
+  "&tj" => ["&kk", "&sk", "&vt", "&xc"],
+  "&vt" => ["&nf"],
+  "&xc" => ["&jd"],
+  "rx" => ["&tj"]
+}
+```
+
+```elixir
+list =
+  [
+    "bf",
+    "bh",
+    "dr",
+    "fb",
+    "fc",
+    "hh",
+    "sm",
+    "vv",
+    "xb",
+    "gv",
+    "lg",
+    "lq",
+    "mt",
+    "sr",
+    "st",
+    "xg",
+    "zv",
+    "cz",
+    "dl",
+    "hl",
+    "hm",
+    "ht",
+    "kx",
+    "pn",
+    "sv",
+    "zf",
+    "gb",
+    "gh",
+    "mh",
+    "nh",
+    "pb",
+    "qq",
+    "rs",
+    "rv",
+    "sg"
+  ]
+  |> Enum.join(" ")
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"bf bh dr fb fc hh sm vv xb gv lg lq mt sr st xg zv cz dl hl hm ht kx pn sv zf gb gh mh nh pb qq rs rv sg"
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
