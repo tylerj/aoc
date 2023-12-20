@@ -1,0 +1,324 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 20 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/20)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/20/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-20.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"broadcaster -> a\n%a -> inv, con\n&inv -> b\n%b -> con\n&con -> output"
+```
+
+## Solution
+
+```elixir
+defmodule Day20 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> press_button(1000)
+    |> then(fn %{high: high, low: low} -> high * low end)
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.map(& &1)
+  end
+
+  defp press_button(state, count \\ 0, max_count)
+
+  defp press_button(state, count, max_count) when count < max_count do
+    send_pulses([{:low, "button", "broadcaster"}], state)
+    |> press_button(count + 1, max_count)
+  end
+
+  defp press_button(state, _, _), do: state
+
+  defp send_pulses([], state), do: state
+
+  defp send_pulses([h | tail], state) do
+    {new_pulses, new_state} = send_pulse(h, state)
+
+    send_pulses(tail ++ new_pulses, new_state)
+  end
+
+  defp send_pulse({pulse, source_module, module}, state) do
+    new_state = Map.update(state, pulse, 1, &(&1 + 1))
+    do_send_pulse(pulse, source_module, module, state[module], new_state)
+  end
+
+  # 'output' for example testing
+  defp do_send_pulse(_pulse, _source, _module, nil, state) do
+    # IO.puts("from #{source}, #{pulse} sent to output")
+    {[], state}
+  end
+
+  defp do_send_pulse(pulse, _source, module, {:broadcast, dests}, state) do
+    # IO.puts("from #{source}, #{pulse} sent to #{module}")
+
+    {
+      Enum.map(dests, &{pulse, module, &1}),
+      state
+    }
+  end
+
+  defp do_send_pulse(:high, _source, _module, {:flip, _, _}, state) do
+    # IO.puts("from #{source}, high sent to #{module}")
+    {[], state}
+  end
+
+  defp do_send_pulse(:low, _source, module, {:flip, dests, :off}, state) do
+    # IO.puts("from #{source}, low sent to #{module} when off")
+    new_state = Map.put(state, module, {:flip, dests, :on})
+
+    {
+      Enum.map(dests, &{:high, module, &1}),
+      new_state
+    }
+  end
+
+  defp do_send_pulse(:low, _source, module, {:flip, dests, :on}, state) do
+    # IO.puts("from #{source}, low sent to #{module} when on")
+    new_state = Map.put(state, module, {:flip, dests, :off})
+
+    {
+      Enum.map(dests, &{:low, module, &1}),
+      new_state
+    }
+  end
+
+  defp do_send_pulse(pulse, source, module, {:conj, dests, memory}, state) do
+    # IO.puts("from #{source}, #{pulse} sent to #{module}, a conjunction")
+    new_memory = Map.put(memory, source, pulse)
+    new_state = Map.put(state, module, {:conj, dests, new_memory})
+
+    next_pulse = if Enum.all?(new_memory, &(elem(&1, 1) == :high)), do: :low, else: :high
+
+    {
+      Enum.map(dests, &{next_pulse, module, &1}),
+      new_state
+    }
+  end
+
+  defmodule Input do
+    def parse(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> Enum.map(&parse_line/1)
+      |> Enum.into(%{})
+      |> setup_conjunctions()
+    end
+
+    defp setup_conjunctions(modules) do
+      for {k, {_, dests, _}} <- modules, reduce: %{} do
+        acc ->
+          Enum.reduce(dests, acc, fn d, acc ->
+            case modules[d] do
+              {:conj, _, _} -> Map.update(acc, d, [k], &[k | &1])
+              _ -> acc
+            end
+          end)
+      end
+      |> Enum.reduce(modules, fn {k, sources}, acc ->
+        Map.update!(acc, k, fn
+          {:conj, d, %{}} ->
+            {:conj, d, sources |> Enum.map(&{&1, :low}) |> Enum.into(%{})}
+
+          v ->
+            v
+        end)
+      end)
+    end
+
+    def parse_line(line) do
+      dest = &String.split(&1, ", ")
+
+      case String.split(line, " -> ") do
+        ["%" <> module, d] ->
+          {module, {:flip, dest.(d), :off}}
+
+        ["&" <> module, d] ->
+          {module, {:conj, dest.(d), %{}}}
+
+        [module, d] ->
+          {module, {:broadcast, dest.(d)}}
+      end
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day20, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+ {:module, Day20.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
+```
+
+Consult your module configuration; determine the number of low pulses and high pulses that would be sent after pushing the button 1000 times, waiting for all pulses to be fully handled after each push of the button. **What do you get if you multiply the total number of low pulses sent by the total number of high pulses sent?**
+
+Your puzzle answer was `818649769`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day20.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+11687500
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day20.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {"a", {:flip, ["inv", "con"], :off}},
+  {"b", {:flip, ["con"], :off}},
+  {"broadcaster", {:broadcast, ["a"]}},
+  {"con", {:conj, ["output"], %{"a" => :low, "b" => :low}}},
+  {"inv", {:conj, ["b"], %{"a" => :low}}}
+]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/20/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day20Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input1: "broadcaster -> a, b, c\n%a -> b\n%b -> c\n%c -> inv\n&inv -> a",
+      input2: "broadcaster -> a\n%a -> inv, con\n&inv -> b\n%b -> con\n&con -> output"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input1: input1, input2: input2} do
+      assert Day20.part1(input1) == 32_000_000
+      assert Day20.part1(input2) == 11_687_500
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day20.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+.
+
+  1) test part2/1 returns expected value (Day20Test)
+     lib/advent_of_code/2023/day-20.livemd#cell:4chqxzlk255jnn2qleyzyzx3oetynjzb:21
+     ** (FunctionClauseError) no function clause matching in Day20Test."test part2/1 returns expected value"/1
+
+     The following arguments were given to Day20Test."test part2/1 returns expected value"/1:
+     
+         # 1
+         %{async: false, line: 21, module: Day20Test, registered: %{}, file: "/Users/tyler.johnson/code/aoc/lib/advent_of_code/2023/day-20.livemd#cell:4chqxzlk255jnn2qleyzyzx3oetynjzb", case: Day20Test, test: :"test part2/1 returns expected value", describe: "part2/1", describe_line: 20, test_type: :test, input1: "broadcaster -> a, b, c\n%a -> b\n%b -> c\n%c -> inv\n&inv -> a", input2: "broadcaster -> a\n%a -> inv, con\n&inv -> b\n%b -> con\n&con -> output"}
+     
+     stacktrace:
+       lib/advent_of_code/2023/day-20.livemd#cell:4chqxzlk255jnn2qleyzyzx3oetynjzb:21: (test)
+
+
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 1 failure
+
+Randomized with seed 684092
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 1, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day20.part1(input) end,
+        "Part 2" => fn -> Day20.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+Benchmarking.run(input)
+```
