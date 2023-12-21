@@ -39,39 +39,49 @@ defmodule Day21 do
   def part1(input, num_steps) do
     {grid, start} = parse(input)
 
-    make_step([start], grid, num_steps, :part1)
-    |> Map.values()
-    |> Enum.sum()
+    make_step([start], grid, [num_steps], :part1) |> List.first()
   end
 
-  def part2(input, num_steps, part) do
+  def part2(input) do
     {grid, start} = parse(input)
 
-    make_step([start], grid, num_steps, part)
+    x = div(26_501_365 - 65, 131)
+
+    steps = [
+      65 + 0 * 131,
+      65 + 1 * 131,
+      65 + 2 * 131
+    ]
+
+    {a, b, c} = make_step([start], grid, steps, :part2) |> quadratic_values()
+    a * x ** 2 + b * x + c
   end
 
-  defp make_step(locations, grid, max_steps, count \\ 0, part) do
+  defp quadratic_values([c0, c1, c2]) do
+    a = div(-2 * (c1 - c0) + (c2 - c0), 2)
+    b = c1 - c0 - a
+
+    {a, b, c0}
+  end
+
+  defp make_step(locations, grid, max_steps, location_counts \\ [], count \\ 0, part)
+  defp make_step(_, _, [], location_counts, _, _), do: Enum.reverse(location_counts)
+
+  defp make_step(locations, grid, [next_max | max_steps], location_counts, count, part) do
     locations
     |> Enum.flat_map(&next_locations(&1, grid, part))
-    |> Enum.uniq_by(&elem(&1, 0))
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.uniq()
     |> then(fn
-      locations when count + 1 == max_steps ->
-        Enum.reduce(locations, %{}, fn {_xy, grid_xy}, xy_count ->
-          Map.update(xy_count, grid_xy, 1, &(&1 + 1))
-        end)
-
       locations ->
-        Enum.reduce(locations, %{}, fn {_xy, grid_xy}, xy_count ->
-          Map.update(xy_count, grid_xy, 1, &(&1 + 1))
-        end)
-        |> then(fn xy_count ->
-          IO.puts("#{count + 1}:#{xy_count[part]}")
-        end)
+        {lc, ms} =
+          if count + 1 == next_max do
+            {[length(locations) | location_counts], max_steps}
+          else
+            {location_counts, [next_max | max_steps]}
+          end
 
-        locations
-        |> Enum.map(&elem(&1, 0))
-        # |> tap(fn x -> IO.puts("#{count + 1}:#{length(x)}") end)
-        |> make_step(grid, max_steps, count + 1, part)
+        make_step(locations, grid, ms, lc, count + 1, part)
     end)
   end
 
@@ -110,7 +120,6 @@ defmodule Day21 do
       |> Stream.with_index()
       |> Enum.reduce({%{}, nil}, &parse_line/2)
       |> add_max_xy()
-      |> normalize_start()
     end
 
     defp parse_line({line, row}, {grid, start}) do
@@ -139,7 +148,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day21, <<70, 79, 82, 49, 0, 0, 24, ...>>,
+{:module, Day21, <<70, 79, 82, 49, 0, 0, 23, ...>>,
  {:module, Day21.Input, <<70, 79, 82, ...>>, {:add_max_xy, 1}}}
 ```
 
@@ -150,343 +159,29 @@ Your puzzle answer was `3795`.
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day21.part1(input, 6)
+Day21.part1(input, 64)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-1:
-2:
-3:
-4:
-5:
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-45
+3795
 ```
 
 Starting from the garden plot marked S on your infinite map, **how many garden plots could the Elf reach in exactly 26501365 steps?**
 
-Your puzzle answer was `answer two`.
-
-<!-- livebook:{"break_markdown":true} -->
-
-* The offset (iteration where the first value appears) is equal to `abs(65-x) + abs(65-y)`
-* The cycle's first values are perfect squares.
-  * The first value that appears (`x^2`) is `1`, then next cycle `4`, `9`, `16`, `25`, etc
-* The other value that appears is each pattern cycle is either:
-  * `x * (x - 1)`:
-    * x = 1: `1 * 0 = 0`
-    * x = 2: `2 * 1 = 2`
-    * x = 3: `3 * 2 = 6`
-  * or, `x * (x + 1)`:
-    * x = 1: `1 * 2 = 2`
-    * x = 2: `2 * 3 = 6`
-    * x = 3: `3 * 4 = 12`
-* So, the cycle number pairs are:
-  * `{1, 0} and {1, 2}`
-  * `{4, 2} and {4, 6}`
-  * `{9, 6} and {9, 12}`
-  * `{16, 12} and {16, 20}`
-  * `{25, 20} and {25, 30}`
-  * `{36, 30} and {36, 42}`
-  * `{49, 42} and {49, 56}`
-  * etc
-* Each subsequent cycle starts 131 steps after the prior cycle starts
+Your puzzle answer was `630129824772393`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day21.part2(input, 1000, {65, 65})
+Day21.part2(input)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-1:
-2:1
-3:
-4:1
-5:
-6:1
-7:
-8:1
-9:
-10:1
-11:
-12:1
-13:
-14:1
-15:
-16:1
-17:
-18:1
-19:
-20:1
-21:
-22:1
-23:
-24:1
-25:
-26:1
-27:
-28:1
-29:
-30:1
-31:
-32:1
-33:
-34:1
-35:
-36:1
-37:
-38:1
-39:
-40:1
-41:
-42:1
-43:
-44:1
-45:
-46:1
-47:
-48:1
-49:
-50:1
-51:
-52:1
-53:
-54:1
-55:
-56:1
-57:
-58:1
-59:
-60:1
-61:
-62:1
-63:
-64:1
-65:
-66:1
-67:
-68:1
-69:
-70:1
-71:
-72:1
-73:
-74:1
-75:
-76:1
-77:
-78:1
-79:
-80:1
-81:
-82:1
-83:
-84:1
-85:
-86:1
-87:
-88:1
-89:
-90:1
-91:
-92:1
-93:
-94:1
-95:
-96:1
-97:
-98:1
-99:
-100:1
-101:
-102:1
-103:
-104:1
-105:
-106:1
-107:
-108:1
-109:
-110:1
-111:
-112:1
-113:
-114:1
-115:
-116:1
-117:
-118:1
-119:
-120:1
-121:
-122:1
-123:
-124:1
-125:
-126:1
-127:
-128:1
-129:
-130:1
-131:4
-132:1
-133:4
-134:1
-135:4
-136:1
-137:4
-138:1
-139:4
-140:1
-141:4
-142:1
-143:4
-144:1
-145:4
-146:1
-147:4
-148:1
-149:4
-150:1
-151:4
-152:1
-153:4
-154:1
-155:4
-156:1
-157:4
-158:1
-159:4
-160:1
-161:4
-162:1
-163:4
-164:1
-165:4
-166:1
-167:4
-168:1
-169:4
-170:1
-171:4
-172:1
-173:4
-174:1
-175:4
-176:1
-177:4
-178:1
-179:4
-180:1
-181:4
-182:1
-183:4
-184:1
-185:4
-186:1
-187:4
-188:1
-189:4
-190:1
-191:4
-192:1
-193:4
-194:1
-195:4
-196:1
-197:4
-198:1
-199:4
-200:1
-201:4
-202:1
-203:4
-204:1
-205:4
-206:1
-207:4
-208:1
-209:4
-210:1
-211:4
-212:1
-213:4
-214:1
-215:4
-216:1
-217:4
-218:1
-219:4
-220:1
-221:4
-222:1
-223:4
-224:1
-225:4
-226:1
-227:4
-228:1
-229:4
-230:1
-231:4
-232:1
-233:4
-234:1
-235:4
-236:1
-237:4
-238:1
-239:4
-240:1
-241:4
-242:1
-243:4
-244:1
-245:4
-246:1
-247:4
-248:1
-249:4
-250:1
-251:4
-252:1
-253:4
-254:1
-255:4
-256:1
-257:4
-258:1
-259:4
-260:1
-261:4
-262:9
-263:4
-264:9
-265:4
-266:9
-267:4
-268:9
-269:4
-270:9
-271:4
-272:9
-273:4
-274:9
-275:4
-276:9
-277:4
-278:9
-279:4
-280:9
+630129824772393
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -517,15 +212,6 @@ defmodule Day21Test do
       assert Day21.part1(input, 6) == 16
     end
   end
-
-  describe "part2/1" do
-    test "returns expected value", %{input: input} do
-      assert Day21.part2(input, 6) == 16
-      assert Day21.part2(input, 10) == 50
-      assert Day21.part2(input, 50) == 1594
-      assert Day21.part2(input, 100) == 6536
-    end
-  end
 end
 
 ExUnit.run()
@@ -534,44 +220,17 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-1:
-2:
-3:
-4:
-5:
-
-
-  1) test part2/1 returns expected value (Day21Test)
-     lib/advent_of_code/2023/day-21.livemd#cell:275sqwr3zydafcx2s4pdryo3vzdvenpd:19
-     ** (UndefinedFunctionError) function Day21.part2/2 is undefined or private. Did you mean:
-     
-           * part2/3
-     
-     stacktrace:
-       Day21.part2("...........\n.....###.#.\n.###.##..#.\n..#.#...#..\n....#.#....\n.##..S####.\n.##..#...#.\n.......##..\n.##.#.####.\n.##..##.##.\n...........", 6)
-       lib/advent_of_code/2023/day-21.livemd#cell:275sqwr3zydafcx2s4pdryo3vzdvenpd:20: (test)
-
 .
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 1 failure
+1 test, 0 failures
 
 Randomized with seed 278444
-warning: Day21.part2/2 is undefined or private. Did you mean:
-
-      * part2/3
-
-Invalid call found at 4 locations:
-  lib/advent_of_code/2023/day-21.livemd#cell:275sqwr3zydafcx2s4pdryo3vzdvenpd:20: Day21Test."test part2/1 returns expected value"/1
-  lib/advent_of_code/2023/day-21.livemd#cell:275sqwr3zydafcx2s4pdryo3vzdvenpd:21: Day21Test."test part2/1 returns expected value"/1
-  lib/advent_of_code/2023/day-21.livemd#cell:275sqwr3zydafcx2s4pdryo3vzdvenpd:22: Day21Test."test part2/1 returns expected value"/1
-  lib/advent_of_code/2023/day-21.livemd#cell:275sqwr3zydafcx2s4pdryo3vzdvenpd:23: Day21Test."test part2/1 returns expected value"/1
-
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{total: 2, excluded: 0, failures: 1, skipped: 0}
+%{total: 1, excluded: 0, failures: 0, skipped: 0}
 ```
 
 ## Benchmarking
@@ -582,7 +241,7 @@ defmodule Benchmarking do
   def run(input) do
     Benchee.run(
       %{
-        "Part 1" => fn -> Day21.part1(input) end,
+        "Part 1" => fn -> Day21.part1(input, 64) end,
         "Part 2" => fn -> Day21.part2(input) end
       },
       memory_time: 2,
@@ -597,15 +256,64 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1 Pro
+Number of Available Cores: 10
+Available memory: 32 GB
+Elixir 1.15.7
+Erlang 26.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1         18.14       0.0551 s     ±2.30%       0.0551 s       0.0595 s
+Part 2        0.0991        10.09 s     ±0.00%        10.09 s        10.09 s
+
+Comparison: 
+Part 1         18.14
+Part 2        0.0991 - 183.03x slower +10.03 s
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1       0.0749 GB
+Part 2        11.11 GB - 148.33x memory usage +11.04 GB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1       0.00748 B     ±0.00%      0.00748 B      0.00749 B
+Part 2          1.11 B     ±0.00%         1.11 B         1.11 B
+
+Comparison: 
+Part 1       0.00748 B
+Part 2          1.11 B - 148.53x reduction count +1.10 B
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
