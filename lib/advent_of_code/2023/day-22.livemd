@@ -1,0 +1,302 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 22 - Advent of Code 2023
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2023/day/22)
+* [AoC Puzzle Input](https://adventofcode.com/2023/day/22/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2023/day-22.livemd)
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"6,2,347~6,4,347\n2,4,228~2,4,229\n6,6,148~6,9,148\n0,4,343~2,4,343\n3,6,32~6,6,32\n3,4,63~6,4,63\n6,7,127~8,7,127\n2,9,58~3,9,58\n6,9,171~6,9,171\n3,3,142~7,3,142\n3,7,129~3,8,129\n3,1,44~4,1,44\n6,5,25~6,7,25\n6,7,239~6,7,239\n2,4,339~4,4,339\n7,7,53~7,8,53\n7,0,301~7,1,301\n9,1,13~9,3,13\n3,9,328~5,9,328\n8,0,57~8,0,59\n8,0,56~8,1,56\n5,6,237~8,6,237\n2,7,10~2,9,10\n4,4,130~4,5,130\n9,4,285~9,4,287\n9,2,52~9,2,54\n8,3,208~8,5,208\n4,3,186~4,5,186\n6,0,31~8,0,31\n3,1,84~3,4,84\n2,4,279~2,6,279\n4,4,282~7,4,282\n4,7,87~4,8,87\n2,5,184~2,6,184\n5,2,23~5,3,23\n5,8,339~5,9,339\n1,8,333~3,8,333\n7,7,57~7,9,57\n5,0,27~5,3,27\n3,6,228~3,6,230\n3,0,101~5,0,101\n7,8,136~7,8,138\n0,2,82~0,2,84\n0,5,301~0,8,301\n5,0,286~5,1,286\n2,6,25~2,8,25\n0,0,338~1,0,338\n3,7,52~3,9,52\n1,6,127~3,6,127\n7,4,136~7,7,136\n7,7,242~9,7,242\n2,0,360~4,0,360\n2,8,117~2,8,119\n9,2,8~9,2,10\n3,6,143~3,7,143\n0,2,30~0,4,30\n8,8,351~8,8,352\n8,5,14~8,7,14\n7,3,229~7,5,229\n5,6,110~5,7,110\n6,4,91~6,4,92\n3,1,226~3,3,226\n6,7,184~9,7,184\n2,1,253~2,4,253\n7,7,21~7,9,21\n7,9,4~7,9,5\n0,9,212~3,9,212\n1,6,48~3,6,48\n2,8,154~4,8,154\n7,4,116~7,6,116\n1,7,251~4,7,251\n5,4,310~5,7,310\n5,8,206~6,8,206\n0,3,52~0,6,52\n4,0,24~7,0,24\n0,3,26~3,3,26\n4,3,241~4,3,242\n8,5,48~8,7,48\n3,1,269~3,1,269\n2,3,286~4,3,286\n9,5,244~9,5,246\n3,9,4~5,9,4\n6,1,1~8,1,1\n3,0,270~3,1,270\n5,1,111~8,1,111\n9,1,346~9,3,346\n6,0,310~6,2,310\n1,2,119~1,4,119\n7,9,191~7,9,193\n9,5,337~9,5,340\n3,3,278~6,3,278\n1,4,220~1,7,220\n4,6,129~4,7,129\n4,9,26~7,9,26\n6,8,350~9,8,350\n2,8,95~4,8,95\n2,5,285~4,5,285\n6,7,294~6,7,297\n0,4,345~2,4,345\n0,0,81~0,0,83\n6,1,26~6,3,26\n1,4,66~4,4,66\n4,1,21~4,3,21\n1,1,229~4,1,229\n8,1,284~8,4,284\n7,0,88~9,0,88\n1,8,149~3,8,149\n8,0,116~8,3,116\n6,2,125~6,4,125\n6,0,323~6,3,323\n3,2,128~6,2,128\n9,6,115~9,8,115\n6,2,312~6,4,312\n8,6,241~8,8,241\n2,9,276~3,9,276\n6,1,136~6,2,136\n8,6,171~8,6,172\n6,4,280~6,6,280\n4,0,282~7,0,282\n3,0,213~3,2,213\n4,3,90~4,5,90\n7,0,60~7,2,60\n7,2,98~7,2,98\n5,7,48~7,7,48\n6,3,111~6,3,113\n1,3,296~1,5,296\n0,7,286~0,9,286\n4,7,195~5,7,195\n9,7,11~9,7,13\n3,0,162~5,0,162\n3,0,117~4,0,117\n2,9,55~4,9,55\n4,3,246~4,5,246\n7,6,33~9,6,33\n2,9,222~4,9,222\n1,0,313~3,0,313\n8,4,279~8,6,279\n2,5,20~2,8,20\n4,0,146~6,0,146\n3,0,140~3,1,140\n1,1,263~1,3,263\n1,3,41~1,6,41\n1,8,120~4,8,120\n1,3,312~1,5,312\n8,7,13~8,9,13\n3,5,80~3,7,80\n1,3,180~3,3,180\n2,6,163~2,6,166\n2,9,277~3,9,277\n7,6,245~7,8,245\n1,8,226~1,8,227\n1,5,125~1,7,125\n2,5,39~2,7,39\n3,7,241~5,7,241\n6,3,341~7,3,341\n6,0,288~6,3,288\n2,5,321~2,7,321\n2,5,296~2,8,296\n6,9,237~9,9,237\n2,6,9~2,9,9\n0,1,192~2,1,192\n2,0,332~2,3,332\n3,0,29~3,2,29\n6,7,210~8,7,210\n7,2,184~7,3,184\n9,0,289~9,3,289\n4,7,295~4,9,295\n5,3,224~6,3,224\n0,1,303~0,4,303\n5,3,78~5,3,80\n8,0,248~8,3,248\n7,3,332~7,6,332\n4,3,69~4,5,69\n7,1,104~7,4,104\n1,1,233~1,3,233\n9,1,232~9,3,232\n2,6,102~4,6,102\n2,5,107~2,7,107\n1,0,2~1,0,4\n4,4,269~6,4,269\n1,8,152~2,8,152\n0,4,335~3,4,335\n4,2,221~4,4,221\n0,1,239~0,4,239\n2,7,128~4,7,128\n0,9,162~1,9,162\n9,6,259~9,7,259\n1,6,12~3,6,12\n7,6,183~7,9,183\n5,5,128~5,5,128\n0,7,11~2,7,11\n8,5,36~9,5,36\n8,3,89~9,3,89\n4,0,202~6,0,202\n1,9,172~3,9,172\n1,0,102~4,0,102\n3,7,93~3,8,93\n0,6,105~2,6,105\n7,6,336~7,7,336\n7,1,53~7,3,53\n6,9,178~8,9,178\n4,3,123~4,5,123\n3,5,1~3,8,1\n4,6,205~4,7,205\n0,0,92~3,0,92\n6,8,158~9,8,158\n7,6,58~7,8,58\n6,5,210~6,6,210\n7,3,164~7,4,164\n4,1,304~4,4,304\n3,8,321~5,8,321\n7,8,181~8,8,181\n0,2,300~0,5,300\n4,0,3~4,0,7\n6,3,96~6,6,96\n5,7,318~5,8,318\n9,0,323~9,2,323\n8,3,166~8,4,166\n2,7,336~6,7,336\n6,7,208~8,7,208\n5,0,253~7,0,253\n2,2,209~2,3,209\n9,3,318~9,6,318\n4,4,182~5,4,182\n3,9,353~6,9,353\n1,9,161~4,9,161\n2,8,170~2,9,170\n2,0,244~2,2,244\n2,1,102~2,3,102\n1,5,258~1,7,258\n0,7,14~0,9,14\n5,1,17~5,3,17\n4,6,225~7,6,225\n0,2,148~0,4,148\n7,9,127~9,9,127\n2,5,277~2,6,277\n2,1,4~2,4,4\n4,3,32~4,5,32\n7,0,224~7,2,224\n4,1,314~4,3,314\n8,0,217~8,2,217\n2,4,39~2,4,39\n7,4,217~9,4,217\n2,6,283~3,6,283\n3,4,191~3,6,191\n6,2,1~6,5,1\n9,1,123~9,1,123\n4,4,235~5,4,235\n7,2,354~7,3,354\n3,5,12~4,5,12\n8,1,174~9,1,174\n5,4,131~8,4,131\n2,0,33~2,1,33\n2,3,127~4,3,127\n3,2,278~5,2,278\n2,3,5~2,6,5\n4,5,297~4,7,297\n5,2,185~5,4,185\n2,1,76~2,3,76\n4,8,123~7,8,123\n2,2,268~3,2,268\n5,2,167~5,3,167\n9,0,15~9,3,15\n1,6,109~1,9,109\n5,7,147~5,9,147\n6,2,278~9,2,278\n8,4,108~9,4,108\n9,1" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day22 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    {grid, bricks} = parse(input)
+
+    {grid, bricks} =
+      bricks
+      |> sort_by_z()
+      |> Enum.reduce({grid, bricks}, &move_brick_down/2)
+
+    Enum.count(bricks, &can_disintegrate?(&1, grid, bricks))
+  end
+
+  def part2(input) do
+    parse(input)
+  end
+
+  defp can_disintegrate?({id, points}, grid, bricks) do
+    points
+    |> Enum.map(fn {x, y, z} ->
+      case grid[{x, y, z + 1}] do
+        ^id -> nil
+        nil -> nil
+        value -> value
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
+    |> Enum.reject(fn id2 ->
+      has_other_support?(bricks[id2], id2, id, grid)
+    end)
+    |> then(fn
+      [] -> true
+      [_ | _] -> false
+    end)
+  end
+
+  defp has_other_support?(points, id, other_id, grid) do
+    points
+    |> Enum.any?(fn
+      {_, _, 1} ->
+        true
+
+      {x, y, z} ->
+        case grid[{x, y, z - 1}] do
+          ^id -> false
+          ^other_id -> false
+          nil -> false
+          _ -> true
+        end
+    end)
+  end
+
+  defp move_brick_down({id, points}, {grid, bricks}) do
+    z_down = count_move_down(id, points, grid)
+
+    {new_points, new_grid} =
+      Enum.map_reduce(points, grid, fn {x, y, z}, acc ->
+        new_point = {x, y, z - z_down}
+        {new_point, acc |> Map.delete({x, y, z}) |> Map.put(new_point, id)}
+      end)
+
+    {new_grid, Map.put(bricks, id, new_points)}
+  end
+
+  defp count_move_down(brick_id, points, grid, count \\ 0) do
+    if Enum.all?(points, &can_move_down?(&1, grid, brick_id, count)) do
+      count_move_down(brick_id, points, grid, count + 1)
+    else
+      count
+    end
+  end
+
+  defp can_move_down?({_, _, z}, _, _, count) when z - count == 1, do: false
+
+  defp can_move_down?({x, y, z}, grid, brick_id, count) do
+    case grid[{x, y, z - (count + 1)}] do
+      nil -> true
+      ^brick_id -> true
+      _ -> false
+    end
+  end
+
+  def sort_by_z(bricks) do
+    bricks
+    |> Enum.sort_by(fn {_id, points} ->
+      points
+      |> Enum.map(&elem(&1, 2))
+      |> Enum.min()
+    end)
+  end
+
+  defmodule Input do
+    def parse(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> Stream.map(&parse_line/1)
+      |> Stream.with_index(1)
+      |> Enum.reduce({%{}, %{}}, &add_brick/2)
+    end
+
+    # 1,0,1~1,2,1
+    defp parse_line(line) do
+      line
+      |> String.split("~")
+      |> Enum.map(fn brick ->
+        brick
+        |> String.split(",")
+        |> Enum.map(&String.to_integer/1)
+      end)
+    end
+
+    defp add_brick({[[x1, y, z], [x2, y, z]], i}, {grid, bricks}) do
+      x1..x2
+      |> Enum.map(&{&1, y, z})
+      |> build_bricks(i, grid, bricks)
+    end
+
+    defp add_brick({[[x, y1, z], [x, y2, z]], i}, {grid, bricks}) do
+      y1..y2
+      |> Enum.map(&{x, &1, z})
+      |> build_bricks(i, grid, bricks)
+    end
+
+    defp add_brick({[[x, y, z1], [x, y, z2]], i}, {grid, bricks}) do
+      z1..z2
+      |> Enum.map(&{x, y, &1})
+      |> build_bricks(i, grid, bricks)
+    end
+
+    defp build_bricks(brick_points, id, grid, bricks) do
+      brick_points
+      |> Enum.reduce(grid, fn point, acc ->
+        Map.put(acc, point, id)
+      end)
+      |> then(fn new_grid ->
+        {
+          new_grid,
+          Map.put(bricks, id, brick_points)
+        }
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day22, <<70, 79, 82, 49, 0, 0, 25, ...>>,
+ {:module, Day22.Input, <<70, 79, 82, ...>>, {:build_bricks, 4}}}
+```
+
+Figure how the blocks will settle based on the snapshot. Once they've settled, consider disintegrating a single brick; **how many bricks could be safely chosen as the one to get disintegrated?**
+
+Your puzzle answer was `509`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day22.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+509
+```
+
+For each brick, determine how many other bricks would fall if that brick were disintegrated. **What is the sum of the number of other bricks that would fall?**
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day22.part2(input)
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2023) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2023/day/22/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day22Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day22.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day22.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day22.part1(input) end,
+        "Part 2" => fn -> Day22.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+Benchmarking.run(input)
+```
