@@ -118,11 +118,10 @@ defmodule Day02 do
     input
     |> parse()
     |> Enum.count(fn line ->
-      safe?(line) or
-        0..(length(line) - 1)
-        |> Enum.any?(fn index ->
-          line |> List.delete_at(index) |> safe?()
-        end)
+      0..(length(line) - 1)
+      |> Enum.any?(fn index ->
+        line |> List.delete_at(index) |> safe?()
+      end)
     end)
   end
 
@@ -303,28 +302,28 @@ Benchmarking Part 1 ...
 Benchmarking Part 2 ...
 
 Name             ips        average  deviation         median         99th %
-Part 1        2.10 K      476.00 μs     ±3.16%      474.36 μs      514.19 μs
-Part 2        1.49 K      670.77 μs    ±44.33%      658.86 μs      713.68 μs
+Part 1        2.09 K      477.73 μs     ±3.69%      475.11 μs      524.52 μs
+Part 2        1.50 K      668.84 μs    ±14.04%      664.23 μs      711.86 μs
 
 Comparison: 
-Part 1        2.10 K
-Part 2        1.49 K - 1.41x slower +194.77 μs
+Part 1        2.09 K
+Part 2        1.50 K - 1.40x slower +191.11 μs
 
 Memory usage statistics:
 
 Name           average  deviation         median         99th %
 Part 1         0.59 MB     ±0.00%        0.59 MB        0.59 MB
-Part 2         1.03 MB     ±0.00%        1.03 MB        1.03 MB
+Part 2         1.09 MB     ±0.02%        1.09 MB        1.09 MB
 
 Comparison: 
 Part 1         0.59 MB
-Part 2         1.03 MB - 1.75x memory usage +0.44 MB
+Part 2         1.09 MB - 1.84x memory usage +0.50 MB
 
 Reduction count statistics:
 
 Name   Reduction count
 Part 1         66.01 K
-Part 2        129.59 K - 1.96x reduction count +63.59 K
+Part 2        131.63 K - 1.99x reduction count +65.62 K
 
 **All measurements for reduction count were the same**
 ```
