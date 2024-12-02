@@ -118,7 +118,13 @@ defmodule Day02 do
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(& &1)
+    |> Enum.count(fn line ->
+      safe?(line) or
+        0..(length(line) - 1)
+        |> Enum.any?(fn index ->
+          line |> List.delete_at(index) |> safe?()
+        end)
+    end)
   end
 
   defp safe?(line, dir \\ nil)
@@ -155,7 +161,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day02, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+{:module, Day02, <<70, 79, 82, 49, 0, 0, 13, ...>>,
  {:module, Day02.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -177,7 +183,7 @@ Day02.part1(input)
 
 Update your analysis by handling situations where the Problem Dampener can remove a single level from unsafe reports. **How many reports are now safe?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `476`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -188,7 +194,7 @@ Day02.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-[""]
+476
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -209,19 +215,19 @@ defmodule Day02Test do
 
   setup_all do
     [
-      input: ""
+      input: "7 6 4 2 1\n1 2 7 8 9\n9 7 6 2 1\n1 3 2 4 5\n8 6 4 4 1\n1 3 6 7 9"
     ]
   end
 
   describe "part1/1" do
     test "returns expected value", %{input: input} do
-      assert Day02.part1(input) == [""]
+      assert Day02.part1(input) == 2
     end
   end
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day02.part2(input) == [""]
+      assert Day02.part2(input) == 4
     end
   end
 end
@@ -236,13 +242,13 @@ ExUnit.run()
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 
-Randomized with seed 162351
+Randomized with seed 954854
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-%{excluded: 0, failures: 0, skipped: 0, total: 2}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
 
 ## Benchmarking
@@ -268,15 +274,64 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.15.7
+Erlang 26.1.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        2.10 K      476.00 μs     ±3.16%      474.36 μs      514.19 μs
+Part 2        1.49 K      670.77 μs    ±44.33%      658.86 μs      713.68 μs
+
+Comparison: 
+Part 1        2.10 K
+Part 2        1.49 K - 1.41x slower +194.77 μs
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         0.59 MB     ±0.00%        0.59 MB        0.59 MB
+Part 2         1.03 MB     ±0.00%        1.03 MB        1.03 MB
+
+Comparison: 
+Part 1         0.59 MB
+Part 2         1.03 MB - 1.75x memory usage +0.44 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1         66.01 K
+Part 2        129.59 K - 1.96x reduction count +63.59 K
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
