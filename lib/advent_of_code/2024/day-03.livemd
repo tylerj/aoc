@@ -1,0 +1,294 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day X - Advent of Code 2024
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2024/day/3)
+* [AoC Puzzle Input](https://adventofcode.com/2024/day/3/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2024/day-03.livemd)
+
+## Prompt
+
+### --- Day 3: Mull It Over ---
+
+"Our computers are having issues, so I have no idea if we have any Chief Historians in stock! You're welcome to check the warehouse, though," says the mildly flustered shopkeeper at the [North Pole Toboggan Rental Shop](https://adventofcode.com/2020/day/2). The Historians head out to take a look.
+
+The shopkeeper turns to you. "Any chance you can see why our computers are having issues again?"
+
+The computer appears to be trying to run a program, but its memory (your puzzle input) is **corrupted**. All of the instructions have been jumbled up!
+
+It seems like the goal of the program is just to **multiply some numbers**. It does that with instructions like mul(X,Y), where X and Y are each 1-3 digit numbers. For instance, mul(44,46) multiplies 44 by 46 to get a result of 2024. Similarly, mul(123,4) would multiply 123 by 4.
+
+However, because the program's memory has been corrupted, there are also many invalid characters that should be **ignored**, even if they look like part of a mul instruction. Sequences like `mul(4*`, `mul(6,9!`, `?(12,34)`, or `mul ( 2 , 4 )` do **nothing**.
+
+For example, consider the following section of corrupted memory:
+
+x`mul(2,4)`%&mul[3,7]!@^do_not_`mul(5,5)`+mul(32,64]then(`mul(11,8)``mul(8,5)`)
+Only the four highlighted sections are real mul instructions. Adding up the result of each instruction produces **161** `(2*4 + 5*5 + 11*8 + 8*5)`.
+
+Scan the corrupted memory for uncorrupted mul instructions. **What do you get if you add up all of the results of the multiplications?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2024/day/3/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+As you scan through the corrupted memory, you notice that some of the conditional statements are also still intact. If you handle some of the uncorrupted conditional statements in the program, you might be able to get an even more accurate result.
+
+There are two new instructions you'll need to handle:
+
+* The `do()` instruction **enables** future mul instructions.
+* The `don't()` instruction **disables** future mul instructions.
+
+Only the **most recent** `do()` or `don't()` instruction applies. At the beginning of the program, mul instructions are **enabled**.
+
+For example:
+
+x`mul(2,4)`&mul[3,7]!^`don't()`_mul(5,5)+mul(32,64](mul(11,8)un`do()`?`mul(8,5)`)
+
+This corrupted memory is similar to the example from before, but this time the mul(5,5) and mul(11,8) instructions are disabled because there is a don't() instruction before them. The other mul instructions function normally, including the one at the end that gets re-enabled by a do() instruction.
+
+This time, the sum of the results is **48** `(2*4 + 8*5)`.
+
+Handle the new instructions; **what do you get if you add up all of the results of just the enabled multiplications?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2024/day/3/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"why()}''(!how()$~mul(420,484) ]}}mul(218,461),]/select()mul(93,56)';$-;*#$mul(162,415)mul(556,374)when()~when()<[select()^<(@mul(561,946);mul(97,699)select()+%when()~who():mul(387,15)>mul(927,207)~>~when()*who()'do()mul(454,740)when()%from(),~@%]from()mul(54,688)mul(338,694)what()select()~!< <;+<mul(127,722)'how()#~%*^mul(337,149)!,!mul(11,87)'<who()* where(671,579)-mul(596,125)who(){@,,-;+from()how(148,934)mul(452,741) ~}mul(513,343)mul(45,508),where()what()mul(758,167)$@''where()!*from()?mul(3,372)$@mul(491,647)]':%why()mul(459,967)(#(mul(369,467)):mul(662,431))<]:from()select()@mul(172,72)why()+,who()#from()+what()@#mul(394,721)what(){why()'!mul(69,419)when(300,372)%where()mul(135,896)who()who()when()}(?&%when()^mul(692,658)@~!$*when()+!mul(586,546)?#$select()from()~/mul(609,19)from()where():who()~*}mul(54,319);what()<what()when()when()@^<:mul(962,480)[%how(133,773)what()'^!:#]mul(419,406)@}#!)'mul(524,802)!%mul(938,46)$~{#mul(443,398)~where()*}&{]&>/mul(373,536)&+mul(505,931)why()[mul(457,381) >/ mul(800,67)why()~what()[mul(807,815)&$who()mul(667,529)&how(843,372)what()mul(636,823)<mul(363,915)$ +mul(162,118)($/{when()'^what()mul(461,357)^{mul(303,284)how()?why()mul(31,429)$who()-do()what()[}#mul(471,260)!,^(?,- why()!mul(706,849)(mul(845,857)@;?mul(417,923)~from()%how()who()where()&mul(731,874){![]+mul(433,314)what()>?*who()mul(960,331)where()?mul(648,668)how()/<!why()>who()why()!'mul(649,819)[~:how()&what()]{mul(857,238)%-mul(603,559)mul(511,89):mul(888,328)*how()$/}]mul(177,966)who(777,724)why();:;mul(211,756)]:}+mul(297,394)>^how();$[mul(603,264)mul(794,883)when()why()~&select()from())mul(446,859) & ;:>?*what()/mul(388,763);},?when()do()where())<->what()mul(974,397)+why()select()#@mul(137,814)@when()why()when(697,786)mul(897,431)^}}&mul(74,810)?<&~] '&$]mul(49,565)(>where())]/mul(926,812)mul(842,573) how()-mul(126,526) @mul(818,934)?select()}^what()who()from()}mul(240,118)!from()^@?what()mul(77,983)+$what()mul(736,950)$&%?why()select();mul(213,409)where()*&*what():>~when()<mul(581,188)%]where()-?[why(308,248)>when()mul(87,245)$^ what()]&#select()mul(558,637)why()!mul(695,929[;*)+??mul(896,494)when())who()select()^>+how(641,113)mul(374,932);^?:where()>mul(780,265)^#;+when()}}mul(218,272)@$#mul(892,55)[what()?~{'when()}mul(527,984) {>?-'+-:-don't()select()#;/?]''!mul(56,714)/<select()*)>why()>mul(819,178)*~[+}],mul(793,717)from(75,849)~-,+($/,mul(719,587)where()#:@;*$+#?mul(919,859)who()+what(),  @;>mul(89,488)where()?from()#$mul(680,657)mul(619,642)?[+don't()$:]{select()$what()@mul(619,164)}!select()mul(528,754)mul(199,830)how()where()+from()/~$who()(mul(49,273(mul(32,974)do()*select()]mul(42,960)%@?:[##::mul(802,384)]{##where())what()[mul(610,271)how()#@>what()where()don't()'&)>mul%?mul(449,76)when()%[<{^mul(944,356)what()(*;<{$<~mul(476,918){who(){-mul(124,698);?who()who(610,775)what()'&mul(579,336)why()<{'mul(953,943)<from()mul(222,14)?don't()'why(){mul(986,323)$who()mul(476,802)-<(from(577,504)when(377,110)%mul(160,849)why()when()what()mul(239,985);<who()%!mul(356,867)why(87,771)-mul(486,916)\n'@$from():do()* select()why():how()~/mul~!^,from()#mul(601,494)%<,^mul(549,744)?!+/mul(381,237)+what()when()[)mul{~'~*what()from()$;#,mul(368,89){[;?how()why()#^%mul(926,974)how()select()when()when()@:{,do()how()from()from();;~when()<( mul(770,708)from()# ??($!:mul(612,548)$why())(who()%mul(776,783who()/%'>:%mul(651,439)/who(870,472)from()select()( -] $mul(16,267)mul(865,452)!select()who(){)$%$mul(888,41)],when(737,918)[#@#'mul(655,759)}/$(?#do()when()how()mul(160,406)]$mul(392,433)([;!##^from()mul(56,722)what()*#%select()(>#<who()mul(766,7)$mul(349,492) from()where();-}mul(12,290) -mul(268,832)~@what()when()!)@mul(994,952)?)'when()#'+mul(218,644)^^@ [mul(231,58)'[*/ mul(851,263)~select()#who()<#+where()who()mul(66,566)mul(347,173){why()%:what()]how()mul(266,892)}^mul(399,289)how()]@#]}#don't()$mul(337,947)^['[+-<}}'mul(556,447)&why()[when(193,903)select()mul(269,222)>mul(554,881)'mul(355,774)&/mul!~*<mul(900,983)/ select()'%?mul(112,191)*$&<who()when()when())mul(670,76)>)mul(32,426)where()[how()how()mul(160,991)(where()w" <> ...
+```
+
+## Solution
+
+```elixir
+defmodule Day03 do
+  def part1(input) do
+    ~r/mul\((\d{1,3})\,(\d{1,3})\)/
+    |> Regex.scan(input, capture: :all_but_first)
+    |> Enum.map(&do_mul/1)
+    |> Enum.sum()
+  end
+
+  def part2(input) do
+    ~r/(mul\((\d{1,3})\,(\d{1,3})\)|do\(\)|don\'t\(\))/
+    |> Regex.scan(input, capture: :all_but_first)
+    |> handle(:enabled)
+    |> Enum.sum()
+  end
+
+  defp do_mul([a, b]), do: do_mul(a, b)
+  defp do_mul(a, b), do: String.to_integer(a) * String.to_integer(b)
+
+  defp handle([["don't()"] | tail], :enabled),
+    do: handle(tail, :disabled)
+
+  defp handle([["do()"] | tail], :disabled),
+    do: handle(tail, :enabled)
+
+  defp handle([[_, a, b] | tail], :enabled),
+    do: [do_mul(a, b) | handle(tail, :enabled)]
+
+  defp handle([_ | tail], status),
+    do: handle(tail, status)
+
+  defp handle([], _status),
+    do: []
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day03, <<70, 79, 82, 49, 0, 0, 13, ...>>, {:handle, 2}}
+```
+
+Scan the corrupted memory for uncorrupted mul instructions. **What do you get if you add up all of the results of the multiplications?**
+
+Your puzzle answer was `174561379`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day03.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+174561379
+```
+
+Handle the new instructions; **what do you get if you add up all of the results of just the enabled multiplications?**
+
+Your puzzle answer was `106921067`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day03.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+106921067
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2024) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2024/day/3/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day03Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day03.part1(input) == 161
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day03.part2(input) == 48
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 720197
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day03.part1(input) end,
+        "Part 2" => fn -> Day03.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
+
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.15.7
+Erlang 26.1.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1        2.19 K      456.17 μs    ±15.56%      441.81 μs      659.33 μs
+Part 2        1.08 K      923.81 μs    ±13.59%      916.87 μs      969.28 μs
+
+Comparison: 
+Part 1        2.19 K
+Part 2        1.08 K - 2.03x slower +467.64 μs
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1       302.74 KB     ±0.00%      302.74 KB      302.74 KB
+Part 2       433.62 KB     ±0.00%      433.62 KB      433.62 KB
+
+Comparison: 
+Part 1       302.74 KB
+Part 2       433.62 KB - 1.43x memory usage +130.87 KB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1         22.71 K
+Part 2         27.51 K - 1.21x reduction count +4.80 K
+
+**All measurements for reduction count were the same**
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
