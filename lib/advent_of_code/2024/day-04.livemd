@@ -68,9 +68,36 @@ To begin, [get your puzzle input](https://adventofcode.com/2024/day/4/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+The Elf looks quizzically at you. Did you misunderstand the assignment?
 
-**QUESTION TWO?**
+Looking for the instructions, you flip over the word search to find that this isn't actually an `XMAS` puzzle; it's an `X-MAS` puzzle in which you're supposed to find two MAS in the shape of an X. One way to achieve that is like this:
+
+```
+M.S
+.A.
+M.S
+```
+
+Irrelevant characters have again been replaced with . in the above diagram. Within the X, each MAS can be written forwards or backwards.
+
+Here's the same example from before, but this time all of the X-MASes have been kept instead:
+
+```
+.M.S......
+..A..MSMS.
+.M.S.MAA..
+..A.ASMSM.
+.M.S.M....
+..........
+S.S.S.S.S.
+.A.A.A.A..
+M.M.M.M.M.
+..........
+```
+
+In this example, an X-MAS appears **9** times.
+
+Flip the word search from the instructions back over to the word search side and try again. **How many times does an X-MAS appear?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2024/day/4/input).
 
@@ -90,73 +117,99 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-"MMMSXXMASM\nMSAMXMSMSA\nAMXSXMAAMM\nMSAMASMSMX\nXMASAMXAMM\nXXAMMXXAMA\nSMSMSASXSS\nSAXAMASAAA\nMAMMMXMMMM\nMXMXAXMASX"
+"AAMXMASASMXSAMXXSAMSAMXXSXMMSMMSXSASXSXSSSXSAMXXXSXMASXMAMMASAMXAXAXMXMSSMMSXSASXSAMXXMASMXSMMMMMXXMAXXSXXXAXMSAMXSMXMSXSAMXMXMSXMMXSMXMXSMS\nAXMASXMAASAMMMSMSAMSAMXMAXMAAAMXMASAAMMMAAAMMXMASMAMAMASMSAASXMAXMMXASAMXAAAMSAMMMAMMMXMASASAXXASMMMMSAMMMXMASXMASMSMMMAMMMMMAXXAMXAXMAMSAAA\nXMSMMAMXMMSMAAAAMAMSAMXAMAMSSSMXAMMMSMAMMMMMSASXAXAMASXMAAMXXMSMXSAMXSMMSMMSMMAMASAMMAAXSMMSAMSMMAAAMMAMAASMMMXMMXMASAMAMSMSSSSSSMMXSXMXAMXM\nSAMXSAMSXMASMSSMSMMMMMMAMMMMAMASMXSAAMSMMAMXSASMSSXSASMMSMMMSMAAAXAAAXAAMAMXASMMMSASXSMSMMXMXMAXMSMSSSSMSMXAASMMAASAMXSASAAXAAMXAASMMASAMXAX\nASAASXMMAXAXMAXXAXAXASAMXAAXMMMMMAMXSXMASXSMMMMAAMXMASAAMXSAAMMAMSSMSMMMSSMSMMXMXSXMAXXAAXMMSSMSXMAMAAAAXMSSMXASXXMMSMSMSMSMMMMSSMMASAMAXSSS\nMMMMSAXSAMMXSASMMSMSAXMASMSMXAXAMXMXXASAMXAMXXXMAXAMXSMMMXMXSMXAXMAAXXSAAXMAMXXMMSAMXMSSXMAAMAAAMMAMMMMMMMAMAMXMXAXXAASAMXAAXXXXMAMMMMSXMAAX\nXMAMXMXMASXAMMSAXAAMAMSASMXXSXSXSAMXMAMSMSAMXSMSASXSAMXSMASAXASMMSMMMAMMSSSMSMSMASXMAMMAMSMMSMMMMSASXXAAAMAXXMXASMMMMSMAMSMSMMMXMMMSXMSMSMAM\nSSMSAXSMASMMMASMMMMMXMMASAMASAAMSASAMXMAMMAXXAAAAMASXSASMXMASAXXAAAAMAMAAAMXAASMAMASMSMAMXAAMXSXASASASXSSSSMSXMASXAAXAXSMSMAAAMMASASAAXAXXAX\nAAAMXMXMAXAXMXXXXXXXXXMMMXMAMXMXMASXMXSASMSMXMSMSMXMAMASAMMMMXMMSSSMSXSXMMSXMSSXMSMMMAMMSMMMSAMMMMAMAMAAAAXAXMXAXMSMSAMXAMMSSMAAXMASXMMSMSAS\nMMMMSSXMASMXMASMMMXSXMMMAXMSMSXAMMMXMASASMMMAAAMXMXMXMXMMMXAMASXMAMAXMMMXMAASAXXXAXASASMSXSAMMSAXMAMAMMMMAMMMAMMMXAXMMMMAMAAAMXSXMXMAMAXXSSM\nXMAAMAAMAMMAXAAAAXAMMAAMAMMMAXMXSAAAMAMMMAAXXMMMAMAXMASMMSMASAMMMMMMMAAAMMSSMASMSMSXSAMAMSMASXSMSSSSSMSAMXMXASAMXMSMMSASASMMXXMMMXAXAMMSMMAS\nMSMSSSSMMSXMMMSSXMMSASXSSMSMMMMMMMSMMASASMMSSMXSASXXSASAAXSXMMXMAAMXSSSXSAXXMAMXAAAXMAMMMASMMMXAXAMAAASXSMXASXXAAAAAXSXSASAMSAAAAMMSXXXAAXAM\nXAAAAAXXAAMSXMAMXXMAMMAAAAAAAAAAXAXAXXXXMAAAAAASAMAAMASMMXAMXSASMMSAAAAAMXMXMXSSMSMXMAMAMAMMAMMMMAMXMMMMMAMXXMSSMSSSMSMMAMAAASXMSXMAASMSSMXS\nSMSMMMMSMXMXAMASMMSSMMMMMMMXMSSSMSSMMSSSSMMMMMMSAMMMMAMAXSAMXSASAAMMMMMMMMMXMAAAAAXSSMXSMSSSMMAAMAMXXAAAMXXAMXAAMMAAXXAMXMMMMMXMAASMMMAAXXXX\nSAMXMAMSMSMXAMAMAAXASAAXXXSAAAAAAAXMAXAAMXXXXAXMASXAMASXMMASXMAMMMMSASXMAAXAMXXMSMSAAXAMXMAAASXMSMSASMSMSAMSSMSSMMSMMSSMAXXAXXAMSXMAAMMMMMSM\nSAMXSASXASAASMSMMMMMSXXSAASMMMSMMMSMSMMMMXMMSMSXAXXXSAMXASAMAXSXXXASMSASXSSSXSXXAXMMMMMSAMMMMSAAXAAXAAMAMMSAAAAXAXAXAXMMSMSAXSMMMMSSMSXSXAAA\nMAMXSSSMXMAMMAAXSXMXXXXMXMMASAXXSXAAXMMMXMXXAMXMMSSMMMMSXMASMMMMMMAMASXMXAAAASXXXXXAMAMMAMXSASMMMXMSMMMAMSMXSMMSSMMMSSSXMASXMXMAAMAAAXAXMASM\nSSMMMAXAMXMMMMMMMAXAXSSMMXSAMXMMSSMMMAAXAXXSSSSXSAMXSAAMMXAMMXMAMMSMAMXSSMMMMMAXSMSSSSXSASXMASAMSAMXAASMSSXMMAXXMAAAMAMAMXMMMASXSSSMXMXMAMXM\nMASXMMMXAAMAXMASMMMXSAAAAXMAMXMAMAXXSXMXMXMXMAMSMASAMMSMAMSMSAMMSAAMAMAXAAXXXMSMAAAAAAASAMXMXMAMSXSSXMASAXAAXMXSSSMSMASXMAXAMXSAMAMXSMMSXMAX\nSAMXMXMXSXSAMAAAAAAXAMMMMXAXMAMSSSSMXAMASAMAMAMAXSMXSAXMAXMASXSAMXSMMMSSMSXSMMASMXMMMMMMAMMSASAMXAAMMSMMMSMMXMAMAXMXXMMMXMMSMMMAMXMASXAAAMXM\nMASASASMMASMSMMXSMMXMXMMMMMMMXSXAAXMAXSASASASXSMMMAXMAMSSSMAMAMMSAMAXAXXXXAAASASXSXAAXXMAAMSXSASMSMMMMMAMMAMXMASMSMSMSMSASMXAASAMAXMXSXSAMXA\nMXSASAMAXAXXAXMXMAMXMAXSAAXAXMMMMMMMXXMASXAASAAXAMXMXAXXAXMAMAMXMAMSMMXSAMMMMMMSASXSXSXMASXMASXMXAMXAAMAXSAMXSASXAAAAAXXAMASMMMASMSXAMMAMSSS\nXXMMMMSSMMSSMXXAXMAXXAXXXMXMSAMMMXMSXAMAXXMSMMMMXXMASMXXMASMSXSASXAMAMAMASMSMAXMXMXMXMAXAMAMAMXMASXSSSMSXSXSXSXSXMSMSMMMAMAMAASMAMMMASAMXAAM\nXMASAMXMAXAAAAMSMSMSMSXSASAXSAMAXSAMSXMASMXAASXMXSXXAXSXXXMASASASAMSAMXSAMXASMSMXMASXMXSASXMMXMXAMXMAAAMASMSXXAMMXAXXAXSMMMSXMMSXAMMMSXSMMXM\nXSAMXSASMMMSMMMXAAAXAAAXASMXXSMAMMAMXXXXXAMMXMASAMXSXMASXXXXSXMXMAXSAMAMASXMMMAMAMAAAAASAMXXSASXSSSMMMMMASAMMMMMMXAMXMMXAAASASMMSXASASASASAS\nMMASXMASXAXAXXAMSMSMSMAMXMXXMXMMSSSMSSSMXMAXASMMXXMXAMMMMMSASXSASAMXAMSXMMAAASASXMASMMMMAXAXXASXAAXXXMXMAMMMAXMAMMSMXMAMMMXXAMAAASMMASASAMAA\nAXAMAMAMMSXMSMSMAXXAXXMAXMMMXXAMAMAMAAAXSXXSAMAMSMSAMMXSAAMMMAXASAXXSAXAXSSMMSMSASXXMASXSMMSMSMMMMMMAXAMAXMXSXMAMMXAAMMMSMSMASXMMAXMMMAMMMSM\nSMSSMMASXMAXXAAXMSMXMAMSMXAASMSMASMMMSMMXAAXASMMAAAAMSXMMMXAMAMXMXSAMASAMXXAAXASAMXMSASMXAAAXAAXMAAXXSXSASMMMASMSSMMMSXAAAMSAMASXMASMMSMSAMX\nXMAAASXSASAMMSMXSAXAXXMAXSMSMAASAMAAAAXMMSMSAMASMXMSMXAMASXMMASAAXMXMMMMMMSMMSXMMMAAMASXSSSMSSSMMMSMXXAXAAAASAMXAAXSAMXXMMMMXSAMXXAMAMMAMASA\nMMMSMMX" <> ...
 ```
 
 ## Solution
 
 ```elixir
 defmodule Day04 do
-  defdelegate parse(input), to: __MODULE__.Input
-
   def part1(input) do
-    grid = parse(input)
+    check_part(Day04.Part1, input)
+  end
+
+  def part2(input) do
+    check_part(Day04.Part2, input)
+  end
+
+  defp check_part(module, input) do
+    grid = Day04.Input.parse(input)
 
     1..grid.max_y
     |> Enum.flat_map(fn y ->
       1..grid.max_x
       |> Enum.flat_map(fn x ->
-        check_coord({x, y}, grid)
+        module.check_coord({x, y}, grid)
       end)
     end)
     |> Enum.sum()
   end
 
-  def part2(input) do
-    input
-    |> parse()
-  end
+  def next_char(dir, xy, grid), do: grid[next_xy(dir, xy)]
 
-  defp check_coord(xy, grid) do
-    check_coord(grid[xy], xy, grid)
-  end
+  def next_xy(:NW, {x, y}), do: {x - 1, y - 1}
+  def next_xy(:N, {x, y}), do: {x, y - 1}
+  def next_xy(:NE, {x, y}), do: {x + 1, y - 1}
+  def next_xy(:E, {x, y}), do: {x + 1, y}
+  def next_xy(:SE, {x, y}), do: {x + 1, y + 1}
+  def next_xy(:S, {x, y}), do: {x, y + 1}
+  def next_xy(:SW, {x, y}), do: {x - 1, y + 1}
+  def next_xy(:W, {x, y}), do: {x - 1, y}
 
-  defp check_coord(?X, xy, grid) do
-    [
-      next_coord(:NW, ?M, xy, grid),
-      next_coord(:N, ?M, xy, grid),
-      next_coord(:NE, ?M, xy, grid),
-      next_coord(:E, ?M, xy, grid),
-      next_coord(:SE, ?M, xy, grid),
-      next_coord(:S, ?M, xy, grid),
-      next_coord(:SW, ?M, xy, grid),
-      next_coord(:W, ?M, xy, grid)
-    ]
-  end
-
-  defp check_coord(_, _, _), do: [0]
-
-  defp next_coord(dir, char, xy, grid) do
-    xy = next_xy(dir, xy)
-
-    case grid[xy] do
-      ^char when char == ?S -> 1
-      ^char -> next_coord(dir, next_char(char), xy, grid)
-      _ -> 0
+  defmodule Part1 do
+    def check_coord(xy, grid) do
+      check_coord(grid[xy], xy, grid)
     end
+
+    defp check_coord(?X, xy, grid) do
+      [
+        next_coord(:NW, ?M, xy, grid),
+        next_coord(:N, ?M, xy, grid),
+        next_coord(:NE, ?M, xy, grid),
+        next_coord(:E, ?M, xy, grid),
+        next_coord(:SE, ?M, xy, grid),
+        next_coord(:S, ?M, xy, grid),
+        next_coord(:SW, ?M, xy, grid),
+        next_coord(:W, ?M, xy, grid)
+      ]
+    end
+
+    defp check_coord(_, _, _), do: [0]
+
+    defp next_coord(dir, char, xy, grid) do
+      xy = Day04.next_xy(dir, xy)
+
+      case grid[xy] do
+        ^char when char == ?S -> 1
+        ^char -> next_coord(dir, next_char(char), xy, grid)
+        _ -> 0
+      end
+    end
+
+    defp next_char(?M), do: ?A
+    defp next_char(?A), do: ?S
   end
 
-  defp next_char(?M), do: ?A
-  defp next_char(?A), do: ?S
+  defmodule Part2 do
+    defdelegate next_char(dir, xy, grid), to: Day04
 
-  defp next_xy(:NW, {x, y}), do: {x - 1, y - 1}
-  defp next_xy(:N, {x, y}), do: {x, y - 1}
-  defp next_xy(:NE, {x, y}), do: {x + 1, y - 1}
-  defp next_xy(:E, {x, y}), do: {x + 1, y}
-  defp next_xy(:SE, {x, y}), do: {x + 1, y + 1}
-  defp next_xy(:S, {x, y}), do: {x, y + 1}
-  defp next_xy(:SW, {x, y}), do: {x - 1, y + 1}
-  defp next_xy(:W, {x, y}), do: {x - 1, y}
+    def check_coord(xy, grid) do
+      check_coord(grid[xy], xy, grid)
+    end
+
+    defp check_coord(?A, xy, grid) do
+      d1 = {next_char(:NW, xy, grid), next_char(:SE, xy, grid)}
+      d2 = {next_char(:NE, xy, grid), next_char(:SW, xy, grid)}
+
+      if valid_diagonal?(d1) and valid_diagonal?(d2), do: [1], else: [0]
+    end
+
+    defp check_coord(_, _, _), do: [0]
+
+    defp valid_diagonal?({?M, ?S}), do: true
+    defp valid_diagonal?({?S, ?M}), do: true
+    defp valid_diagonal?(_), do: false
+  end
 
   defmodule Input do
     def parse(input) when is_binary(input) do
@@ -191,7 +244,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day04, <<70, 79, 82, 49, 0, 0, 17, ...>>,
+{:module, Day04, <<70, 79, 82, 49, 0, 0, 14, ...>>,
  {:module, Day04.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
 ```
 
@@ -208,12 +261,12 @@ Day04.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-18
+2613
 ```
 
-**QUESTION TWO?**
+Flip the word search from the instructions back over to the word search side and try again. **How many times does an X-MAS appear?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `1905`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -224,59 +277,7 @@ Day04.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-%{
-  {10, 6} => 65,
-  {9, 8} => 65,
-  {5, 10} => 65,
-  {9, 4} => 77,
-  {2, 7} => 77,
-  {1, 7} => 83,
-  {8, 8} => 65,
-  {4, 6} => 77,
-  {1, 4} => 77,
-  {7, 10} => 77,
-  {6, 1} => 88,
-  {2, 8} => 65,
-  {7, 2} => 83,
-  {2, 2} => 83,
-  {9, 9} => 77,
-  {7, 3} => 65,
-  {7, 7} => 83,
-  {7, 6} => 88,
-  {9, 7} => 83,
-  {7, 1} => 77,
-  {3, 1} => 77,
-  {5, 7} => 83,
-  {4, 5} => 83,
-  {1, 5} => 88,
-  {2, 4} => 83,
-  {7, 5} => 88,
-  {8, 10} => 65,
-  {8, 1} => 65,
-  {4, 10} => 88,
-  {9, 5} => 77,
-  {1, 10} => 77,
-  {10, 9} => 77,
-  {4, 1} => 83,
-  {10, 8} => 65,
-  {9, 6} => 77,
-  {1, 1} => 77,
-  {3, 7} => 83,
-  {9, 2} => 83,
-  {4, 3} => 83,
-  {4, 7} => 77,
-  {5, 1} => 88,
-  {5, 9} => 77,
-  {10, 3} => 77,
-  {10, 5} => 77,
-  {8, 7} => 88,
-  {3, 4} => 65,
-  {2, 1} => 77,
-  {6, 4} => 83,
-  {5, ...} => 65,
-  {...} => 83,
-  ...
-}
+1905
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -310,7 +311,7 @@ defmodule Day04Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day04.part2(input) == [""]
+      assert Day04.part2(input) == 9
     end
   end
 end
@@ -321,20 +322,9 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-.
-
-  1) test part2/1 returns expected value (Day04Test)
-     lib/advent_of_code/2024/day-04.livemd#cell:6u5vcz4asatsbiwxrh7hl3uu6guhkx3r:19
-     Assertion with == failed
-     code:  assert Day04.part2(input) == [""]
-     left:  %{{10, 6} => 65, {9, 8} => 65, {5, 10} => 65, {9, 4} => 77, {2, 7} => 77, {1, 7} => 83, {8, 8} => 65, {4, 6} => 77, {1, 4} => 77, {7, 10} => 77, {6, 1} => 88, {2, 8} => 65, {7, 2} => 83, {2, 2} => 83, {9, 9} => 77, {7, 3} => 65, {7, 7} => 83, {7, 6} => 88, {9, 7} => 83, {7, 1} => 77, {3, 1} => 77, {5, 7} => 83, {4, 5} => 83, {1, 5} => 88, {2, 4} => 83, {7, 5} => 88, {8, 10} => 65, {8, 1} => 65, {4, 10} => 88, {9, 5} => 77, {1, 10} => 77, {10, 9} => 77, {4, 1} => 83, {10, 8} => 65, {9, 6} => 77, {1, 1} => 77, {3, 7} => 83, {9, 2} => 83, {4, 3} => 83, {4, 7} => 77, {5, 1} => 88, {5, 9} => 77, {10, 3} => 77, {10, 5} => 77, {8, 7} => 88, {3, 4} => 65, {2, 1} => 77, {6, 4} => 83, {5, ...} => 65, {...} => 83, ...}
-     right: [""]
-     stacktrace:
-       lib/advent_of_code/2024/day-04.livemd#cell:6u5vcz4asatsbiwxrh7hl3uu6guhkx3r:20: (test)
-
-
+..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
-2 tests, 1 failure
+2 tests, 0 failures
 
 Randomized with seed 766654
 ```
@@ -342,7 +332,7 @@ Randomized with seed 766654
 <!-- livebook:{"output":true} -->
 
 ```
-%{total: 2, failures: 1, excluded: 0, skipped: 0}
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
 ```
 
 ## Benchmarking
@@ -368,15 +358,64 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.15.7
+Erlang 26.1.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 2        161.42        6.19 ms     ±9.01%        6.02 ms        7.41 ms
+Part 1        113.80        8.79 ms     ±8.88%        8.53 ms       10.56 ms
+
+Comparison: 
+Part 2        161.42
+Part 1        113.80 - 1.42x slower +2.59 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 2        11.55 MB
+Part 1        13.21 MB - 1.14x memory usage +1.66 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 2        569.41 K     ±0.01%       569.40 K       569.60 K
+Part 1        793.88 K     ±0.01%       793.87 K       794.05 K
+
+Comparison: 
+Part 2        569.40 K
+Part 1        793.88 K - 1.39x reduction count +224.46 K
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
