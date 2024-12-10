@@ -1,6 +1,6 @@
 <!-- livebook:{"persist_outputs":true} -->
 
-# Day X - Advent of Code 2024
+# Day 3 - Advent of Code 2024
 
 ```elixir
 Mix.install([:kino, :benchee])
