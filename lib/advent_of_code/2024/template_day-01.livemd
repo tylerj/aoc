@@ -42,7 +42,6 @@ input = Kino.Input.textarea("Please paste your input file:")
 
 ```elixir
 input = input |> Kino.Input.read()
-# input = AdventOfCode.Input.get!(1, 2024)
 ```
 
 <!-- livebook:{"output":true} -->

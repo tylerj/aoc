@@ -1,0 +1,443 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 6 - Advent of Code 2024
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2024/day/6)
+* [AoC Puzzle Input](https://adventofcode.com/2024/day/6/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2024/day-06.livemd)
+
+## Prompt
+
+### --- Day Day 6: Guard Gallivant ---
+
+The Historians use their fancy [device](https://adventofcode.com/2024/day/4) again, this time to whisk you all away to the North Pole prototype suit manufacturing lab... in the year [1518](https://adventofcode.com/2018/day/5)! It turns out that having direct access to history is very convenient for a group of historians.
+
+You still have to be careful of time paradoxes, and so it will be important to avoid anyone from 1518 while The Historians search for the Chief. Unfortunately, a single **guard** is patrolling this part of the lab.
+
+Maybe you can work out where the guard will go ahead of time so that The Historians can search safely?
+
+You start by making a map (your puzzle input) of the situation. For example:
+
+```
+....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#...
+```
+
+The map shows the current position of the guard with `^` (to indicate the guard is currently facing **up** from the perspective of the map). Any **obstructions** - crates, desks, alchemical reactors, etc. - are shown as `#`.
+
+Lab guards in 1518 follow a very strict patrol protocol which involves repeatedly following these steps:
+
+* If there is something directly in front of you, turn right 90 degrees.
+* Otherwise, take a step forward.
+
+Following the above protocol, the guard moves up several times until she reaches an obstacle (in this case, a pile of failed suit prototypes):
+
+```
+....#.....
+....^....#
+..........
+..#.......
+.......#..
+..........
+.#........
+........#.
+#.........
+......#...
+```
+
+Because there is now an obstacle in front of the guard, she turns right before continuing straight in her new facing direction:
+
+```
+....#.....
+........>#
+..........
+..#.......
+.......#..
+..........
+.#........
+........#.
+#.........
+......#...
+```
+
+Reaching another obstacle (a spool of several **very** long polymers), she turns right again and continues downward:
+
+```
+....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#......v.
+........#.
+#.........
+......#...
+```
+
+This process continues for a while, but the guard eventually leaves the mapped area (after walking past a tank of universal solvent):
+
+```
+....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#........
+........#.
+#.........
+......#v..
+```
+
+By predicting the guard's route, you can determine which specific positions in the lab will be in the patrol path. **Including the guard's starting position**, the positions visited by the guard before leaving the area are marked with an `X`:
+
+```
+....#.....
+....XXXXX#
+....X...X.
+..#.X...X.
+..XXXXX#X.
+..X.X.X.X.
+.#XXXXXXX.
+.XXXXXXX#.
+#XXXXXXX..
+......#X..
+```
+
+In this example, the guard will visit **41** distinct positions on your map.
+
+Predict the path of the guard. **How many distinct positions will the guard visit before leaving the mapped area?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2024/day/6/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2024/day/6/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"....#.....\n.........#\n..........\n..#.......\n.......#..\n..........\n.#..^.....\n........#.\n#.........\n......#..."
+```
+
+## Solution
+
+```elixir
+defmodule Day06 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    input
+    |> parse()
+    |> walk()
+    |> Map.get(:seen)
+    |> MapSet.size()
+  end
+
+  def part2(input) do
+    input
+    |> parse()
+  end
+
+  defp walk(grid) do
+    next_xy = next_xy(grid)
+
+    case grid[next_xy] do
+      nil ->
+        grid
+
+      ?# ->
+        grid |> turn_right() |> walk()
+
+      ?. ->
+        grid |> step_forward() |> walk()
+    end
+  end
+
+  defp next_xy(%{dir: :U, pos: {x, y}}), do: {x, y - 1}
+  defp next_xy(%{dir: :R, pos: {x, y}}), do: {x + 1, y}
+  defp next_xy(%{dir: :D, pos: {x, y}}), do: {x, y + 1}
+  defp next_xy(%{dir: :L, pos: {x, y}}), do: {x - 1, y}
+
+  defp turn_right(grid) do
+    Map.update!(grid, :dir, fn
+      :U -> :R
+      :R -> :D
+      :D -> :L
+      :L -> :U
+    end)
+  end
+
+  defp step_forward(grid) do
+    xy = next_xy(grid)
+
+    grid
+    |> Map.put(:pos, xy)
+    |> Map.update!(:seen, &MapSet.put(&1, xy))
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.split("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      grid = %{
+        max_y: length(input),
+        max_x: input |> List.first() |> String.length()
+      }
+
+      input
+      |> Enum.with_index(1)
+      |> Enum.reduce(grid, &parse_line/2)
+    end
+
+    def parse_line({line, y}, grid) do
+      line
+      |> String.to_charlist()
+      |> Enum.with_index(1)
+      |> Enum.reduce(grid, fn
+        {?^, x}, acc ->
+          acc
+          |> Map.merge(%{
+            :pos => {x, y},
+            :seen => MapSet.new([{x, y}]),
+            :dir => :U,
+            {x, y} => ?.
+          })
+
+        {c, x}, acc ->
+          Map.put(acc, {x, y}, c)
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day06, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+ {:module, Day06.Input, <<70, 79, 82, ...>>, {:parse_line, 2}}}
+```
+
+Predict the path of the guard. **How many distinct positions will the guard visit before leaving the mapped area?**
+
+Your puzzle answer was `answer one`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+41
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{
+  :dir => :U,
+  {10, 6} => 46,
+  {9, 8} => 35,
+  {5, 10} => 46,
+  {9, 4} => 46,
+  :pos => {5, 7},
+  {2, 7} => 35,
+  {1, 7} => 46,
+  {8, 8} => 46,
+  {4, 6} => 46,
+  {1, 4} => 46,
+  {7, 10} => 35,
+  {6, 1} => 46,
+  {2, 8} => 46,
+  {7, 2} => 46,
+  {2, 2} => 46,
+  {9, 9} => 46,
+  {7, 3} => 46,
+  {7, 7} => 46,
+  {7, 6} => 46,
+  {9, 7} => 46,
+  {7, 1} => 46,
+  {3, 1} => 46,
+  {5, 7} => 46,
+  {4, 5} => 46,
+  {1, 5} => 46,
+  {2, 4} => 46,
+  {7, 5} => 46,
+  {8, 10} => 46,
+  {8, 1} => 46,
+  {4, 10} => 46,
+  {9, 5} => 46,
+  {1, 10} => 46,
+  {10, 9} => 46,
+  {4, 1} => 46,
+  {10, 8} => 46,
+  {9, 6} => 46,
+  {1, 1} => 46,
+  {3, 7} => 46,
+  {9, 2} => 46,
+  {4, 3} => 46,
+  {4, 7} => 46,
+  {5, 1} => 35,
+  {5, 9} => 46,
+  {10, 3} => 46,
+  {10, 5} => 46,
+  {8, 7} => 46,
+  {3, 4} => 35,
+  {2, ...} => 46,
+  {...} => 46,
+  ...
+}
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2024) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2024/day/6/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day06Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input:
+        "....#.....\n.........#\n..........\n..#.......\n.......#..\n..........\n.#..^.....\n........#.\n#.........\n......#..."
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day06.part1(input) == 41
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day06.part2(input) == nil
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+.
+
+  1) test part2/1 returns expected value (Day06Test)
+     lib/advent_of_code/2024/day-06.livemd#cell:ri7xl3rzwwrnorle6jvmgewmmkueya67:19
+     Assertion with == failed
+     code:  assert Day06.part2(input) == nil
+     left:  %{:dir => :U, {10, 6} => 46, {9, 8} => 35, {5, 10} => 46, {9, 4} => 46, :pos => {5, 7}, {2, 7} => 35, {1, 7} => 46, {8, 8} => 46, {4, 6} => 46, {1, 4} => 46, {7, 10} => 35, {6, 1} => 46, {2, 8} => 46, {7, 2} => 46, {2, 2} => 46, {9, 9} => 46, {7, 3} => 46, {7, 7} => 46, {7, 6} => 46, {9, 7} => 46, {7, 1} => 46, {3, 1} => 46, {5, 7} => 46, {4, 5} => 46, {1, 5} => 46, {2, 4} => 46, {7, 5} => 46, {8, 10} => 46, {8, 1} => 46, {4, 10} => 46, {9, 5} => 46, {1, 10} => 46, {10, 9} => 46, {4, 1} => 46, {10, 8} => 46, {9, 6} => 46, {1, 1} => 46, {3, 7} => 46, {9, 2} => 46, {4, 3} => 46, {4, 7} => 46, {5, 1} => 35, {5, 9} => 46, {10, 3} => 46, {10, 5} => 46, {8, 7} => 46, {3, 4} => 35, {2, ...} => 46, {...} => 46, ...}
+     right: nil
+     stacktrace:
+       lib/advent_of_code/2024/day-06.livemd#cell:ri7xl3rzwwrnorle6jvmgewmmkueya67:20: (test)
+
+
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 1 failure
+
+Randomized with seed 823797
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, excluded: 0, failures: 1, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day06.part1(input) end,
+        "Part 2" => fn -> Day06.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+Benchmarking.run(input)
+```
