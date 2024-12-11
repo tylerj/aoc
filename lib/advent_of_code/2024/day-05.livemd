@@ -102,9 +102,16 @@ To begin, [get your puzzle input](https://adventofcode.com/2024/day/5/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+While the Elves get to work printing the correctly-ordered updates, you have a little time to fix the rest of them.
 
-**QUESTION TWO?**
+For each of the **incorrectly-ordered updates**, use the page ordering rules to put the page numbers in the right order. For the above example, here are the three incorrectly-ordered updates and their correct orderings:
+
+* `75,97,47,61,53` becomes `97,75,*47*,61,53`.
+* `61,13,29` becomes `61,*29*,13`.
+* `97,13,75,29,47` becomes `97,75,*47*,29,13`.
+  After taking **only the incorrectly-ordered updates** and ordering them correctly, their middle page numbers are `47`, `29`, and `47`. Adding these together produces **123**.
+
+Find the updates which are not in the correct order. **What do you get if you add up the middle page numbers after correctly ordering just those updates?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2024/day/5/input).
 
@@ -137,26 +144,65 @@ defmodule Day05 do
 
     updates
     |> Enum.filter(&correct_order?(&1, rules))
-    |> Enum.map(&Enum.at(&1, floor(length(&1) / 2)))
+    |> Enum.map(&get_middle/1)
     |> Enum.sum()
   end
 
   def part2(input) do
-    # {rules, updates} = parse(input)
+    {rules, updates} = parse(input)
+
+    updates
+    |> Enum.reject(&correct_order?(&1, rules))
+    |> Enum.map(&reorder(&1, rules))
+    |> Enum.map(&get_middle/1)
+    |> Enum.sum()
   end
 
   defp correct_order?(update, rules) do
-    Enum.all?(rules, fn {a, b} ->
-      idx_a = Enum.find_index(update, &(&1 == a))
-      idx_b = Enum.find_index(update, &(&1 == b))
+    Enum.all?(rules, &rule_met?(&1, update))
+  end
 
-      cond do
-        is_nil(idx_a) -> true
-        is_nil(idx_b) -> true
-        idx_a < idx_b -> true
-        true -> false
-      end
-    end)
+  defp rule_met?(rule, update) do
+    {idx_a, idx_b} = find_indexes(rule, update)
+
+    cond do
+      is_nil(idx_a) -> true
+      is_nil(idx_b) -> true
+      idx_a < idx_b -> true
+      true -> false
+    end
+  end
+
+  defp find_indexes({a, b}, update) do
+    {
+      Enum.find_index(update, &(&1 == a)),
+      Enum.find_index(update, &(&1 == b))
+    }
+  end
+
+  defp get_middle(list) do
+    middle_index = (length(list) / 2) |> floor()
+
+    Enum.at(list, middle_index)
+  end
+
+  defp reorder(update, rules), do: reorder(update, rules, rules)
+
+  defp reorder(update, [], _), do: update
+
+  defp reorder(update, [rule | tail], all_rules) do
+    if rule_met?(rule, update) do
+      reorder(update, tail, all_rules)
+    else
+      # Move b to be immediately after a
+      {_a, b} = rule
+      {idx_a, idx_b} = find_indexes(rule, update)
+
+      update
+      |> List.insert_at(idx_a + 1, b)
+      |> List.delete_at(idx_b)
+      |> reorder(all_rules)
+    end
   end
 
   defmodule Input do
@@ -194,15 +240,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-warning: variable "input" is unused (if the variable is not meant to be used, prefix it with an underscore)
-  lib/advent_of_code/2024/day-05.livemd#cell:pksjqc2pd6nxq3wkd4nqizb7zerwkhm5:13: Day05.part2/1
-
-```
-
-<!-- livebook:{"output":true} -->
-
-```
-{:module, Day05, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+{:module, Day05, <<70, 79, 82, 49, 0, 0, 18, ...>>,
  {:module, Day05.Input, <<70, 79, 82, ...>>, {:parse_update, 1}}}
 ```
 
@@ -222,9 +260,9 @@ Day05.part1(input)
 5964
 ```
 
-**QUESTION TWO?**
+Find the updates which are not in the correct order. **What do you get if you add up the middle page numbers after correctly ordering just those updates?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `4719`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -235,7 +273,7 @@ Day05.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-nil
+4719
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -269,7 +307,7 @@ defmodule Day05Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day05.part2(input) == nil
+      assert Day05.part2(input) == 123
     end
   end
 end
@@ -316,15 +354,62 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 7, ...>>, {:run, 1}}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.15.7
+Erlang 26.1.1
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+
+Name             ips        average  deviation         median         99th %
+Part 1         33.31       30.02 ms     ±4.95%       29.88 ms       36.70 ms
+Part 2          2.85      350.67 ms     ±1.52%      349.18 ms      369.89 ms
+
+Comparison: 
+Part 1         33.31
+Part 2          2.85 - 11.68x slower +320.66 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1        16.27 MB
+Part 2       173.24 MB - 10.65x memory usage +156.97 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1         11.79 M
+Part 2        140.68 M - 11.93x reduction count +128.90 M
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
