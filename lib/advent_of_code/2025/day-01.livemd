@@ -118,7 +118,7 @@ input = input |> Kino.Input.read()
 <!-- livebook:{"output":true} -->
 
 ```
-"L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82"
+"R9\nL8\nL26\nR45\nR40\nL45\nR13\nL20\nL8\nR5\nR47\nR38\nL22\nL26\nL22\nL19\nL25\nL21\nL15\nR19\nR3\nR33\nR46\nL9\nR48\nL21\nR13\nR10\nL20\nR48\nL43\nR44\nR35\nR23\nL48\nL21\nL7\nR26\nL23\nL50\nL34\nR22\nL14\nR21\nL47\nR16\nR21\nL5\nL48\nR85\nR87\nL82\nR53\nL22\nL49\nL92\nL8\nR36\nR72\nR92\nR36\nL13\nR55\nL85\nL14\nL74\nL28\nL65\nL12\nR24\nR76\nR13\nL15\nL31\nL81\nL86\nL62\nR37\nL76\nR8\nR30\nL84\nL51\nR67\nR31\nR14\nR86\nL89\nR76\nL16\nR29\nR47\nR46\nR14\nR69\nR24\nR82\nR18\nR1\nR92\nL51\nR44\nL13\nR87\nR76\nR64\nL90\nR66\nL73\nL26\nR78\nR86\nL15\nR74\nL390\nL510\nR899\nL67\nR32\nL935\nL2\nL27\nL11\nL889\nL138\nL6\nL56\nR25\nL25\nL2\nR2\nL13\nL87\nR68\nL17\nR49\nR78\nR17\nL68\nL14\nL1\nL780\nR68\nL29\nL59\nR971\nL19\nR57\nL25\nR33\nL6\nL81\nR258\nL3\nL88\nL909\nR24\nR53\nL53\nL24\nR278\nR37\nR85\nL17\nR417\nL58\nR42\nR45\nR871\nR48\nR67\nL715\nR15\nL77\nR62\nR50\nR50\nR363\nL27\nL9\nR261\nL62\nR2\nR99\nR57\nL684\nR399\nL447\nL94\nR97\nR97\nR75\nR44\nR42\nL149\nL536\nL64\nL11\nR43\nL196\nL32\nL75\nL40\nL360\nR824\nR912\nL64\nR135\nR54\nL33\nR89\nL30\nL80\nR82\nR12\nL90\nL4\nL56\nR956\nL662\nL62\nL43\nL8\nR76\nL98\nL8\nR61\nR344\nL78\nL37\nL85\nR73\nL73\nR260\nR40\nR33\nL236\nL11\nR89\nR25\nL9\nL91\nL410\nR97\nR2\nR261\nR85\nL957\nL24\nR95\nL94\nR41\nR4\nR112\nR188\nL34\nR34\nR32\nL13\nL26\nL8\nR17\nR6\nL8\nL28\nL28\nR56\nR79\nR15\nR606\nR76\nR224\nL47\nL77\nR29\nL5\nL5\nR773\nR50\nR82\nR355\nL77\nL25\nL43\nR16\nL726\nR69\nR16\nL85\nR86\nL71\nL82\nR60\nL11\nL8\nR524\nL24\nR26\nR760\nL60\nL12\nL88\nL72\nR317\nR154\nR96\nL65\nR66\nL27\nR3\nL4\nR36\nL53\nL51\nL90\nR90\nR40\nR89\nL18\nR34\nR40\nR15\nR70\nL270\nL58\nL42\nL71\nL27\nL2\nR942\nL930\nR19\nR40\nR29\nR9\nR54\nL171\nR8\nL814\nL86\nL716\nL84\nL59\nL41\nL25\nR25\nL68\nR51\nR70\nR39\nL892\nR60\nR74\nR93\nR26\nR47\nR62\nL55\nR436\nR31\nR1\nR25\nR35\nR65\nL62\nL38\nR76\nL678\nL91\nR93\nL91\nL9\nL10\nL90\nL13\nR92\nL379\nR54\nR46\nL81\nL29\nR95\nL58\nR61\nR12\nL12\nR373\nL71\nL12\nR77\nL955\nR6\nR71\nL19\nL20\nR475\nL22\nR9\nR944\nR2\nL42\nL85\nR39\nR38\nL112\nR16\nR75\nL375\nR68\nR32\nL48\nR98\nR82\nL60\nR107\nR358\nL40\nL97\nR34\nR66\nL426\nR9\nL23\nL66\nL70\nR7\nR39\nR30\nL31\nR548\nL317\nR39\nR171\nL59\nR449\nR61\nL15\nL97\nL49\nR78\nL4\nR26\nR84\nR893\nL37\nR32\nR728\nL93\nL64\nR357\nL270\nL69\nR39\nR76\nL87\nR94\nR28\nL620\nR658\nL49\nL193\nR4\nL211\nL43\nR702\nL29\nL43\nR20\nL209\nR34\nL72\nR3\nR37\nL89\nL67\nR783\nL27\nL52\nR20\nR37\nR19\nR476\nR33\nR56\nL6\nL58\nL48\nL9\nR51\nR64\nR17\nL7\nL64\nL29\nR45\nL845\nL726\nL12\nL162\nL91\nR29\nR38\nL72\nR96\nR50\nR53\nL29\nL63\nL311\nR201\nR999\nR88\nR12\nL593\nL6\nR51\nR17\nR434\nL48\nR999\nR46\nR79\nL553\nL26\nL80\nR836\nR744\nL905\nL51\nL69\nL9\nL85\nR67\nR52\nL78\nL822\nL14\nL8\nL3\nL75\nL57\nL49\nR6\nL75\nR81\nR694\nL59\nR959\nR67\nL67\nR853\nR47\nR42\nL919\nL23\nR11\nL94\nL78\nR85\nL39\nL85\nR26\nL30\nR4\nL93\nR51\nL211\nR53\nR10\nR90\nR51\nR95\nR42\nL103\nL382\nL3\nL25\nL75\nL69\nL766\nR95\nL260\nL78\nL23\nR41\nR66\nL43\nR78\nL14\nR94\nL321\nR23\nR99\nR76\nR180\nR58\nL10\nL26\nL65\nL35\nR58\nR42\nR20\nR41\nR39\nR8\nL60\nR22\nL74\nL72\nR76\nL31\nR87\nR44\nR59\nR69\nL5\nL57\nL813\nR881\nR80\nL14\nL98\nL60\nR21\nR37\nL73\nR66\nR61\nL54\nL612\nL56\nR57\nL26\nR37\nR745\nR36\nL76\nL5\nR152\nL68\nL714\nL61\nL32\nR97\nR49\nL48\nL75\nR27\nR88\nR61\nR506\nL47\nL90\nL89\nR45\nL3\nL20\nR52\nR70\nR40\nR867\nL93\nR82\nL37\nL5\nR46\nR30\nR97\nR73\nL40\nR60\nL20\nL705\nL22\nL73\nL66\nR713\nL947\nL39\nR83\nL54\nR322\nR97\nR97\nR49\nR13\nL68\nL49\nL73\nR3\nL50\nL31\nR83\nR70\nL85\nL593\nR37\nR60\nR28\nL91\nR91\nR184\nR16\nR46\nR33\nL79\nL80\nL20\nR19\nL17\nL27\nR25\nR9\nL9\nR21\nR79\nL20\nL10\nR72\nL542\nL43\nR56\nR87\nL68\nL32\nR18\nR82\nL306\nL68\nL26\nL51\nR51\nR79\nL277\nR45\nR19\nR44\nR38\nL233\nL71\nL17\nL58\nR703\nR728\nR26\nR75\nL44\nL357\nL31\nR667\nR64\nR57\nL57\nL883\nL817\nR54\nR10\nL86\nL75\nL903\nL55\nR52\nL97\nR51\nR49\nR91\nR15\nL1\nR95\nR21\nL22\nL99\nR51\nR449\nL45\nR19\nR26\nL223\nL677\nL1\nL399\nL41\nL59\nR224\nL24\nR228\nR26\nL68\nR238\nR76\nR85\nL85\nR99\nR595\nR872\nR234\nR24\nL90\nL34\nR69\nR58\nL27\nL99\nL67\nR66\nL74\nL26\nL988\nL12\nR734\nL43\nL91\nR46\nR66\nL12\nL30\nR53\nL77\nR54\nR90\nR10\nL399\nL16\nL20\nR85\nL77\nR841\nR86\nR13\nL33\nR3\nR31\nL85\nR170\nL99\nR86\nR14\nL17\nL83\nL41\nR16\nL475\nR946\nR28\nR66\nR85\nL25\nL15\nL85\nR684\nR65\nL49\nR69\nR92\nL72\nR7\nR4\nR52\nL55\nR40\nL356\nL81\nR348\nL26\nR778\nL45\nL30\nR60\nR17\nR98\nR435\nR65\nL618\nR37\nR81\nR80\nR20\nR84\nL77\nL10\nL40\nL37\nL20\nL847\nL47\nL62\nR32\nL58\nR716\nR66\nR63\nR93\nR44\nR33\nR60\nL9\nR70\nL654\nL48\nL7\nL70\nL75\nR96\nR94\nR60\nL655\nL795\nR44\nL44\nL84\nR55\nR12\nR17\nL92\nL51\nR43\nR54\nR646\nL987\nR87\nR34\nR66\nL80\nL947\nR320\nL51\nR79\nL21\nR90\nL2\nL32\nR44\nR12\nR87\nL4\nR534\nR265\nL69\nL47\nL28\nL60\nR10\nR54\nR80\nL35\nR1\nR91\nR9\nL7\nR98\nL55\nL18\nR782\nR968\nL383\nL510\nL178\nL354\nL40\nR97\nL39\nL92\nR31\nL22\nL23\nL655\nR33\nL478\nR25\nL588\nL15\nL565\nL50\nR47\nL10\nL99\nL2\nL95\nL582\nL529\nR8\nR80\nL51\nR41\nL55\nL45\nR898\nR32\nR411\nL692\nR248\nR33\nR41\nR664\nR95\nR24\nL74\nL2" <> ...
 ```
 
 ## Solution
@@ -136,8 +136,9 @@ defmodule Day01 do
 
   def part2(input) do
     input
-    # |> parse()
-    # |> Enum.map(& &1)
+    |> parse()
+    |> Enum.reduce({50, 0}, &turn_dial_part_2/2)
+    |> elem(1)
   end
 
   defp turn_dial({"L", amount}, [h | _] = list) do
@@ -151,6 +152,23 @@ defmodule Day01 do
   defp normalize_dial(x) when x < 0, do: 100 + x
   defp normalize_dial(x) when x > 99, do: x - 100
   defp normalize_dial(x), do: x
+
+  defp turn_dial_part_2({"L", amount}, acc) do
+    1..amount
+    |> Enum.reduce(acc, fn 
+      _, {1, count} -> {0, count + 1}
+      _, {0, count} -> {99, count}
+      _, {dial, count} -> {dial - 1, count}
+    end)
+  end
+
+  defp turn_dial_part_2({"R", amount}, acc) do
+    1..amount
+    |> Enum.reduce(acc, fn
+      _, {99, count} -> {0, count + 1}
+      _, {dial, count} -> {dial + 1, count}
+    end)
+  end
 
   defmodule Input do
     def parse(input) when is_binary(input) do
@@ -175,7 +193,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day01, <<70, 79, 82, 49, 0, 0, 12, ...>>,
+{:module, Day01, <<70, 79, 82, 49, 0, 0, 16, ...>>,
  {:module, Day01.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -192,12 +210,12 @@ Day01.part1(input)
 <!-- livebook:{"output":true} -->
 
 ```
-3
+1034
 ```
 
-**QUESTION TWO?**
+Using password method 0x434C49434B, **what is the password to open the door?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `6166`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -208,7 +226,7 @@ Day01.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-"L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82"
+6166
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -241,7 +259,7 @@ defmodule Day01Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day01.part2(input) == input
+      assert Day01.part2(input) == 6
     end
   end
 end
@@ -252,7 +270,7 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-Running ExUnit with seed: 257138, max_cases: 28
+Running ExUnit with seed: 647656, max_cases: 28
 
 ..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
@@ -288,15 +306,66 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 8, ...>>, {:run, 1}}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M4 Pro
+Number of Available Cores: 14
+Available memory: 48 GB
+Elixir 1.18.3
+Erlang 27.3
+JIT enabled: true
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+Excluding outliers: false
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+Calculating statistics...
+Formatting results...
+
+Name             ips        average  deviation         median         99th %
+Part 1        2.38 K        0.42 ms     ±9.77%        0.41 ms        0.51 ms
+Part 2        0.49 K        2.02 ms    ±17.05%        1.96 ms        4.40 ms
+
+Comparison: 
+Part 1        2.38 K
+Part 2        0.49 K - 4.82x slower +1.61 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         2.14 MB
+Part 2        16.44 MB - 7.68x memory usage +14.30 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1         0.140 M
+Part 2          1.68 M - 11.95x reduction count +1.54 M
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
