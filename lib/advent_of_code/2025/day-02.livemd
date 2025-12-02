@@ -108,61 +108,31 @@ input = input |> Kino.Input.read()
 defmodule Day02 do
   defdelegate parse(input), to: __MODULE__.Input
 
+  @part1_regex ~r/^([0-9]+)\1$/
   def part1(input) do
     input
     |> parse()
-    |> Enum.flat_map(&find_invalid_ids_part1/1)
-    |> Enum.sum_by(fn {id, _} -> String.to_integer(id) end)
-  end
-
-  def part2(input) do
-    input
-    |> parse()
-    |> Enum.flat_map(&find_invalid_ids_part2/1)
+    |> Enum.flat_map(&find_invalid_ids(&1, @part1_regex)) 
     |> Enum.sum()
   end
 
-  defp find_invalid_ids_part1({low, high}) do
-    low..high
-    |> Stream.map(fn id ->
-      str = to_string(id)
-
-      {str, String.length(str)}
-    end)
-    |> Stream.filter(&is_invalid_part1?/1)
+  @part2_regex ~r/^([0-9]+)\1+$/
+  def part2(input) do
+    input
+    |> parse()
+    |> Enum.flat_map(&find_invalid_ids(&1, @part2_regex))
+    |> Enum.sum()
   end
 
-  defp is_invalid_part1?({_id, len}) when rem(len, 2) == 1, do: false
-
-  defp is_invalid_part1?({id, len}) do
-    with {a, b} <- String.split_at(id, div(len, 2)), do: a == b
-  end
-
-  defp find_invalid_ids_part2({low, high}) do
+  defp find_invalid_ids({low, high}, regex) do
     low..high
     |> Stream.map(&to_string/1)
-    |> Stream.filter(&is_invalid_part2?/1)
+    |> Stream.filter(&is_invalid?(&1, regex))
     |> Stream.map(&String.to_integer/1)
   end
 
-  defp is_invalid_part2?(input) when is_binary(input) do
-    String.split_at(input, 1) |> is_invalid_part2?()
-  end
-
-  defp is_invalid_part2?({head, rest}) when byte_size(head) > byte_size(rest),
-    do: false
-  
-  defp is_invalid_part2?({head, tail}) do
-    tail
-    |> String.split(head)
-    |> Enum.reject(& &1 == "")
-    |> then(fn
-      [] ->
-        true
-      _ ->
-        {h, rest} = String.split_at(tail, 1)
-        is_invalid_part2?({head <> h, rest})
-    end)
+  defp is_invalid?(input, regex) do
+    Regex.match?(regex, input)
   end
 
   defmodule Input do
@@ -185,7 +155,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day02, <<70, 79, 82, 49, 0, 0, 19, ...>>,
+{:module, Day02, <<70, 79, 82, 49, 0, 0, 14, ...>>,
  {:module, Day02.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -262,7 +232,7 @@ ExUnit.run()
 <!-- livebook:{"output":true} -->
 
 ```
-Running ExUnit with seed: 927102, max_cases: 28
+Running ExUnit with seed: 456037, max_cases: 28
 
 ..
 Finished in 0.00 seconds (0.00s async, 0.00s sync)
@@ -332,28 +302,28 @@ Calculating statistics...
 Formatting results...
 
 Name             ips        average  deviation         median         99th %
-Part 1          3.09         0.32 s     ±1.99%         0.32 s         0.35 s
-Part 2          0.36         2.81 s     ±0.16%         2.81 s         2.82 s
+Part 1          0.90         1.12 s     ±0.41%         1.12 s         1.12 s
+Part 2          0.86         1.16 s     ±0.83%         1.16 s         1.17 s
 
 Comparison: 
-Part 1          3.09
-Part 2          0.36 - 8.70x slower +2.49 s
+Part 1          0.90
+Part 2          0.86 - 1.04x slower +0.0463 s
 
 Memory usage statistics:
 
 Name           average  deviation         median         99th %
-Part 1         1.62 GB     ±0.00%        1.62 GB        1.62 GB
-Part 2         3.23 GB     ±0.00%        3.23 GB        3.23 GB
+Part 1       251.83 MB     ±0.00%      251.83 MB      251.83 MB
+Part 2       251.85 MB     ±0.00%      251.85 MB      251.85 MB
 
 Comparison: 
-Part 1         1.62 GB
-Part 2         3.23 GB - 1.99x memory usage +1.61 GB
+Part 1       251.83 MB
+Part 2       251.85 MB - 1.00x memory usage +0.0217 MB
 
 Reduction count statistics:
 
 Name   Reduction count
-Part 1        119.49 M
-Part 2        328.47 M - 2.75x reduction count +208.97 M
+Part 1         65.25 M
+Part 2         67.30 M - 1.03x reduction count +2.05 M
 
 **All measurements for reduction count were the same**
 ```
