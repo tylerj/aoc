@@ -66,9 +66,137 @@ To begin, [get your puzzle input](https://adventofcode.com/2025/day/4/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+Now, the Elves just need help accessing as much of the paper as they can.
 
-**QUESTION TWO?**
+Once a roll of paper can be accessed by a forklift, it can be removed. Once a roll of paper is **removed**, the forklifts might be able to access **more** rolls of paper, which they might also be able to remove. How many total rolls of paper could the Elves remove if they keep repeating this process?
+
+Starting with the same example as above, here is one way you could remove as many rolls of paper as possible, using highlighted `@` to indicate that a roll of paper is about to be removed, and using `x` to indicate that a roll of paper was just removed:
+
+```
+Initial state:
+..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.
+
+Remove 13 rolls of paper:
+..xx.xx@x.
+x@@.@.@.@@
+@@@@@.x.@@
+@.@@@@..@.
+x@.@@@@.@x
+.@@@@@@@.@
+.@.@.@.@@@
+x.@@@.@@@@
+.@@@@@@@@.
+x.x.@@@.x.
+
+Remove 12 rolls of paper:
+.......x..
+.@@.x.x.@x
+x@@@@...@@
+x.@@@@..x.
+.@.@@@@.x.
+.x@@@@@@.x
+.x.@.@.@@@
+..@@@.@@@@
+.x@@@@@@@.
+....@@@...
+
+Remove 7 rolls of paper:
+..........
+.x@.....x.
+.@@@@...xx
+..@@@@....
+.x.@@@@...
+..@@@@@@..
+...@.@.@@x
+..@@@.@@@@
+..x@@@@@@.
+....@@@...
+
+Remove 5 rolls of paper:
+..........
+..x.......
+.x@@@.....
+..@@@@....
+...@@@@...
+..x@@@@@..
+...@.@.@@.
+..x@@.@@@x
+...@@@@@@.
+....@@@...
+
+Remove 2 rolls of paper:
+..........
+..........
+..x@@.....
+..@@@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@x.
+....@@@...
+
+Remove 1 roll of paper:
+..........
+..........
+...@@.....
+..x@@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@..
+....@@@...
+
+Remove 1 roll of paper:
+..........
+..........
+...x@.....
+...@@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@..
+....@@@...
+
+Remove 1 roll of paper:
+..........
+..........
+....x.....
+...@@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@..
+....@@@...
+
+Remove 1 roll of paper:
+..........
+..........
+..........
+...x@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@..
+....@@@...
+```
+
+Stop once no more rolls of paper are accessible by a forklift. In this example, a total of 43 rolls of paper can be removed.
+
+Start with your original diagram. **How many rolls of paper in total can be removed by the Elves and their forklifts?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/4/input).
 
@@ -103,23 +231,38 @@ defmodule Day04 do
   def part1(input) do
     grid = parse(input).grid
 
-    Enum.count(grid, fn
-      {xy, ?@} ->
-        xy
-        |> adjacent_positions()
-        |> Enum.count(fn xy ->
-          Map.get(grid, xy) == ?@
-        end)
-        |> then(&(&1 < 4))
-
-      _ ->
-        false
-    end)
+    Enum.count(grid, &removable_roll?(&1, grid))
   end
 
   def part2(input) do
-    input
-    # |> parse()
+    grid = parse(input).grid
+
+    remove_rolls(grid)
+    |> Enum.count(fn {_, char} -> char == ?x end)
+  end
+
+  defp removable_roll?({xy, ?@}, grid) do
+    xy
+    |> adjacent_positions()
+    |> Enum.count(fn xy ->
+      Map.get(grid, xy) == ?@
+    end)
+    |> then(&(&1 < 4))
+  end
+
+  defp removable_roll?(_, _), do: false
+
+  defp remove_rolls(grid) do
+    new_grid =
+      grid
+      |> Enum.map(fn {xy, char} ->
+        if removable_roll?({xy, char}, grid),
+          do: {xy, ?x},
+          else: {xy, char}
+      end)
+      |> Map.new()
+
+    if new_grid == grid, do: new_grid, else: remove_rolls(new_grid) 
   end
 
   defp adjacent_positions({x, y}) do
@@ -131,7 +274,7 @@ defmodule Day04 do
       {x + 1, y + 1},
       {x + 1, y},
       {x + 1, y - 1},
-      {x, y - 1},
+      {x, y - 1}
     ]
   end
 
@@ -163,7 +306,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day04, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+{:module, Day04, <<70, 79, 82, 49, 0, 0, 17, ...>>,
  {:module, Day04.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
 ```
 
@@ -183,9 +326,9 @@ Day04.part1(input)
 13
 ```
 
-**QUESTION TWO?**
+Start with your original diagram. **How many rolls of paper in total can be removed by the Elves and their forklifts?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `8758`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -196,7 +339,7 @@ Day04.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-"..@@.@@@@.\n@@@.@.@.@@\n@@@@@.@.@@\n@.@@@@..@.\n@@.@@@@.@@\n.@@@@@@@.@\n.@.@.@.@@@\n@.@@@.@@@@\n.@@@@@@@@.\n@.@.@@@.@."
+43
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -229,7 +372,7 @@ defmodule Day04Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day04.part2(input) == input
+      assert Day04.part2(input) == 43
     end
   end
 end
@@ -276,15 +419,70 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 8, ...>>, {:run, 1}}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M4 Pro
+Number of Available Cores: 14
+Available memory: 48 GB
+Elixir 1.18.3
+Erlang 27.3
+JIT enabled: true
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+Excluding outliers: false
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+Calculating statistics...
+Formatting results...
+
+Name             ips        average  deviation         median         99th %
+Part 1        127.00        7.87 ms     ±5.78%        7.69 ms        9.06 ms
+Part 2          3.62      275.91 ms     ±0.78%      275.60 ms      279.97 ms
+
+Comparison: 
+Part 1        127.00
+Part 2          3.62 - 35.04x slower +268.04 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1        17.33 MB     ±0.00%       17.33 MB       17.33 MB
+Part 2       307.97 MB     ±0.29%      307.87 MB      309.23 MB
+
+Comparison: 
+Part 1        17.33 MB
+Part 2       307.97 MB - 17.77x memory usage +290.64 MB
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1          1.31 M     ±0.01%         1.31 M         1.31 M
+Part 2         48.56 M     ±0.04%        48.56 M        48.60 M
+
+Comparison: 
+Part 1          1.31 M
+Part 2         48.56 M - 37.06x reduction count +47.25 M
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
