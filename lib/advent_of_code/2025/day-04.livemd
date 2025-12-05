@@ -1,0 +1,290 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 4 - Advent of Code 2025
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2025/day/4)
+* [AoC Puzzle Input](https://adventofcode.com/2025/day/4/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2025/day-04.livemd)
+
+## Prompt
+
+### --- Day 4: Printing Department ---
+
+You ride the escalator down to the printing department. They're clearly getting ready for Christmas; they have lots of large rolls of paper everywhere, and there's even a massive printer in the corner (to handle the really big print jobs).
+
+Decorating here will be easy: they can make their own decorations. What you really need is a way to get further into the North Pole base while the elevators are offline.
+
+"Actually, maybe we can help with that," one of the Elves replies when you ask for help. "We're pretty sure there's a cafeteria on the other side of the back wall. If we could break through the wall, you'd be able to keep moving. It's too bad all of our forklifts are so busy moving those big rolls of paper around."
+
+If you can optimize the work the forklifts are doing, maybe they would have time to spare to break through the wall.
+
+The rolls of paper (@) are arranged on a large grid; the Elves even have a helpful diagram (your puzzle input) indicating where everything is located.
+
+For example:
+
+```
+..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.
+```
+
+The forklifts can only access a roll of paper if there are **fewer than four rolls of paper** in the eight adjacent positions. If you can figure out which rolls of paper the forklifts can access, they'll spend less time looking and more time breaking down the wall to the cafeteria.
+
+In this example, there are `13` rolls of paper that can be accessed by a forklift (marked with `x`):
+
+```
+..xx.xx@x.
+x@@.@.@.@@
+@@@@@.x.@@
+@.@@@@..@.
+x@.@@@@.@x
+.@@@@@@@.@
+.@.@.@.@@@
+x.@@@.@@@@
+.@@@@@@@@.
+x.x.@@@.x.
+```
+
+Consider your complete diagram of the paper roll locations. **How many rolls of paper can be accessed by a forklift?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2025/day/4/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/4/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"..@@.@@@@.\n@@@.@.@.@@\n@@@@@.@.@@\n@.@@@@..@.\n@@.@@@@.@@\n.@@@@@@@.@\n.@.@.@.@@@\n@.@@@.@@@@\n.@@@@@@@@.\n@.@.@@@.@."
+```
+
+## Solution
+
+```elixir
+defmodule Grid do
+  defstruct grid: %{}, max_x: nil, max_y: nil
+end
+
+defmodule Day04 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    grid = parse(input).grid
+
+    Enum.count(grid, fn
+      {xy, ?@} ->
+        xy
+        |> adjacent_positions()
+        |> Enum.count(fn xy ->
+          Map.get(grid, xy) == ?@
+        end)
+        |> then(&(&1 < 4))
+
+      _ ->
+        false
+    end)
+  end
+
+  def part2(input) do
+    input
+    # |> parse()
+  end
+
+  defp adjacent_positions({x, y}) do
+    [
+      {x - 1, y - 1},
+      {x - 1, y},
+      {x - 1, y + 1},
+      {x, y + 1},
+      {x + 1, y + 1},
+      {x + 1, y},
+      {x + 1, y - 1},
+      {x, y - 1},
+    ]
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &String.to_charlist/1)
+      |> Enum.with_index()
+      |> Enum.reduce(%Grid{}, fn {line, x}, acc ->
+        line
+        |> Enum.with_index()
+        |> Enum.reduce(acc, fn {char, y}, acc ->
+          acc
+          |> Map.update!(:grid, &Map.put(&1, {x, y}, char))
+          |> Map.put(:max_y, y)
+        end)
+        |> Map.put(:max_x, x)
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day04, <<70, 79, 82, 49, 0, 0, 13, ...>>,
+ {:module, Day04.Input, <<70, 79, 82, ...>>, {:parse, 1}}}
+```
+
+Consider your complete diagram of the paper roll locations. **How many rolls of paper can be accessed by a forklift?**
+
+Your puzzle answer was `1397`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+13
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day04.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"..@@.@@@@.\n@@@.@.@.@@\n@@@@@.@.@@\n@.@@@@..@.\n@@.@@@@.@@\n.@@@@@@@.@\n.@.@.@.@@@\n@.@@@.@@@@\n.@@@@@@@@.\n@.@.@@@.@."
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2025) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2025/day/4/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day04Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "..@@.@@@@.\n@@@.@.@.@@\n@@@@@.@.@@\n@.@@@@..@.\n@@.@@@@.@@\n.@@@@@@@.@\n.@.@.@.@@@\n@.@@@.@@@@\n.@@@@@@@@.\n@.@.@@@.@."
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day04.part1(input) == 13
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day04.part2(input) == input
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Running ExUnit with seed: 793042, max_cases: 28
+
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day04.part1(input) end,
+        "Part 2" => fn -> Day04.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+Benchmarking.run(input)
+```
