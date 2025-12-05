@@ -52,9 +52,31 @@ To begin, [get your puzzle input](https://adventofcode.com/2025/day/3/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+The escalator doesn't move. The Elf explains that it probably needs more joltage to overcome the [static friction](https://en.wikipedia.org/wiki/Stiction) of the system and hits the big red "joltage limit safety override" button. You lose count of the number of times she needs to confirm "yes, I'm sure" and decorate the lobby a bit while you wait.
 
-**QUESTION TWO?**
+Now, you need to make the largest joltage by turning on **exactly twelve** batteries within each bank.
+
+The joltage output for the bank is still the number formed by the digits of the batteries you've turned on; the only difference is that now there will be `12` digits in each bank's joltage output instead of two.
+
+Consider again the example from before:
+
+```
+987654321111111
+811111111111119
+234234234234278
+818181911112111
+```
+
+Now, the joltages are much larger:
+
+* In `987654321111111`, the largest joltage can be found by turning on everything except some 1s at the end to produce `987654321111`.
+* In the digit sequence `811111111111119`, the largest joltage can be found by turning on everything except some 1s, producing `811111111119`.
+* In `234234234234278`, the largest joltage can be found by turning on everything except a 2 battery, a 3 battery, and another 2 battery near the start to produce `434234234278`.
+* In `818181911112111`, the joltage `888911112111` is produced by turning on everything except some 1s near the front.
+
+The total output joltage is now much larger: `987654321111` + `811111111119` + `434234234278` + `888911112111` = `3121910778619`.
+
+**What is the new total output joltage?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/3/input).
 
@@ -85,36 +107,74 @@ defmodule Day03 do
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(&get_joltage/1)
+    |> Enum.map(&joltage/1)
     |> Enum.map(&String.to_integer/1)
     |> Enum.sum()
   end
 
   def part2(input) do
     input
-    # |> parse()
-    # |> Enum.map(& &1)
+    |> parse()
+    |> Enum.map(&joltage_p2/1)
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.sum()
   end
   
-  defp get_joltage([a | rest]) do
-    get_joltage({a, ?0, rest})
+  defp joltage([a | rest]) do
+    joltage({a, ?0, rest})
   end
 
-  defp get_joltage({a, b, []}) do
+  defp joltage({a, b, []}) do
     [a, b] |> to_string()
   end
   
-  defp get_joltage({a, _, [c | rest]}) when c > a and rest != [] do
-    get_joltage([c | rest])
+  defp joltage({a, _, [c | rest]}) when c > a and rest != [] do
+    joltage([c | rest])
   end
 
-  defp get_joltage({a, b, [c | rest]}) when c > b do
-    get_joltage({a, c, rest})
+  defp joltage({a, b, [c | rest]}) when c > b do
+    joltage({a, c, rest})
   end
 
-  defp get_joltage({a, b, [_ | rest]}) do
-    get_joltage({a, b, rest})
+  defp joltage({a, b, [_ | rest]}) do
+    joltage({a, b, rest})
   end
+
+  defp joltage_p2(list) when is_list(list) do
+    list
+    |> Enum.reverse()
+    |> Enum.split(12)
+    |> then(fn {a, b} ->
+      joltage_p2({Enum.reverse(a), b})
+    end)
+  end
+
+  defp joltage_p2({a, []}), do: to_string(a)
+
+  defp joltage_p2({[a | tail_a], [b | tail_b]}) when b >= a do
+    {
+      replace_value([a, b], tail_a),
+      tail_b
+    }
+    |> joltage_p2()
+  end
+
+  defp joltage_p2({a, [_ | tail_b]}) do
+    joltage_p2({a, tail_b})
+  end
+
+  defp replace_value([a | head], [b | _] = tail) when b > a do
+    Enum.reverse(head) ++ tail
+  end
+
+  defp replace_value([_ | tail], []) do
+    Enum.reverse(tail)
+  end
+
+  defp replace_value(a, [b | tail]) do
+    replace_value([b | a], tail)
+  end
+  
 
   defmodule Input do
     def parse(input) when is_binary(input) do
@@ -137,7 +197,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day03, <<70, 79, 82, 49, 0, 0, 11, ...>>,
+{:module, Day03, <<70, 79, 82, 49, 0, 0, 15, ...>>,
  {:module, Day03.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -157,9 +217,9 @@ Day03.part1(input)
 357
 ```
 
-**QUESTION TWO?**
+**What is the new total output joltage?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `172162399742349`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -170,7 +230,7 @@ Day03.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-"987654321111111\n811111111111119\n234234234234278\n818181911112111"
+3121910778619
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -203,7 +263,7 @@ defmodule Day03Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day03.part2(input) == input
+      assert Day03.part2(input) == 3121910778619
     end
   end
 end
@@ -250,15 +310,68 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 8, ...>>, {:run, 1}}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M4 Pro
+Number of Available Cores: 14
+Available memory: 48 GB
+Elixir 1.18.3
+Erlang 27.3
+JIT enabled: true
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+Excluding outliers: false
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+Calculating statistics...
+Formatting results...
+
+Name             ips        average  deviation         median         99th %
+Part 1       10.04 K       99.63 μs    ±10.81%       97.50 μs      127.71 μs
+Part 2        6.12 K      163.49 μs    ±10.68%      159.87 μs      227.16 μs
+
+Comparison: 
+Part 1       10.04 K
+Part 2        6.12 K - 1.64x slower +63.86 μs
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1         0.97 MB     ±0.00%        0.97 MB        0.97 MB
+Part 2         1.47 MB     ±0.00%        1.47 MB        1.47 MB
+
+Comparison: 
+Part 1         0.97 MB
+Part 2         1.47 MB - 1.51x memory usage +0.50 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1         32.99 K
+Part 2         50.47 K - 1.53x reduction count +17.48 K
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
