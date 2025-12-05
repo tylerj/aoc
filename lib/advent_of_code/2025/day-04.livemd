@@ -237,17 +237,19 @@ defmodule Day04 do
   def part2(input) do
     grid = parse(input).grid
 
-    remove_rolls(grid)
+    grid
+    |> remove_rolls()
     |> Enum.count(fn {_, char} -> char == ?x end)
   end
 
+  @allowed_adjacent_rolls 3
   defp removable_roll?({xy, ?@}, grid) do
     xy
     |> adjacent_positions()
     |> Enum.count(fn xy ->
       Map.get(grid, xy) == ?@
     end)
-    |> then(&(&1 < 4))
+    |> then(&(&1 <= @allowed_adjacent_rolls))
   end
 
   defp removable_roll?(_, _), do: false
