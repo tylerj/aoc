@@ -1,0 +1,256 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 5 - Advent of Code 2025
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2025/day/5)
+* [AoC Puzzle Input](https://adventofcode.com/2025/day/5/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2025/day-05.livemd)
+
+## Prompt
+
+### --- Day 5: Cafeteria ---
+
+As the forklifts break through the wall, the Elves are delighted to discover that there was a cafeteria on the other side after all.
+
+You can hear a commotion coming from the kitchen. "At this rate, we won't have any time left to put the wreaths up in the dining hall!" Resolute in your quest, you investigate.
+
+"If only we hadn't switched to the new inventory management system right before Christmas!" another Elf exclaims. You ask what's going on.
+
+The Elves in the kitchen explain the situation: because of their complicated new inventory management system, they can't figure out which of their ingredients are **fresh** and which are **spoiled**. When you ask how it works, they give you a copy of their database (your puzzle input).
+
+The database operates on **ingredient IDs**. It consists of a list of **fresh ingredient ID ranges**, a blank line, and a list of **available ingredient IDs**. For example:
+
+```
+3-5
+10-14
+16-20
+12-18
+
+1
+5
+8
+11
+17
+32
+```
+
+The fresh ID ranges are **inclusive**: the range 3-5 means that ingredient IDs 3, 4, and 5 are all **fresh**. The ranges can also **overlap**; an ingredient ID is fresh if it is in **any** range.
+
+The Elves are trying to determine which of the **available ingredient IDs** are **fresh**. In this example, this is done as follows:
+
+* Ingredient ID `1` is spoiled because it does not fall into any range.
+* Ingredient ID `5` is **fresh** because it falls into range `3-5`.
+* Ingredient ID `8` is spoiled.
+* Ingredient ID `11` is **fresh** because it falls into range `10-14`.
+* Ingredient ID `17` is **fresh** because it falls into range `16-20` as well as range `12-18`.
+* Ingredient ID `32` is spoiled.
+
+So, in this example, 3 of the available ingredient IDs are fresh.
+
+Process the database file from the new inventory management system. **How many of the available ingredient IDs are fresh?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2025/day/5/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/5/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"3-5\n10-14\n16-20\n12-18\n\n1\n5\n8\n11\n17\n32"
+```
+
+## Solution
+
+```elixir
+defmodule Day05 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    {ranges, ingredients} = parse(input)
+
+    Enum.count(ingredients, fn i ->
+      Enum.any?(ranges, &(i in &1))
+    end)
+  end
+
+  def part2(input) do
+    input
+    # |> parse()
+    # |> Enum.map(& &1)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      [ranges, ingredients] = String.split(input, "\n\n", trim: true)
+
+      {
+        ranges |> to_lines() |> Enum.map(&parse_range/1),
+        ingredients |> to_lines() |> Enum.map(&String.to_integer/1)
+      }
+    end
+
+    defp to_lines(input) do
+      String.split(input, "\n", trim: true)
+    end
+
+    def parse_range(range) do
+      [a, z] = String.split(range, "-")
+      String.to_integer(a)..String.to_integer(z)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day05, <<70, 79, 82, 49, 0, 0, 9, ...>>, ...}
+```
+
+**How many of the available ingredient IDs are fresh?**
+
+Your puzzle answer was `874`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day05.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+3
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day05.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"3-5\n10-14\n16-20\n12-18\n\n1\n5\n8\n11\n17\n32"
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2025) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2025/day/5/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day05Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: "3-5\n10-14\n16-20\n12-18\n\n1\n5\n8\n11\n17\n32"
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day05.part1(input) == 3
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day05.part2(input) == input
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Running ExUnit with seed: 145688, max_cases: 16
+
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, failures: 0, excluded: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day05.part1(input) end,
+        "Part 2" => fn -> Day05.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+Benchmarking.run(input)
+```
