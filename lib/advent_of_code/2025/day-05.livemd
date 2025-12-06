@@ -61,9 +61,22 @@ To begin, [get your puzzle input](https://adventofcode.com/2025/day/5/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+The Elves start bringing their spoiled inventory to the trash chute at the back of the kitchen.
 
-**QUESTION TWO?**
+So that they can stop bugging you when they get new inventory, the Elves would like to know **all** of the IDs that the **fresh ingredient ID ranges** consider to be **fresh**. An ingredient ID is still considered fresh if it is in any range.
+
+Now, the second section of the database (the available ingredient IDs) is irrelevant. Here are the fresh ingredient ID ranges from the above example:
+
+```
+3-5
+10-14
+16-20
+12-18
+```
+
+The ingredient IDs that these ranges consider to be fresh are 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, and 20. So, in this example, the fresh ingredient ID ranges consider a total of **14** ingredient IDs to be fresh.
+
+Process the database file again. **How many ingredient IDs are considered to be fresh according to the fresh ingredient ID ranges?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/5/input).
 
@@ -100,18 +113,36 @@ defmodule Day05 do
   end
 
   def part2(input) do
-    input
-    # |> parse()
-    # |> Enum.map(& &1)
+    {ranges, _} = parse(input)
+
+    Enum.reduce(ranges, [], fn range, acc ->
+      acc
+      |> Enum.reduce({range, []}, &combine_ranges/2)
+      |> then(fn {combined_range, acc} -> [combined_range | acc] end)
+    end)
+    |> Enum.sum_by(&Range.size/1)
   end
+
+  # 3..5, 10..14
+  # 10..14, 3..5
+  defp combine_ranges(a..b//1, {c..d//1, acc}) when c > b or a > d,
+    do: {c..d, [a..b | acc]}
+
+  # 12..18, 16..20
+  # 16..20, 12..18
+  defp combine_ranges(a..b//1, {c..d//1, acc}) when c <= b and d >= a,
+    do: {min(a, c)..max(b, d), acc}
 
   defmodule Input do
     def parse(input) when is_binary(input) do
-      [ranges, ingredients] = String.split(input, "\n\n", trim: true)
+      [ranges, ingredients] = 
+        input
+        |> String.split("\n\n", trim: true)
+        |> Enum.map(&to_lines/1)
 
       {
-        ranges |> to_lines() |> Enum.map(&parse_range/1),
-        ingredients |> to_lines() |> Enum.map(&String.to_integer/1)
+        Enum.map(ranges, &parse_range/1),
+        Enum.map(ingredients, &String.to_integer/1)
       }
     end
 
@@ -130,7 +161,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day05, <<70, 79, 82, 49, 0, 0, 9, ...>>, ...}
+{:module, Day05, <<70, 79, 82, 49, 0, 0, 14, ...>>, ...}
 ```
 
 **How many of the available ingredient IDs are fresh?**
@@ -149,9 +180,9 @@ Day05.part1(input)
 3
 ```
 
-**QUESTION TWO?**
+Process the database file again. **How many ingredient IDs are considered to be fresh according to the fresh ingredient ID ranges?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `348548952146313`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -162,7 +193,7 @@ Day05.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-"3-5\n10-14\n16-20\n12-18\n\n1\n5\n8\n11\n17\n32"
+14
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -195,7 +226,7 @@ defmodule Day05Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day05.part2(input) == input
+      assert Day05.part2(input) == 14
     end
   end
 end
@@ -242,15 +273,66 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 8, ...>>, ...}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.19.4
+Erlang 28.2
+JIT enabled: true
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+Excluding outliers: false
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+Calculating statistics...
+Formatting results...
+
+Name             ips        average  deviation         median         99th %
+Part 2        2.84 K        0.35 ms    ±16.16%        0.34 ms        0.45 ms
+Part 1        0.39 K        2.55 ms    ±10.90%        2.54 ms        2.66 ms
+
+Comparison: 
+Part 2        2.84 K
+Part 1        0.39 K - 7.25x slower +2.20 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 2         1.46 MB
+Part 1       0.0862 MB - 0.06x memory usage -1.37627 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 2        0.0870 M
+Part 1          1.01 M - 11.57x reduction count +0.92 M
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
