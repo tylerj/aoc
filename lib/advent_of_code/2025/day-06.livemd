@@ -54,9 +54,29 @@ To begin, [get your puzzle input](https://adventofcode.com/2025/day/6/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+The big cephalopods come back to check on how things are going. When they see that your grand total doesn't match the one expected by the worksheet, they realize they forgot to explain how to read cephalopod math.
 
-**QUESTION TWO?**
+Cephalopod math is written **right-to-left in columns**. Each number is given in its own column, with the most significant digit at the top and the least significant digit at the bottom. (Problems are still separated with a column consisting only of spaces, and the symbol at the bottom of the problem is still the operator to use.)
+
+Here's the example worksheet again:
+
+```
+123 328  51 64 
+ 45 64  387 23 
+  6 98  215 314
+*   +   *   +  
+```
+
+Reading the problems right-to-left one column at a time, the problems are now quite different:
+
+* The rightmost problem is 4 + 431 + 623 = **1058**
+* The second problem from the right is 175 * 581 * 32 = **3253600**
+* The third problem from the right is 8 + 248 + 369 = **625**
+* Finally, the leftmost problem is 356 * 24 * 1 = **8544**
+
+Now, the grand total is 1058 + 3253600 + 625 + 8544 = **3263827**.
+
+Solve the problems on the math worksheet again. **What is the grand total found by adding together all of the answers to the individual problems?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/6/input).
 
@@ -82,18 +102,24 @@ input = input |> Kino.Input.read()
 
 ```elixir
 defmodule Day06 do
-  defdelegate parse(input), to: __MODULE__.Input
+  defdelegate parse(input, part), to: __MODULE__.Input
 
   def part1(input) do
     input
-    |> parse()
+    |> parse("part1")
     |> Enum.sum_by(&do_problem/1)
   end
 
   def part2(input) do
     input
-    # |> parse()
-    # |> Enum.map(& &1)
+    |> parse("part2")
+    |> Enum.map(&convert_column/1)
+    |> build_problems(nil, [])
+    |> Enum.sum_by(&do_problem/1)
+  end
+
+  defp do_problem(problem) when is_tuple(problem) do
+    problem |> Tuple.to_list() |> do_problem()
   end
 
   defp do_problem(problem) do
@@ -102,10 +128,7 @@ defmodule Day06 do
       :* -> 1
     end
 
-    [operator | operands] =
-      problem
-      |> Tuple.to_list()
-      |> Enum.reverse()
+    [operator | operands] = Enum.reverse(problem)
 
     Enum.reduce(
       operands,
@@ -114,27 +137,76 @@ defmodule Day06 do
     )
   end
 
+  defp convert_column(column) do
+    column
+    |> Tuple.to_list()
+    |> Enum.reverse()
+    |> normalize_column()
+  end
+
+  defp normalize_column([operator | digits]) when operator in [?+, ?*] do
+    {operator, normalize_digits(digits)}
+  end
+
+  defp normalize_column([?\s | digits]) do
+    if Enum.all?(digits, &(&1 == ?\s)),
+      do: nil,
+      else: normalize_digits(digits)
+  end
+
+  defp normalize_digits(digits) do
+    digits
+    |> Enum.reverse()
+    |> to_string()
+    |> String.replace(" ", "")
+    |> String.to_integer()
+  end
+
+  defp build_problems([], current, all) do
+    [current | all]
+  end
+
+  defp build_problems([nil | rest], current, all) do
+    build_problems(rest, nil, [current | all])
+  end
+
+  defp build_problems([{?+, operand} | rest], nil, all) do
+    build_problems(rest, [operand, :+], all)
+  end
+
+  defp build_problems([{?*, operand} | rest], nil, all) do
+    build_problems(rest, [operand, :*], all)
+  end
+
+  defp build_problems([operand | rest], current, all) do
+    build_problems(rest, [operand | current], all)
+  end
+
   defmodule Input do
-    def parse(input) when is_binary(input) do
+    def parse(input, part) when is_binary(input) do
       input
       |> String.splitter("\n", trim: true)
-      |> parse()
+      |> parse(part)
     end
 
-    def parse(input) do
+    def parse(input, "part1") do
       input
-      |> Stream.map(&parse_line/1)
+      |> Stream.map(fn line ->
+        line
+        |> String.split(" ", trim: true)
+        |> Enum.map(fn
+          "+" -> :+
+          "*" -> :*
+          i -> String.to_integer(i)
+        end)
+      end)
       |> Enum.zip()
     end
 
-    def parse_line(line) do
-      line
-      |> String.split(" ", trim: true)
-      |> Enum.map(fn
-        "+" -> :+
-        "*" -> :*
-        i -> String.to_integer(i)
-      end)
+    def parse(input, "part2") do
+      input
+      |> Stream.map(&String.to_charlist/1)
+      |> Enum.zip()
     end
   end
 end
@@ -143,7 +215,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day06, <<70, 79, 82, 49, 0, 0, 11, ...>>, ...}
+{:module, Day06, <<70, 79, 82, 49, 0, 0, 18, ...>>, ...}
 ```
 
 Solve the problems on the math worksheet. **What is the grand total found by adding together all of the answers to the individual problems?**
@@ -162,9 +234,9 @@ Day06.part1(input)
 4277556
 ```
 
-**QUESTION TWO?**
+Solve the problems on the math worksheet again. **What is the grand total found by adding together all of the answers to the individual problems?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `9695042567249`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -175,7 +247,7 @@ Day06.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-"123 328  51 64 \n 45 64  387 23 \n  6 98  215 314\n*   +   *   +  "
+3263827
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -208,7 +280,7 @@ defmodule Day06Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day06.part2(input) == input
+      assert Day06.part2(input) == 3263827
     end
   end
 end
@@ -255,15 +327,66 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 8, ...>>, ...}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.19.4
+Erlang 28.2
+JIT enabled: true
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+Excluding outliers: false
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+Calculating statistics...
+Formatting results...
+
+Name             ips        average  deviation         median         99th %
+Part 1        1.60 K        0.62 ms    ±12.52%        0.62 ms        0.73 ms
+Part 2        0.58 K        1.72 ms     ±7.10%        1.72 ms        1.88 ms
+
+Comparison: 
+Part 1        1.60 K
+Part 2        0.58 K - 2.76x slower +1.10 ms
+
+Memory usage statistics:
+
+Name      Memory usage
+Part 1         1.62 MB
+Part 2         5.49 MB - 3.39x memory usage +3.87 MB
+
+**All measurements for memory usage were the same**
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1        125.36 K
+Part 2        421.67 K - 3.36x reduction count +296.31 K
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
