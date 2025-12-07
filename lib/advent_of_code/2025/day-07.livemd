@@ -1,0 +1,380 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 7 - Advent of Code 2025
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2025/day/7)
+* [AoC Puzzle Input](https://adventofcode.com/2025/day/7/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2025/day-07.livemd)
+
+## Prompt
+
+### --- Day 7: Laboratories ---
+
+You thank the cephalopods for the help and exit the trash compactor, finding yourself in the [familiar](https://adventofcode.com/2024/day/6) [halls](https://adventofcode.com/2018/day/4) of a North Pole research wing.
+
+Based on the large sign that says "teleporter hub", they seem to be researching **teleportation**; you can't help but try it for yourself and step onto the large yellow teleporter pad.
+
+Suddenly, you find yourself in an unfamiliar room! The room has no doors; the only way out is the teleporter. Unfortunately, the teleporter seems to be leaking [magic smoke](https://en.wikipedia.org/wiki/Magic_smoke).
+
+Since this is a teleporter lab, there are lots of spare parts, manuals, and diagnostic equipment lying around. After connecting one of the diagnostic tools, it helpfully displays error code 0H-N0, which apparently means that there's an issue with one of the **tachyon manifolds**.
+
+You quickly locate a diagram of the tachyon manifold (your puzzle input). A tachyon beam enters the manifold at the location marked `S`; tachyon beams always move **downward**. Tachyon beams pass freely through empty space (`.`). However, if a tachyon beam encounters a splitter (`^`), the beam is stopped; instead, a new tachyon beam continues from the immediate left and from the immediate right of the splitter.
+
+For example:
+
+```
+.......S.......
+...............
+.......^.......
+...............
+......^.^......
+...............
+.....^.^.^.....
+...............
+....^.^...^....
+...............
+...^.^...^.^...
+...............
+..^...^.....^..
+...............
+.^.^.^.^.^...^.
+...............
+```
+
+In this example, the incoming tachyon beam (|) extends downward from S until it reaches the first splitter:
+
+```
+.......S.......
+.......|.......
+.......^.......
+...............
+......^.^......
+...............
+.....^.^.^.....
+...............
+....^.^...^....
+...............
+...^.^...^.^...
+...............
+..^...^.....^..
+...............
+.^.^.^.^.^...^.
+...............
+```
+
+At that point, the original beam stops, and two new beams are emitted from the splitter:
+
+```
+.......S.......
+.......|.......
+......|^|......
+...............
+......^.^......
+...............
+.....^.^.^.....
+...............
+....^.^...^....
+...............
+...^.^...^.^...
+...............
+..^...^.....^..
+...............
+.^.^.^.^.^...^.
+...............
+```
+
+Those beams continue downward until they reach more splitters:
+
+```
+.......S.......
+.......|.......
+......|^|......
+......|.|......
+......^.^......
+...............
+.....^.^.^.....
+...............
+....^.^...^....
+...............
+...^.^...^.^...
+...............
+..^...^.....^..
+...............
+.^.^.^.^.^...^.
+...............
+```
+
+At this point, the two splitters create a total of only three tachyon beams, since they are both dumping tachyons into the same place between them:
+
+```
+.......S.......
+.......|.......
+......|^|......
+......|.|......
+.....|^|^|.....
+...............
+.....^.^.^.....
+...............
+....^.^...^....
+...............
+...^.^...^.^...
+...............
+..^...^.....^..
+...............
+.^.^.^.^.^...^.
+...............
+```
+
+This process continues until all of the tachyon beams reach a splitter or exit the manifold:
+
+```
+.......S.......
+.......|.......
+......|^|......
+......|.|......
+.....|^|^|.....
+.....|.|.|.....
+....|^|^|^|....
+....|.|.|.|....
+...|^|^|||^|...
+...|.|.|||.|...
+..|^|^|||^|^|..
+..|.|.|||.|.|..
+.|^|||^||.||^|.
+.|.|||.||.||.|.
+|^|^|^|^|^|||^|
+|.|.|.|.|.|||.|
+```
+
+To repair the teleporter, you first need to understand the beam-splitting properties of the tachyon manifold. In this example, a tachyon beam is split a total of **21** times.
+
+Analyze your manifold diagram. **How many times will the beam be split?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2025/day/7/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/7/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+".......S.......\n...............\n.......^.......\n...............\n......^.^......\n...............\n.....^.^.^.....\n...............\n....^.^...^....\n...............\n...^.^...^.^...\n...............\n..^...^.....^..\n...............\n.^.^.^.^.^...^.\n..............."
+```
+
+## Solution
+
+```elixir
+defmodule Grid do
+  defstruct grid: %{}, start: nil, max_x: nil, max_y: nil
+end
+
+defmodule Day07 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    grid = parse(input)
+    {x, y} = grid.start
+
+    count_splits(0, x + 1, [y], grid)
+  end
+
+  def part2(input) do
+    input
+    # |> parse()
+  end
+  
+  defp count_splits(split_count, x, _, grid) when x > grid.max_x,
+    do: split_count
+    
+  defp count_splits(split_count, x, ys, grid) do
+    {splits, not_split} = Enum.split_with(ys, &(grid.grid[{x, &1}] == ?^))
+
+    new_ys = Enum.flat_map(splits, fn y -> [y - 1, y + 1] end)
+    new_ys = Enum.uniq(new_ys ++ not_split)
+
+    new_count = split_count + Enum.count(splits)
+    
+    count_splits(new_count, x + 1, new_ys, grid)
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &String.to_charlist/1)
+      |> Enum.with_index()
+      |> Enum.reduce(%Grid{}, fn {line, x}, acc ->
+        line
+        |> Enum.with_index()
+        |> Enum.reduce(acc, fn
+          {?S, y}, acc ->
+            Map.put(acc, :start, {x, y})
+
+          {char, y}, acc ->
+            acc
+            |> Map.update!(:grid, &Map.put(&1, {x, y}, char))
+            |> Map.put(:max_y, y)
+        end)
+        |> Map.put(:max_x, x)
+      end)
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day07, <<70, 79, 82, 49, 0, 0, 14, ...>>, ...}
+```
+
+Analyze your manifold diagram. **How many times will the beam be split?**
+
+Your puzzle answer was `1550`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day07.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+21
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day07.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+".......S.......\n...............\n.......^.......\n...............\n......^.^......\n...............\n.....^.^.^.....\n...............\n....^.^...^....\n...............\n...^.^...^.^...\n...............\n..^...^.....^..\n...............\n.^.^.^.^.^...^.\n..............."
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2025) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2025/day/7/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day07Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ".......S.......\n...............\n.......^.......\n...............\n......^.^......\n...............\n.....^.^.^.....\n...............\n....^.^...^....\n...............\n...^.^...^.^...\n...............\n..^...^.....^..\n...............\n.^.^.^.^.^...^.\n..............."
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.part1(input) == 21
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day07.part2(input) == input
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Running ExUnit with seed: 678749, max_cases: 16
+
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{total: 2, excluded: 0, failures: 0, skipped: 0}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day07.part1(input) end,
+        "Part 2" => fn -> Day07.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+Benchmarking.run(input)
+```
