@@ -162,9 +162,80 @@ To begin, [get your puzzle input](https://adventofcode.com/2025/day/7/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+With your analysis of the manifold complete, you begin fixing the teleporter. However, as you open the side of the teleporter to replace the broken manifold, you are surprised to discover that it isn't a classical tachyon manifold - it's a **quantum tachyon manifold**.
 
-**QUESTION TWO?**
+With a quantum tachyon manifold, only a **single tachyon particle** is sent through the manifold. A tachyon particle takes **both** the left and right path of each splitter encountered.
+
+Since this is impossible, the manual recommends the many-worlds interpretation of quantum tachyon splitting: each time a particle reaches a splitter, it's actually **time itself** which splits. In one timeline, the particle went left, and in the other timeline, the particle went right.
+
+To fix the manifold, what you really need to know is the **number of timelines** active after a single particle completes all of its possible journeys through the manifold.
+
+In the above example, there are many timelines. For instance, there's the timeline where the particle always went left:
+
+```
+.......S.......
+.......|.......
+......|^.......
+......|........
+.....|^.^......
+.....|.........
+....|^.^.^.....
+....|..........
+...|^.^...^....
+...|...........
+..|^.^...^.^...
+..|............
+.|^...^.....^..
+.|.............
+|^.^.^.^.^...^.
+|..............
+```
+
+Or, there's the timeline where the particle alternated going left and right at each splitter:
+
+```
+.......S.......
+.......|.......
+......|^.......
+......|........
+......^|^......
+.......|.......
+.....^|^.^.....
+......|........
+....^.^|..^....
+.......|.......
+...^.^.|.^.^...
+.......|.......
+..^...^|....^..
+.......|.......
+.^.^.^|^.^...^.
+......|........
+```
+
+Or, there's the timeline where the particle ends up at the same point as the alternating timeline, but takes a totally different path to get there:
+
+```
+.......S.......
+.......|.......
+......|^.......
+......|........
+.....|^.^......
+.....|.........
+....|^.^.^.....
+....|..........
+....^|^...^....
+.....|.........
+...^.^|..^.^...
+......|........
+..^..|^.....^..
+.....|.........
+.^.^.^|^.^...^.
+......|........
+```
+
+In this example, in total, the particle ends up on `40` different timelines.
+
+Apply the many-worlds interpretation of quantum tachyon splitting to your manifold diagram. **In total, how many different timelines would a single tachyon particle end up on?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/7/input).
 
@@ -200,26 +271,48 @@ defmodule Day07 do
     grid = parse(input)
     {x, y} = grid.start
 
-    count_splits(0, x + 1, [y], grid)
+    count_splits_p1(0, x + 1, [y], grid)
   end
 
   def part2(input) do
-    input
-    # |> parse()
+    grid = parse(input)
+    {x, y} = grid.start
+
+    count_splits_p2(x + 1, %{y => 1}, grid)
   end
-  
-  defp count_splits(split_count, x, _, grid) when x > grid.max_x,
+
+  defp count_splits_p1(split_count, x, _, grid) when x > grid.max_x,
     do: split_count
-    
-  defp count_splits(split_count, x, ys, grid) do
+
+  defp count_splits_p1(split_count, x, ys, grid) do
     {splits, not_split} = Enum.split_with(ys, &(grid.grid[{x, &1}] == ?^))
 
     new_ys = Enum.flat_map(splits, fn y -> [y - 1, y + 1] end)
     new_ys = Enum.uniq(new_ys ++ not_split)
 
     new_count = split_count + Enum.count(splits)
-    
-    count_splits(new_count, x + 1, new_ys, grid)
+
+    count_splits_p1(new_count, x + 1, new_ys, grid)
+  end
+
+  defp count_splits_p2(x, ys, grid) when x > grid.max_x,
+    do: Enum.sum_by(ys, fn {_, count} -> count end)
+
+  defp count_splits_p2(x, ys, grid) do
+    {splits, not_split} =
+      Enum.split_with(ys, fn {y, _count} ->
+        grid.grid[{x, y}] == ?^
+      end)
+
+    splits = Enum.flat_map(splits, fn {y, count} -> [{y - 1, count}, {y + 1, count}] end)
+
+    new_ys =
+      (splits ++ not_split)
+      |> Enum.reduce(%{}, fn {key, value}, acc ->
+        Map.update(acc, key, value, fn existing -> existing + value end)
+      end)
+
+    count_splits_p2(x + 1, new_ys, grid)
   end
 
   defmodule Input do
@@ -254,7 +347,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day07, <<70, 79, 82, 49, 0, 0, 14, ...>>, ...}
+{:module, Day07, <<70, 79, 82, 49, 0, 0, 21, ...>>, ...}
 ```
 
 Analyze your manifold diagram. **How many times will the beam be split?**
@@ -273,9 +366,9 @@ Day07.part1(input)
 21
 ```
 
-**QUESTION TWO?**
+Apply the many-worlds interpretation of quantum tachyon splitting to your manifold diagram. **In total, how many different timelines would a single tachyon particle end up on?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `9897897326778`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -286,7 +379,7 @@ Day07.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-".......S.......\n...............\n.......^.......\n...............\n......^.^......\n...............\n.....^.^.^.....\n...............\n....^.^...^....\n...............\n...^.^...^.^...\n...............\n..^...^.....^..\n...............\n.^.^.^.^.^...^.\n..............."
+40
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -319,7 +412,7 @@ defmodule Day07Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day07.part2(input) == input
+      assert Day07.part2(input) == 40
     end
   end
 end
@@ -366,15 +459,68 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 8, ...>>, ...}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M1
+Number of Available Cores: 8
+Available memory: 8 GB
+Elixir 1.19.4
+Erlang 28.2
+JIT enabled: true
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+Excluding outliers: false
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+Calculating statistics...
+Formatting results...
+
+Name             ips        average  deviation         median         99th %
+Part 1        158.43        6.31 ms     ±8.96%        6.15 ms        7.43 ms
+Part 2        153.60        6.51 ms     ±7.93%        6.62 ms        7.14 ms
+
+Comparison: 
+Part 1        158.43
+Part 2        153.60 - 1.03x slower +0.198 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1        15.36 MB     ±0.00%       15.36 MB       15.36 MB
+Part 2        16.07 MB     ±0.00%       16.07 MB       16.07 MB
+
+Comparison: 
+Part 1        15.36 MB
+Part 2        16.07 MB - 1.05x memory usage +0.71 MB
+
+Reduction count statistics:
+
+Name   Reduction count
+Part 1        323.17 K
+Part 2        368.38 K - 1.14x reduction count +45.21 K
+
+**All measurements for reduction count were the same**
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
