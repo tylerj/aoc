@@ -75,9 +75,11 @@ To begin, [get your puzzle input](https://adventofcode.com/2025/day/8/input).
 
 ### --- Part Two ---
 
-Part Two prompt
+The Elves were right; they **definitely** don't have enough extension cables. You'll need to keep connecting junction boxes together until they're all in **one large circuit.**
 
-**QUESTION TWO?**
+Continuing the above example, the first connection which causes all of the junction boxes to form a single circuit is between the junction boxes at `216,146,977` and `117,168,530`. The Elves need to know how far those junction boxes are from the wall so they can pick the right extension cable; multiplying the X coordinates of those two junction boxes (`216` and `117`) produces `25272`.
+
+Continue connecting the closest unconnected pairs of junction boxes together until they're all in the same circuit. **What do you get if you multiply together the X coordinates of the last two junction boxes you need to connect?**
 
 Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/8/input).
 
@@ -105,7 +107,7 @@ input = input |> Kino.Input.read()
 defmodule Day08 do
   defdelegate parse(input), to: __MODULE__.Input
 
-  def part1(input, num_circuits) do
+  def part1(input, num_circuits \\ 1000) do
     points = input |> parse() |> Enum.to_list()
     index = points |> Enum.map(&{&1, &1}) |> Map.new()
     circuits = points |> Enum.map(&{&1, [&1]}) |> Map.new()
@@ -127,9 +129,23 @@ defmodule Day08 do
   end
 
   def part2(input) do
-    input
-    # |> parse()
-    # |> Enum.map(& &1)
+    points = input |> parse() |> Enum.to_list()
+    index = points |> Enum.map(&{&1, &1}) |> Map.new()
+    circuits = points |> Enum.map(&{&1, [&1]}) |> Map.new()
+
+    points
+    |> all_pairs()
+    |> List.flatten()
+    |> Enum.sort_by(&calc_distance/1)
+    |> Enum.reduce_while({index, circuits}, fn pair, acc ->
+      {index, circuits} = join_circuits(pair, acc)
+
+      calc_product = fn {{x1, _, _}, {x2, _, _}} -> x1 * x2 end
+
+      if map_size(circuits) == 1,
+        do: {:halt, calc_product.(pair)},
+        else: {:cont, {index, circuits}}
+    end)
   end
 
   defp all_pairs([h | [t]]), do: {h, t}
@@ -195,7 +211,7 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
-{:module, Day08, <<70, 79, 82, 49, 0, 0, 20, ...>>,
+{:module, Day08, <<70, 79, 82, 49, 0, 0, 25, ...>>,
  {:module, Day08.Input, <<70, 79, 82, ...>>, {:parse_line, 1}}}
 ```
 
@@ -206,18 +222,18 @@ Your puzzle answer was `75582`.
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day08.part1(input, 1000)
+Day08.part1(input, 10)
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
-20
+40
 ```
 
-**QUESTION TWO?**
+Continue connecting the closest unconnected pairs of junction boxes together until they're all in the same circuit. **What do you get if you multiply together the X coordinates of the last two junction boxes you need to connect?**
 
-Your puzzle answer was `answer two`.
+Your puzzle answer was `59039696`.
 
 <!-- livebook:{"reevaluate_automatically":true} -->
 
@@ -228,7 +244,7 @@ Day08.part2(input)
 <!-- livebook:{"output":true} -->
 
 ```
-"162,817,812\n57,618,57\n906,360,560\n592,479,940\n352,342,300\n466,668,158\n542,29,236\n431,825,988\n739,650,466\n52,470,668\n216,146,977\n819,987,18\n117,168,530\n805,96,715\n346,949,466\n970,615,88\n941,993,340\n862,61,35\n984,92,344\n425,690,689"
+25272
 ```
 
 Both parts of this puzzle are complete! They provide two gold stars: **
@@ -261,7 +277,7 @@ defmodule Day08Test do
 
   describe "part2/1" do
     test "returns expected value", %{input: input} do
-      assert Day08.part2(input) == input
+      assert Day08.part2(input) == 25272
     end
   end
 end
@@ -275,7 +291,7 @@ ExUnit.run()
 Running ExUnit with seed: 938843, max_cases: 28
 
 ..
-Finished in 0.01 seconds (0.00s async, 0.01s sync)
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
 2 tests, 0 failures
 ```
 
@@ -308,15 +324,70 @@ end
 <!-- livebook:{"output":true} -->
 
 ```
+{:module, Benchmarking, <<70, 79, 82, 49, 0, 0, 8, ...>>, {:run, 1}}
+```
 
+```elixir
+Benchmarking.run(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+Operating System: macOS
+CPU Information: Apple M4 Pro
+Number of Available Cores: 14
+Available memory: 48 GB
+Elixir 1.18.3
+Erlang 27.3
+JIT enabled: true
+
+Benchmark suite executing with the following configuration:
+warmup: 2 s
+time: 5 s
+memory time: 2 s
+reduction time: 2 s
+parallel: 1
+inputs: none specified
+Estimated total run time: 22 s
+Excluding outliers: false
+
+Benchmarking Part 1 ...
+Benchmarking Part 2 ...
+Calculating statistics...
+Formatting results...
+
+Name             ips        average  deviation         median         99th %
+Part 1          6.62      151.06 ms    ±11.49%      145.92 ms      202.92 ms
+Part 2          6.40      156.20 ms    ±10.98%      150.35 ms      215.76 ms
+
+Comparison: 
+Part 1          6.62
+Part 2          6.40 - 1.03x slower +5.14 ms
+
+Memory usage statistics:
+
+Name           average  deviation         median         99th %
+Part 1       202.46 MB     ±0.00%      202.46 MB      202.46 MB
+Part 2       218.78 MB     ±0.00%      218.78 MB      218.78 MB
+
+Comparison: 
+Part 1       202.46 MB
+Part 2       218.78 MB - 1.08x memory usage +16.32 MB
+
+Reduction count statistics:
+
+Name           average  deviation         median         99th %
+Part 1         19.43 M     ±0.01%        19.43 M        19.43 M
+Part 2         19.65 M     ±0.01%        19.65 M        19.65 M
+
+Comparison: 
+Part 1         19.43 M
+Part 2         19.65 M - 1.01x reduction count +0.22 M
 ```
 
 <!-- livebook:{"output":true} -->
 
 ```
 nil
-```
-
-```elixir
-Benchmarking.run(input)
 ```
