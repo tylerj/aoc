@@ -1,0 +1,316 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day 8 - Advent of Code 2025
+
+```elixir
+Mix.install([:kino, :benchee])
+```
+
+## Links
+
+* [Advent of Code (AoC)](https://adventofcode.com/2025/day/8)
+* [AoC Puzzle Input](https://adventofcode.com/2025/day/8/input)
+* [tylerj GitHub - Livebook](https://github.com/tylerj/aoc/blob/main/lib/advent_of_code/2025/day-08.livemd)
+
+## Prompt
+
+### --- Day 8: Playground ---
+
+Equipped with a new understanding of teleporter maintenance, you confidently step onto the repaired teleporter pad.
+
+You rematerialize on an unfamiliar teleporter pad and find yourself in a vast underground space which contains a giant playground!
+
+Across the playground, a group of Elves are working on setting up an ambitious Christmas decoration project. Through careful rigging, they have suspended a large number of small electrical [junction boxes](https://en.wikipedia.org/wiki/Junction_box).
+
+Their plan is to connect the junction boxes with long strings of lights. Most of the junction boxes don't provide electricity; however, when two junction boxes are connected by a string of lights, electricity can pass between those two junction boxes.
+
+The Elves are trying to figure out **which junction boxes to connect** so that electricity can reach **every** junction box. They even have a list of all of the junction boxes' positions in 3D space (your puzzle input).
+
+For example:
+
+```
+162,817,812
+57,618,57
+906,360,560
+592,479,940
+352,342,300
+466,668,158
+542,29,236
+431,825,988
+739,650,466
+52,470,668
+216,146,977
+819,987,18
+117,168,530
+805,96,715
+346,949,466
+970,615,88
+941,993,340
+862,61,35
+984,92,344
+425,690,689
+```
+
+This list describes the position of 20 junction boxes, one per line. Each position is given as X,Y,Z coordinates. So, the first junction box in the list is at `X=162`, `Y=817`, `Z=812`.
+
+To save on string lights, the Elves would like to focus on connecting pairs of junction boxes that are **as close together as possible** according to [straight-line distance](https://en.wikipedia.org/wiki/Euclidean_distance). In this example, the two junction boxes which are closest together are `162,817,812` and `425,690,689`.
+
+By connecting these two junction boxes together, because electricity can flow between them, they become part of the same **circuit**. After connecting them, there is a single circuit which contains two junction boxes, and the remaining 18 junction boxes remain in their own individual circuits.
+
+Now, the two junction boxes which are closest together but aren't already directly connected are `162,817,812` and `431,825,988`. After connecting them, since `162,817,812` is already connected to another junction box, there is now a single circuit which contains **three** junction boxes and an additional 17 circuits which contain one junction box each.
+
+The next two junction boxes to connect are `906,360,560` and `805,96,715`. After connecting them, there is a circuit containing 3 junction boxes, a circuit containing 2 junction boxes, and 15 circuits which contain one junction box each.
+
+The next two junction boxes are `431,825,988` and `425,690,689`. Because these two junction boxes were **already in the same circuit,** nothing happens!
+
+This process continues for a while, and the Elves are concerned that they don't have enough extension cables for all these circuits. They would like to know how big the circuits will be.
+
+After making the ten shortest connections, there are 11 circuits: one circuit which contains **5** junction boxes, one circuit which contains **4** junction boxes, two circuits which contain **2** junction boxes each, and seven circuits which each contain a single junction box. Multiplying together the sizes of the three largest circuits (5, 4, and one of the circuits of size 2) produces `40`.
+
+Your list contains many junction boxes; connect together the **1000** pairs of junction boxes which are closest together. Afterward, **what do you get if you multiply together the sizes of the three largest circuits?**
+
+To begin, [get your puzzle input](https://adventofcode.com/2025/day/8/input).
+
+<!-- livebook:{"break_markdown":true} -->
+
+### --- Part Two ---
+
+Part Two prompt
+
+**QUESTION TWO?**
+
+Although it hasn't changed, you can still [get your puzzle input](https://adventofcode.com/2025/day/8/input).
+
+## Input
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input = input |> Kino.Input.read()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+"162,817,812\n57,618,57\n906,360,560\n592,479,940\n352,342,300\n466,668,158\n542,29,236\n431,825,988\n739,650,466\n52,470,668\n216,146,977\n819,987,18\n117,168,530\n805,96,715\n346,949,466\n970,615,88\n941,993,340\n862,61,35\n984,92,344\n425,690,689"
+```
+
+## Solution
+
+```elixir
+defmodule Day08 do
+  defdelegate parse(input), to: __MODULE__.Input
+
+  def part1(input) do
+    points = input |> parse() |> Enum.to_list()
+
+    circuits = points |> Enum.map(&{&1, &1}) |> Map.new()
+
+    points
+    |> all_pairs()
+    |> List.flatten()
+    |> Enum.sort_by(&calc_distance/1)
+    |> Enum.take(10)
+    |> Enum.reduce(circuits, &update_circuit/2)
+  end
+
+  def part2(input) do
+    input
+    # |> parse()
+    # |> Enum.map(& &1)
+  end
+
+  defp all_pairs([h | [t]]), do: {h, t}
+
+  defp all_pairs([h | tail]) do
+    [
+      Enum.map(tail, &{h, &1}),
+      all_pairs(tail)
+    ]
+  end
+
+  defp calc_distance({{x1, y1, z1}, {x2, y2, z2}}) do
+    [
+      abs(x1 - x2) |> :math.pow(2),
+      abs(y1 - y2) |> :math.pow(2),
+      abs(z1 - z2) |> :math.pow(2)
+    ]
+    |> Enum.sum()
+    |> :math.sqrt()
+  end
+
+  defp join_circuits({circuit_a, circuit_b}, circuits) do
+    circuits
+  end
+
+  defmodule Input do
+    def parse(input) when is_binary(input) do
+      input
+      |> String.splitter("\n", trim: true)
+      |> parse()
+    end
+
+    def parse(input) do
+      Stream.map(input, &parse_line/1)
+    end
+
+    def parse_line(line) do
+      line
+      |> String.split(",")
+      |> Enum.map(&String.to_integer/1)
+      |> List.to_tuple()
+    end
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+warning: variable "circuits" is unused (if the variable is not meant to be used, prefix it with an underscore)
+└─ lib/advent_of_code/2025/day-08.livemd#cell:ur7ptnsnlbnnrtua:7: Day08.part1/1
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+{:module, Day08, <<70, 79, 82, 49, 0, 0, 13, ...>>, ...}
+```
+
+Your list contains many junction boxes; connect together the 1000 pairs of junction boxes which are closest together. Afterward, **what do you get if you multiply together the sizes of the three largest circuits?**
+
+Your puzzle answer was `answer one`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day08.part1(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[
+  {{162, 817, 812}, {425, 690, 689}},
+  {{162, 817, 812}, {431, 825, 988}},
+  {{906, 360, 560}, {805, 96, 715}},
+  {{431, 825, 988}, {425, 690, 689}},
+  {{862, 61, 35}, {984, 92, 344}},
+  {{52, 470, 668}, {117, 168, 530}},
+  {{819, 987, 18}, {941, 993, 340}},
+  {{906, 360, 560}, {739, 650, 466}},
+  {{346, 949, 466}, {425, 690, 689}},
+  {{906, 360, 560}, {984, 92, 344}}
+]
+```
+
+**QUESTION TWO?**
+
+Your puzzle answer was `answer two`.
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day08.part2(input)
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+[""]
+```
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should [return to your Advent calendar](https://adventofcode.com/2025) and try another puzzle.
+
+If you still want to see it, you can [get your puzzle input](https://adventofcode.com/2025/day/8/input).
+
+## Tests
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+ExUnit.start(auto_run: false)
+
+defmodule Day08Test do
+  use ExUnit.Case, async: false
+
+  setup_all do
+    [
+      input: ""
+    ]
+  end
+
+  describe "part1/1" do
+    test "returns expected value", %{input: input} do
+      assert Day08.part1(input) == [""]
+    end
+  end
+
+  describe "part2/1" do
+    test "returns expected value", %{input: input} do
+      assert Day08.part2(input) == [""]
+    end
+  end
+end
+
+ExUnit.run()
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+..
+Finished in 0.00 seconds (0.00s async, 0.00s sync)
+2 tests, 0 failures
+
+Randomized with seed 162351
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+%{excluded: 0, failures: 0, skipped: 0, total: 2}
+```
+
+## Benchmarking
+
+```elixir
+defmodule Benchmarking do
+  # https://github.com/bencheeorg/benchee
+  def run(input) do
+    Benchee.run(
+      %{
+        "Part 1" => fn -> Day08.part1(input) end,
+        "Part 2" => fn -> Day08.part2(input) end
+      },
+      memory_time: 2,
+      reduction_time: 2
+    )
+
+    nil
+  end
+end
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+
+```
+
+<!-- livebook:{"output":true} -->
+
+```
+nil
+```
+
+```elixir
+Benchmarking.run(input)
+```
